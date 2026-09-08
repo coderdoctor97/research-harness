@@ -1,5 +1,5 @@
 """Minimal config loader."""
 
-from harness.config import settings
+from harness.config.loader import HarnessConfig, load_config
 
-__all__ = ["settings"]
+__all__ = ["HarnessConfig", "load_config"]

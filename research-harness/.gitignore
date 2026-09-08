@@ -1,26 +1,4 @@
-# Python
-__pycache__/
-*.py[cod]
-*$py.class
-*.egg-info/
-dist/
-build/
-.eggs/
-.pytest_cache/
-.ruff_cache/
-.mypy_cache/
-
-# Environment
+# .env — never commit keys
 .env
 .env.local
-*.env
-
-# IDE
-.idea/
-.vscode/
-*.swp
-*.swo
-
-# OS
-Thumbs.db
-.DS_Store
+ENV_VAR
