@@ -14,7 +14,7 @@
 | 2 | Config System | DONE | 6/6 | 9 passed | T1–T6 green; pyproject relaxed to >=3.10 (sandbox) |
 | 3 | Tool Registry | DONE | 6/6 | 10 passed | schema, executor, rate-limit, web_search, fetch_url |
 | 4 | Orchestration Loop | DONE | 6/6 | 30 passed | parser, state machine, dispatcher, recovery, prompts, E2E; SYNC GATE 1 passed |
-| 5 | Citation Engine | TODO | 0/7 | — | blocked by P4 |
+| 5 | Citation Engine | DONE | 7/7 | 14 passed | SourceRegistry, validate, URLs, links, sources, scrubber, pipeline |
 | 6 | Memory & Context | TODO | 0/6 | — | blocked by P5 |
 | 7 | Custom Endpoints | TODO | 0/5 | — | blocked by P3 (parallel band) |
 | 8 | Default Tool Suite | TODO | 0/5 | — | blocked by P3+P4 (parallel band) |
@@ -25,7 +25,7 @@
 
 | Squad | Phase(s) | Owner files | Status |
 |---|---|---|---|
-| Squad-Citations | P5 → P6 | `citations/`, `memory/` | TODO |
+| Squad-Citations | P5 → P6 | `citations/`, `memory/` | P5 DONE; P6 TODO |
 | Squad-Extensibility | P7 | `registry/dynamic.py`, `registry/fallback.py` | TODO |
 | Squad-Tools | P8 | `tools/builtin/` | TODO |
 
@@ -63,13 +63,13 @@
 - [x] P4.T6 `[S]` E2E loop tests (mock LLM)
 
 ### Phase 5 — Citation Engine
-- [ ] P5.T1 `[S]` SourceRegistry
-- [ ] P5.T2 `[P]` Citation validator
-- [ ] P5.T3 `[P]` URL validator
-- [ ] P5.T4 `[P]` Markdown link formatter
-- [ ] P5.T5 `[P]` Auto Sources section
-- [ ] P5.T6 `[P]` Key scrubber
-- [ ] P5.T7 `[S]` Pipeline assembly + prompt refinement + tests
+- [x] P5.T1 `[S]` SourceRegistry
+- [x] P5.T2 `[P]` Citation validator
+- [x] P5.T3 `[P]` URL validator
+- [x] P5.T4 `[P]` Markdown link formatter
+- [x] P5.T5 `[P]` Auto Sources section
+- [x] P5.T6 `[P]` Key scrubber
+- [x] P5.T7 `[S]` Pipeline assembly + prompt refinement + tests
 
 ### Phase 6 — Memory & Context
 - [ ] P6.T1 `[S]` Token counter
@@ -140,3 +140,4 @@
 | 2026-09-09 | P2 | test_llm_client.py used api_key= kwarg (LLMClient uses api_key_env) | Removed broken test; P1 smoke tests retained |
 | 2026-09-09 | P3 | respx.Response → respx.MockResponse (v0.23 API change) | Fixed in tests |
 | 2026-09-09 | P3 | respx URL matching flaky with query strings | Switched to unittest.mock.patch strategy |
+| 2026-09-09 | P5 | validate() stripped all [n] instead of only orphans | Fixed to keep valid citations |
