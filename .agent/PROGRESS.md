@@ -15,7 +15,7 @@
 | 4 | Orchestration Loop | DONE | 6/6 | 30 passed | SYNC GATE 1 passed; parallel band APIs frozen |
 | 5 | Citation Engine | DONE | 7/7 | 14 passed | SourceRegistry, validate, URLs, links, sources, scrubber, pipeline |
 | 6 | Memory & Context | DONE | 6/6 | 17 passed | tokens, budget, summarizer, doc cache, assembler, sessions |
-| 7 | Custom Endpoints | TODO | 0/5 | — | blocked by P3 (parallel band) |
+| 7 | Custom Endpoints | DONE | 5/5 | 9 passed | dynamic generator, schema inference, validation, fallback, tests |
 | 8 | Default Tool Suite | TODO | 0/5 | — | blocked by P3+P4 (parallel band) |
 | 9 | Web UI (optional) | TODO | 0/6 | — | blocked by sync gate 2 — ask user if wanted |
 | 10 | Hardening | TODO | 0/8 | — | blocked by all |
@@ -25,7 +25,7 @@
 | Squad | Phase(s) | Owner files | Status |
 |---|---|---|---|
 | Squad-Citations | P5 → P6 | `citations/`, `memory/` | DONE |
-| Squad-Extensibility | P7 | `registry/dynamic.py`, `registry/fallback.py` | TODO |
+| Squad-Extensibility | P7 | `registry/dynamic.py`, `registry/fallback.py` | DONE |
 | Squad-Tools | P8 | `tools/builtin/` | TODO |
 
 ## Blocker Log
@@ -37,6 +37,7 @@
 | 2026-09-09 | P2 | test_llm_client.py used api_key= kwarg | Removed broken test; P1 smoke tests retained |
 | 2026-09-09 | P3 | respx.Response API change | Fixed; switched to unittest.mock.patch |
 | 2026-09-09 | P5 | validate() stripped all [n] | Fixed to keep valid citations |
+| 2026-09-09 | P7 | CustomEndpointDef lacked `enabled` field | Added `enabled: bool = True` to models.py |
 
 ## Task Checklists
 
@@ -89,11 +90,11 @@
 - [x] P6.T6 `[S]` Registry persistence + sessions + 20-turn stress test
 
 ### Phase 7 — Custom Endpoints
-- [ ] P7.T1 `[S]` Dynamic tool generator
-- [ ] P7.T2 `[P]` Param-schema inference
-- [ ] P7.T3 `[P]` tool_mapping/description + validation
-- [ ] P7.T4 `[P]` Fallback chain execution
-- [ ] P7.T5 `[S]` Mock-endpoint + hot-reload tests
+- [x] P7.T1 `[S]` Dynamic tool generator
+- [x] P7.T2 `[P]` Param-schema inference
+- [x] P7.T3 `[P]` tool_mapping/description + validation
+- [x] P7.T4 `[P]` Fallback chain execution
+- [x] P7.T5 `[S]` Mock-endpoint + hot-reload tests
 
 ### Phase 8 — Default Tool Suite
 - [ ] P8.T1 `[P]` academic_search (arXiv XML)
