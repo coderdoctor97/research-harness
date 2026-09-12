@@ -2,16 +2,19 @@
 from __future__ import annotations
 
 import os
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.templating import Jinja2Templates
+
+templates = Jinja2Templates(directory=os.path.join(os.path.dirname(__file__), "templates"))
 
 
 def create_application() -> FastAPI:
     app = FastAPI(title="LLM Research Harness UI", docs_url="/api/docs")
 
     @app.get("/", response_class=HTMLResponse)
-    async def index():
-        return "<html><body><h1>LLM Research Harness</h1><p>UI coming soon.</p></body></html>"
+    async def index(request: Request):
+        return templates.TemplateResponse("index.html", {"request": request})
 
     @app.get("/health")
     async def health():
