@@ -60,3 +60,35 @@ class LLMClient:
         if not choices:
             raise LLMResponseError("Empty choices in response")
         return choices[0].get("message", {}).get("content", "")
+
+    def stream_chat(self, message: str):
+        url = f"{self.base_url}/chat/completions"
+        payload = {
+            "model": self.model_name,
+            "messages": [{"role": "user", "content": message}],
+            "stream": True,
+        }
+        try:
+            r = self.client.post(url, json=payload, headers=self._headers(), timeout=self.timeout + 60)
+            r.raise_for_status()
+        except httpx.ConnectError as exc:
+            raise LLMConnectionError(f"Connection refused: {exc}") from exc
+        except httpx.TimeoutException as exc:
+            raise LLMConnectionError(f"Timeout: {exc}") from exc
+        except httpx.HTTPStatusError as exc:
+            raise LLMResponseError(f"HTTP {exc.response.status_code}") from exc
+        full_text = ""
+        for line in r.text.splitlines():
+            line = line.strip()
+            if line.startswith("data: "):
+                chunk = line[6:]
+                if chunk == "[DONE]":
+                    break
+                try:
+                    import json
+                    obj = json.loads(chunk)
+                    delta = obj.get("choices", [{}])[0].get("delta", {}).get("content", "")
+                    full_text += delta
+                    yield delta
+                except (json.JSONDecodeError, IndexError):
+                    continue

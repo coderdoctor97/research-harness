@@ -29,3 +29,9 @@ def create_application() -> FastAPI:
     _mount_config(app)
 
     return app
+
+
+def launch() -> None:
+    """Console script entry point for `harness-ui`."""
+    import uvicorn
+    uvicorn.run(create_application(), host="127.0.0.1", port=8080)
