@@ -19,6 +19,7 @@ class CustomEndpointDef(BaseModel):
     endpoint: EndpointDef
     parameters: dict = Field(default_factory=dict)
     tool_mapping: str | None = Field(default=None, description="Maps to builtin tool if provided")
+    enabled: bool = Field(default=True, description="If false, tool is disabled")
 
 
 class HarnessConfig(BaseModel):

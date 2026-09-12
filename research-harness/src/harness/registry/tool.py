@@ -22,15 +22,6 @@ class Tool:
         raise NotImplementedError
 
     def schema(self) -> dict:
-        return {
-            "type": "function",
-            "function": {
-                "name": self.name,
-                "description": self.description,
-                "parameters": {
-                    "type": "object",
-                    "properties": self.parameters,
-                    "required": [k for k, v in self.parameters.items() if v.get("required") or "default" not in v],
-                },
-            },
-        }
+        if isinstance(self.parameters, dict) and self.parameters.get("type") == "object":
+            return {"type": "function", "function": {"name": self.name, "description": self.description, "parameters": self.parameters}}
+        return {"type": "function", "function": {"name": self.name, "description": self.description, "parameters": {"type": "object", "properties": self.parameters, "required": [k for k, v in self.parameters.items() if v.get("required") or "default" not in v]}}}
