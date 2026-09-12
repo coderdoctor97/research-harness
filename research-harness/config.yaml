@@ -1,0 +1,13 @@
+# P2.T6 — committed example config per plan.md §2
+# Do NOT edit in place for local use — override via .env.local.
+
+llm:
+  base_url: "http://localhost:11434/v1"
+  model_name: "llama3"
+  api_key_env: "API_KEY"
+  timeout: 30
+  max_iterations: 8
+
+endpoints: []
+
+custom_endpoints: []

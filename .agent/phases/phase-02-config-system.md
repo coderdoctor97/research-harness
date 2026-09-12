@@ -1,44 +1,46 @@
-# Phase 02 — Configuration System
+# Phase 02 — Config System
 
 > **Squad:** Squad-Core (spine) · **Depends on:** P1 · **Tasks:** 6
-> **Source of truth:** `plan.md` §2 (full YAML schema + resolution rules), §7-Phase 2, §9 (key priority)
+> **Source of truth:** `plan.md` §2, §7-Phase 2, §9 (secrets/ENV_VAR)
 
 ## Goal
 
-Full config file parsing exactly per plan.md §2: `${ENV_VAR}` resolution, `{{placeholder|default:x}}`
-templates, validation with human-readable errors, and hot-reload without restart.
+A full config layer: YAML loading, `${ENV_VAR}` resolution, `{{placeholder}}` templates,
+schema validation with friendly errors, and a hot-reload watcher. Phase 1's flat
+`config.py` is fully replaced.
 
 ## Preconditions
 
-- Phase 1 `DONE` (package + minimal config loader exist).
+- Phase 1 complete (`LLMClient`, package layout, `.env` gitignored, zero secrets).
 
 ## Tasks
 
 | ID | Task | Mode | Owner | Output |
 |---|---|---|---|---|
-| P2.T1 | Pydantic models mirroring the §2 schema 1:1: `harness.llm`, `harness.orchestration`, `harness.memory`, `harness.response`, `endpoints.*` (url, method, headers, body_template, query_params_template, response_parsing, rate_limit, retry, enabled), `custom_endpoints.*` (incl. tool_mapping, tool_description) | `[S]` | IMPLEMENTER-A | `config/models.py` |
-| P2.T2 | Env resolver: load `.env` (python-dotenv), then resolve every `${VAR}` per §9 priority (system env → `.env`); missing key ⇒ log warning naming the key (never the value) and disable the affected endpoint | `[P]` | IMPLEMENTER-A | `config/resolver.py` |
-| P2.T3 | Template engine: fill `{{placeholder}}` and `{{placeholder|default:x}}` in body templates, query-param templates, and URL paths; strict mode raises on unresolved required placeholders; JSON-safe escaping for string substitution | `[P]` | IMPLEMENTER-B | `config/templates.py` |
-| P2.T4 | Validation + error reporting: required fields, type checks, URL format; malformed YAML ⇒ friendly one-screen error (file, line, hint) — never a raw stack trace | `[P]` | IMPLEMENTER-C | `config/validation.py` |
-| P2.T5 | Hot-reload: file watcher (watchfiles/polling fallback) detecting changes ≤ 5 s; atomic swap of the live config object; registry-notified hook for Phase 7 | `[P]` | IMPLEMENTER-B | `config/watcher.py` |
-| P2.T6 | Test suite + committed artifacts: `config.yaml` and `.env.example` committed byte-faithful to §2; tests for every resolution rule (§2 "Configuration Resolution Rules" 1–5) | `[S]` | TESTER | `tests/test_config_*.py`, `config.yaml`, `.env.example` |
+| P2.T1 | Pydantic models for full §2 schema (harness + endpoints + custom_endpoints) | `[S]` | IMPLEMENTER-A | `config/models.py` |
+| P2.T2 | `${ENV_VAR}` resolver + `.env` load; §9 priority; missing-key warning → disable endpoint | `[P]` | IMPLEMENTER-A | `config/resolver.py` + tests |
+| P2.T3 | `{{placeholder\|default:x}}` template engine (body, query params, URL path) | `[P]` | IMPLEMENTER-B | `config/templates.py` + tests |
+| P2.T4 | Validation + human-readable errors; malformed YAML ⇒ friendly message, no traceback | `[P]` | IMPLEMENTER-C | `config/validation.py` + tests |
+| P2.T5 | Hot-reload watcher (≤5 s poll); atomic swap of live config dict | `[P]` | IMPLEMENTER-C | `config/watcher.py` |
+| P2.T6 | Config test suite + commit `config.yaml` / `.env.example` exactly per §2 | `[S]` | TESTER | `tests/test_config_system.py`, `config.yaml`, `.env.example` |
 
 ## Execution Waves
 
-1. **Wave 1 (sequential):** P2.T1 — models are imported by everything else.
-2. **Wave 2 (parallel):** P2.T2 + P2.T3 + P2.T4 + P2.T5.
-3. **Wave 3 (sequential):** P2.T6 — TESTER + REVIEWER gate.
+1. **Wave 1 (sequential):** P2.T1 — schema first; nothing else compiles without it.
+2. **Wave 2 (parallel, in sync):** P2.T2 + P2.T3 + P2.T4 + P2.T5 — four disjoint files.
+3. **Wave 3 (sequential):** P2.T6 — TESTER wires everything + committed artifacts.
 
 ## Acceptance Criteria (from plan.md §7-P2)
 
-- [ ] Config loads and validates without errors (committed `config.yaml` is the fixture)
-- [ ] Missing required fields produce clear error messages
-- [ ] Environment variables resolve per priority; missing keys disable endpoints with a warning
-- [ ] Malformed YAML produces a helpful error, not a stack trace
-- [ ] Config changes are detected and reloaded within 5 seconds (test with tmp_path + sleep/poll)
-- [ ] Resolution rules 1–5 of §2 each have a dedicated test
+- [ ] `${ENV_VAR}` resolves in base_url, headers, body; missing key → warning, endpoint disabled
+- [ ] `{{placeholder|default:x}}` works in URL, query params, body templates
+- [ ] Malformed YAML produces friendly error; no traceback leaks to CLI
+- [ ] Hot-reload picks up YAML change within ≤5 s; in-flight requests complete with old config
+- [ ] `config.yaml` and `.env.example` present and match §2 schema exactly
+- [ ] `pytest` fully green; `ruff check` clean
+- [ ] Zero secrets in committed files (`.env` gitignored)
 
 ## Handoff to Phase 3
 
-- `HarnessConfig` object (typed, validated, hot-swappable) is the API Phase 3 builds on.
-- Template engine and env resolver are the primitives the generic HTTP executor composes.
+- `research-harness/src/harness/config/` is the canonical config package.
+- `models.py` exports `HarnessConfig` — Phase 3's registry imports it.

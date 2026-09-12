@@ -2,3 +2,13 @@
 .env
 .env.local
 ENV_VAR
+
+# Python
+__pycache__/
+*.pyc
+*.egg-info/
+.eggs/
+*.egg
+.venv/
+dist/
+build/
