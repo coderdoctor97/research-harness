@@ -17,7 +17,7 @@
 | 6 | Memory & Context | DONE | 6/6 | 17 passed | tokens, budget, summarizer, doc cache, assembler, sessions |
 | 7 | Custom Endpoints | DONE | 5/5 | 9 passed | dynamic generator, schema inference, validation, fallback |
 | 8 | Default Tool Suite | DONE | 5/5 | 14 passed | academic_search, news_search, extract_links, summarize_page, compute |
-| 9 | Web UI (optional) | TODO | 0/6 | — | blocked by sync gate 2 — ask user if wanted |
+| 9 | Web UI (optional) | DONE | 6/6 | 9 passed | FastAPI, endpoints, keys, chat, logs, config |
 | 10 | Hardening | TODO | 0/8 | — | blocked by all |
 
 ## Parallel Band Tracker
@@ -27,6 +27,7 @@
 | Squad-Citations | P5 → P6 | `citations/`, `memory/` | DONE |
 | Squad-Extensibility | P7 | `registry/dynamic.py`, `registry/fallback.py` | DONE |
 | Squad-Tools | P8 | `tools/builtin/` | DONE |
+| Squad-UI | P9 | `ui/` | DONE |
 
 ## Blocker Log
 
@@ -104,12 +105,12 @@
 - [x] P8.T5 `[P]` compute (sandboxed)
 
 ### Phase 9 — Web UI (optional)
-- [ ] P9.T1 `[S]` FastAPI scaffold (localhost bind)
-- [ ] P9.T2 `[P]` Endpoint manager
-- [ ] P9.T3 `[P]` Key management (masked)
-- [ ] P9.T4 `[P]` Chat UI
-- [ ] P9.T5 `[P]` Log viewer
-- [ ] P9.T6 `[S]` Export/import + UI tests
+- [x] P9.T1 `[S]` FastAPI scaffold (localhost bind)
+- [x] P9.T2 `[P]` Endpoint manager
+- [x] P9.T3 `[P]` Key management (masked)
+- [x] P9.T4 `[P]` Chat UI
+- [x] P9.T5 `[P]` Log viewer
+- [x] P9.T6 `[S]` Export/import + UI tests
 
 ### Phase 10 — Hardening
 - [ ] P10.T1 `[P]` Error audit vs §8 tables
