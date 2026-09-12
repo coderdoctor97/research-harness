@@ -15,8 +15,8 @@
 | 4 | Orchestration Loop | DONE | 6/6 | 30 passed | SYNC GATE 1 passed; parallel band APIs frozen |
 | 5 | Citation Engine | DONE | 7/7 | 14 passed | SourceRegistry, validate, URLs, links, sources, scrubber, pipeline |
 | 6 | Memory & Context | DONE | 6/6 | 17 passed | tokens, budget, summarizer, doc cache, assembler, sessions |
-| 7 | Custom Endpoints | DONE | 5/5 | 9 passed | dynamic generator, schema inference, validation, fallback, tests |
-| 8 | Default Tool Suite | TODO | 0/5 | — | blocked by P3+P4 (parallel band) |
+| 7 | Custom Endpoints | DONE | 5/5 | 9 passed | dynamic generator, schema inference, validation, fallback |
+| 8 | Default Tool Suite | DONE | 5/5 | 14 passed | academic_search, news_search, extract_links, summarize_page, compute |
 | 9 | Web UI (optional) | TODO | 0/6 | — | blocked by sync gate 2 — ask user if wanted |
 | 10 | Hardening | TODO | 0/8 | — | blocked by all |
 
@@ -26,7 +26,7 @@
 |---|---|---|---|
 | Squad-Citations | P5 → P6 | `citations/`, `memory/` | DONE |
 | Squad-Extensibility | P7 | `registry/dynamic.py`, `registry/fallback.py` | DONE |
-| Squad-Tools | P8 | `tools/builtin/` | TODO |
+| Squad-Tools | P8 | `tools/builtin/` | DONE |
 
 ## Blocker Log
 
@@ -97,11 +97,11 @@
 - [x] P7.T5 `[S]` Mock-endpoint + hot-reload tests
 
 ### Phase 8 — Default Tool Suite
-- [ ] P8.T1 `[P]` academic_search (arXiv XML)
-- [ ] P8.T2 `[P]` news_search
-- [ ] P8.T3 `[P]` extract_links
-- [ ] P8.T4 `[P]` summarize_page (compound)
-- [ ] P8.T5 `[P]` compute (sandboxed)
+- [x] P8.T1 `[P]` academic_search (arXiv XML)
+- [x] P8.T2 `[P]` news_search
+- [x] P8.T3 `[P]` extract_links
+- [x] P8.T4 `[P]` summarize_page (compound)
+- [x] P8.T5 `[P]` compute (sandboxed)
 
 ### Phase 9 — Web UI (optional)
 - [ ] P9.T1 `[S]` FastAPI scaffold (localhost bind)
