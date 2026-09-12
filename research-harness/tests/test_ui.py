@@ -40,7 +40,11 @@ def test_keys_set_and_masked(client):
 
 
 def test_chat_endpoint(client):
-    r = client.post("/api/chat", json={"message": "hello"})
+    from unittest.mock import patch, MagicMock
+    mock_client = MagicMock()
+    mock_client.chat.return_value = "Echo: hello"
+    with patch("harness.ui.routes_chat._get_client", return_value=mock_client):
+        r = client.post("/api/chat", json={"message": "hello"})
     assert r.status_code == 200
     assert "hello" in r.json()["response"]
 

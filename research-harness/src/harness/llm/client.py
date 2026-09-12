@@ -61,6 +61,22 @@ class LLMClient:
             raise LLMResponseError("Empty choices in response")
         return choices[0].get("message", {}).get("content", "")
 
+    def list_models(self) -> list[dict]:
+        """Fetch available models from the configured base_url."""
+        url = f"{self.base_url}/models"
+        try:
+            r = self.client.get(url, headers=self._headers())
+            r.raise_for_status()
+        except httpx.ConnectError as exc:
+            raise LLMConnectionError(f"Connection refused: {exc}") from exc
+        except httpx.TimeoutException as exc:
+            raise LLMConnectionError(f"Timeout: {exc}") from exc
+        except httpx.HTTPStatusError as exc:
+            raise LLMResponseError(f"HTTP {exc.response.status_code}") from exc
+        data = r.json()
+        models = data.get("data", [])
+        return [{"id": m.get("id", ""), "name": m.get("id", ""), "owned_by": m.get("owned_by", "")} for m in models]
+
     def stream_chat(self, message: str):
         url = f"{self.base_url}/chat/completions"
         payload = {

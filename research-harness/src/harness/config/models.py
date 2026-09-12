@@ -22,7 +22,16 @@ class CustomEndpointDef(BaseModel):
     enabled: bool = Field(default=True, description="If false, tool is disabled")
 
 
+class MCPServerDef(BaseModel):
+    name: str = Field(description="Unique server name")
+    command: str = Field(description="Executable command (e.g. npx, python)")
+    args: list[str] = Field(default_factory=list, description="Command arguments")
+    env: dict = Field(default_factory=dict, description="Environment variables")
+    enabled: bool = Field(default=True)
+
+
 class HarnessConfig(BaseModel):
     llm: dict = Field(description="{base_url, model_name, api_key_env, timeout, max_iterations}")
     endpoints: list[EndpointDef] = Field(default_factory=list)
     custom_endpoints: list[CustomEndpointDef] = Field(default_factory=list)
+    mcp_servers: list[MCPServerDef] = Field(default_factory=list)

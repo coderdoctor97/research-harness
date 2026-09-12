@@ -25,11 +25,15 @@ def create_application() -> FastAPI:
     from harness.ui.routes_chat import mount as _mount_chat
     from harness.ui.routes_logs import mount as _mount_logs
     from harness.ui.routes_config import mount as _mount_config
+    from harness.ui.routes_models import mount as _mount_models
+    from harness.ui.routes_mcp import mount as _mount_mcp
     _mount_endpoints(app)
     _mount_keys(app)
     _mount_chat(app)
     _mount_logs(app)
     _mount_config(app)
+    _mount_models(app)
+    _mount_mcp(app)
 
     return app
 

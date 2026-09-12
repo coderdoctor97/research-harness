@@ -11,3 +11,5 @@ llm:
 endpoints: []
 
 custom_endpoints: []
+
+mcp_servers: []
