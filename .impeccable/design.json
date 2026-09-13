@@ -1,0 +1,438 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-09-13T12:41:15Z",
+  "title": "Design System: LLM Research Harness — Console",
+  "extensions": {
+    "colorMeta": {
+      "amber-signal": {
+        "role": "primary",
+        "displayName": "Amber Signal",
+        "canonical": "oklch(0.80 0.14 75)",
+        "tonalRamp": [
+          "oklch(0.15 0.140 75)",
+          "oklch(0.26 0.140 75)",
+          "oklch(0.38 0.140 75)",
+          "oklch(0.49 0.140 75)",
+          "oklch(0.61 0.140 75)",
+          "oklch(0.72 0.140 75)",
+          "oklch(0.84 0.140 75)",
+          "oklch(0.95 0.140 75)"
+        ]
+      },
+      "blue-signal": {
+        "role": "secondary",
+        "displayName": "Blue Signal",
+        "canonical": "oklch(0.70 0.13 235)",
+        "tonalRamp": [
+          "oklch(0.15 0.130 235)",
+          "oklch(0.26 0.130 235)",
+          "oklch(0.38 0.130 235)",
+          "oklch(0.49 0.130 235)",
+          "oklch(0.61 0.130 235)",
+          "oklch(0.72 0.130 235)",
+          "oklch(0.84 0.130 235)",
+          "oklch(0.95 0.130 235)"
+        ]
+      },
+      "night-sky": {
+        "role": "neutral",
+        "displayName": "Night Sky",
+        "canonical": "oklch(0.17 0.021 256)",
+        "tonalRamp": [
+          "oklch(0.15 0.021 256)",
+          "oklch(0.26 0.021 256)",
+          "oklch(0.38 0.021 256)",
+          "oklch(0.49 0.021 256)",
+          "oklch(0.61 0.021 256)",
+          "oklch(0.72 0.021 256)",
+          "oklch(0.84 0.021 256)",
+          "oklch(0.95 0.021 256)"
+        ]
+      },
+      "panel": {
+        "role": "neutral",
+        "displayName": "Panel",
+        "canonical": "oklch(0.205 0.024 256)",
+        "tonalRamp": [
+          "oklch(0.15 0.024 256)",
+          "oklch(0.26 0.024 256)",
+          "oklch(0.38 0.024 256)",
+          "oklch(0.49 0.024 256)",
+          "oklch(0.61 0.024 256)",
+          "oklch(0.72 0.024 256)",
+          "oklch(0.84 0.024 256)",
+          "oklch(0.95 0.024 256)"
+        ]
+      },
+      "panel-raised": {
+        "role": "neutral",
+        "displayName": "Panel Raised",
+        "canonical": "oklch(0.245 0.026 256)",
+        "tonalRamp": [
+          "oklch(0.15 0.026 256)",
+          "oklch(0.26 0.026 256)",
+          "oklch(0.38 0.026 256)",
+          "oklch(0.49 0.026 256)",
+          "oklch(0.61 0.026 256)",
+          "oklch(0.72 0.026 256)",
+          "oklch(0.84 0.026 256)",
+          "oklch(0.95 0.026 256)"
+        ]
+      },
+      "well": {
+        "role": "neutral",
+        "displayName": "Well",
+        "canonical": "oklch(0.15 0.019 258)",
+        "tonalRamp": [
+          "oklch(0.15 0.019 258)",
+          "oklch(0.26 0.019 258)",
+          "oklch(0.38 0.019 258)",
+          "oklch(0.49 0.019 258)",
+          "oklch(0.61 0.019 258)",
+          "oklch(0.72 0.019 258)",
+          "oklch(0.84 0.019 258)",
+          "oklch(0.95 0.019 258)"
+        ]
+      },
+      "warm-ink": {
+        "role": "neutral",
+        "displayName": "Warm Ink",
+        "canonical": "oklch(0.93 0.012 235)",
+        "tonalRamp": [
+          "oklch(0.15 0.012 235)",
+          "oklch(0.26 0.012 235)",
+          "oklch(0.38 0.012 235)",
+          "oklch(0.49 0.012 235)",
+          "oklch(0.61 0.012 235)",
+          "oklch(0.72 0.012 235)",
+          "oklch(0.84 0.012 235)",
+          "oklch(0.95 0.012 235)"
+        ]
+      },
+      "warm-ink-soft": {
+        "role": "neutral",
+        "displayName": "Warm Ink Soft",
+        "canonical": "oklch(0.72 0.022 240)",
+        "tonalRamp": [
+          "oklch(0.15 0.022 240)",
+          "oklch(0.26 0.022 240)",
+          "oklch(0.38 0.022 240)",
+          "oklch(0.49 0.022 240)",
+          "oklch(0.61 0.022 240)",
+          "oklch(0.72 0.022 240)",
+          "oklch(0.84 0.022 240)",
+          "oklch(0.95 0.022 240)"
+        ]
+      },
+      "warm-ink-faint": {
+        "role": "neutral",
+        "displayName": "Warm Ink Faint",
+        "canonical": "oklch(0.55 0.024 242)",
+        "tonalRamp": [
+          "oklch(0.15 0.024 242)",
+          "oklch(0.26 0.024 242)",
+          "oklch(0.38 0.024 242)",
+          "oklch(0.49 0.024 242)",
+          "oklch(0.61 0.024 242)",
+          "oklch(0.72 0.024 242)",
+          "oklch(0.84 0.024 242)",
+          "oklch(0.95 0.024 242)"
+        ]
+      },
+      "line": {
+        "role": "neutral",
+        "displayName": "Line",
+        "canonical": "oklch(0.315 0.032 252)",
+        "tonalRamp": [
+          "oklch(0.15 0.032 252)",
+          "oklch(0.26 0.032 252)",
+          "oklch(0.38 0.032 252)",
+          "oklch(0.49 0.032 252)",
+          "oklch(0.61 0.032 252)",
+          "oklch(0.72 0.032 252)",
+          "oklch(0.84 0.032 252)",
+          "oklch(0.95 0.032 252)"
+        ]
+      },
+      "line-soft": {
+        "role": "neutral",
+        "displayName": "Line Soft",
+        "canonical": "oklch(0.275 0.028 252)",
+        "tonalRamp": [
+          "oklch(0.15 0.028 252)",
+          "oklch(0.26 0.028 252)",
+          "oklch(0.38 0.028 252)",
+          "oklch(0.49 0.028 252)",
+          "oklch(0.61 0.028 252)",
+          "oklch(0.72 0.028 252)",
+          "oklch(0.84 0.028 252)",
+          "oklch(0.95 0.028 252)"
+        ]
+      },
+      "signal-green": {
+        "role": "status",
+        "displayName": "Signal Green",
+        "canonical": "oklch(0.74 0.14 160)",
+        "tonalRamp": [
+          "oklch(0.15 0.140 160)",
+          "oklch(0.26 0.140 160)",
+          "oklch(0.38 0.140 160)",
+          "oklch(0.49 0.140 160)",
+          "oklch(0.61 0.140 160)",
+          "oklch(0.72 0.140 160)",
+          "oklch(0.84 0.140 160)",
+          "oklch(0.95 0.140 160)"
+        ]
+      },
+      "signal-yellow": {
+        "role": "status",
+        "displayName": "Signal Yellow",
+        "canonical": "oklch(0.82 0.14 85)",
+        "tonalRamp": [
+          "oklch(0.15 0.140 85)",
+          "oklch(0.26 0.140 85)",
+          "oklch(0.38 0.140 85)",
+          "oklch(0.49 0.140 85)",
+          "oklch(0.61 0.140 85)",
+          "oklch(0.72 0.140 85)",
+          "oklch(0.84 0.140 85)",
+          "oklch(0.95 0.140 85)"
+        ]
+      },
+      "signal-red": {
+        "role": "status",
+        "displayName": "Signal Red",
+        "canonical": "oklch(0.68 0.19 25)",
+        "tonalRamp": [
+          "oklch(0.15 0.190 25)",
+          "oklch(0.26 0.190 25)",
+          "oklch(0.38 0.190 25)",
+          "oklch(0.49 0.190 25)",
+          "oklch(0.61 0.190 25)",
+          "oklch(0.72 0.190 25)",
+          "oklch(0.84 0.190 25)",
+          "oklch(0.95 0.190 25)"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Page titles only — the h2 under each numbered eyebrow."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Card titles (.card-header h3)."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Sub-card and list headers: chat header, MCP/preset cards, empty-state titles."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Base text (14px / 1.55); dense zones step down to 13.5px."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Mono uppercase data voice: eyebrows, field labels, buttons, badges, table headers, timestamps."
+      }
+    },
+    "shadows": [
+      {
+        "name": "tactile-amber",
+        "value": "0 2px 0 oklch(0.62 0.15 60 / 0.9)",
+        "purpose": "Hard 2px edge under primary buttons; collapses to inset 0 2px 5px on :active."
+      },
+      {
+        "name": "tactile-dark",
+        "value": "0 2px 0 oklch(0.17 0.02 256)",
+        "purpose": "Hard 2px edge under secondary buttons."
+      },
+      {
+        "name": "toast",
+        "value": "0 10px 30px oklch(0 0 0 / 0.45)",
+        "purpose": "The only true drop shadow — reserved for the floating toast surface."
+      },
+      {
+        "name": "led-glow",
+        "value": "0 0 8px <led-color>",
+        "purpose": "Instrument-light bloom around 7px status LEDs; green = online, red = offline."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease-standard",
+        "value": "cubic-bezier(0.33, 1, 0.68, 1)",
+        "purpose": "Default easing (--ease) for every state transition."
+      },
+      {
+        "name": "press",
+        "value": "90ms",
+        "purpose": "Micro-transforms: button :active, link press."
+      },
+      {
+        "name": "state",
+        "value": "120-140ms",
+        "purpose": "Color/border/background state changes."
+      },
+      {
+        "name": "enter",
+        "value": "220-260ms",
+        "purpose": "Entering surfaces: views, messages, toasts. Always animation-fill-mode: both (BF-006)."
+      },
+      {
+        "name": "led-pulse",
+        "value": "2.4s ease-in-out infinite",
+        "purpose": "Online LED pulse — the console's breathing rate."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "narrow",
+        "value": "820px",
+        "purpose": "Sidebar collapses to 66px icon rail; main padding 20/16; grids single-column; chat max-width 96%."
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The amber action button — tactile mono switch with a hard 2px depth edge.",
+      "html": "<button class=\"ds-btn-primary\">Fetch models</button>",
+      "css": ".ds-btn-primary{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:9px 18px;border-radius:3px;border:1px solid oklch(0.80 0.14 75);cursor:pointer;background:oklch(0.80 0.14 75);color:oklch(0.18 0.03 70);font-family:'IBM Plex Mono',Consolas,monospace;font-size:12px;font-weight:600;letter-spacing:0.04em;box-shadow:0 2px 0 oklch(0.62 0.15 60 / 0.9);transition:transform 90ms cubic-bezier(0.33,1,0.68,1),background 140ms cubic-bezier(0.33,1,0.68,1),box-shadow 140ms cubic-bezier(0.33,1,0.68,1)}.ds-btn-primary:hover{background:oklch(0.84 0.14 78)}.ds-btn-primary:focus-visible{outline:none;box-shadow:0 2px 0 oklch(0.62 0.15 60 / 0.9),0 0 0 3px oklch(0.70 0.13 235 / 0.30)}.ds-btn-primary:active{transform:translateY(1.5px) scale(0.98);box-shadow:inset 0 2px 5px oklch(0 0 0 / 0.28)}.ds-btn-primary:disabled{opacity:0.5;cursor:not-allowed;transform:none}"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "The quiet companion action — raised panel fill, hairline border, dark depth edge.",
+      "html": "<button class=\"ds-btn-secondary\">Save as default</button>",
+      "css": ".ds-btn-secondary{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:9px 18px;border-radius:3px;border:1px solid oklch(0.315 0.032 252);cursor:pointer;background:oklch(0.245 0.026 256);color:oklch(0.72 0.022 240);font-family:'IBM Plex Mono',Consolas,monospace;font-size:12px;font-weight:600;letter-spacing:0.04em;box-shadow:0 2px 0 oklch(0.17 0.02 256);transition:transform 90ms cubic-bezier(0.33,1,0.68,1),border-color 140ms cubic-bezier(0.33,1,0.68,1),color 140ms cubic-bezier(0.33,1,0.68,1),box-shadow 140ms cubic-bezier(0.33,1,0.68,1)}.ds-btn-secondary:hover{border-color:oklch(0.55 0.024 242);color:oklch(0.93 0.012 235)}.ds-btn-secondary:focus-visible{outline:none;box-shadow:0 2px 0 oklch(0.17 0.02 256),0 0 0 3px oklch(0.70 0.13 235 / 0.30)}.ds-btn-secondary:active{transform:translateY(1.5px) scale(0.98);box-shadow:inset 0 2px 5px oklch(0 0 0 / 0.3)}"
+    },
+    {
+      "name": "Input Field",
+      "kind": "input",
+      "refersTo": "input-field",
+      "description": "Recessed well surface with hairline border; blue signal ring on focus.",
+      "html": "<input class=\"ds-input\" type=\"text\" placeholder=\"https://api.example.com/v1\">",
+      "css": ".ds-input{width:100%;background:oklch(0.15 0.019 258);border:1px solid oklch(0.315 0.032 252);color:oklch(0.93 0.012 235);padding:9px 12px;border-radius:3px;font-size:13.5px;font-family:'IBM Plex Sans',system-ui,sans-serif;transition:border-color 140ms cubic-bezier(0.33,1,0.68,1),box-shadow 140ms cubic-bezier(0.33,1,0.68,1)}.ds-input::placeholder{color:oklch(0.55 0.024 242)}.ds-input:focus{outline:none;border-color:oklch(0.70 0.13 235);box-shadow:0 0 0 3px oklch(0.70 0.13 235 / 0.30)}"
+    },
+    {
+      "name": "Nav Item (active)",
+      "kind": "nav",
+      "refersTo": "nav-item-active",
+      "description": "Sidebar link with the blue 'you are here' bar at the rail edge.",
+      "html": "<a class=\"ds-nav-item\" href=\"#\"><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"oklch(0.70 0.13 235)\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z\"/></svg>Chat</a>",
+      "css": ".ds-nav-item{position:relative;display:flex;align-items:center;gap:11px;width:100%;padding:8.5px 10px;background:oklch(0.70 0.13 235 / 0.10);color:oklch(0.93 0.012 235);text-decoration:none;font-family:'IBM Plex Sans',system-ui,sans-serif;font-size:13.5px;font-weight:500;border-radius:3px;transition:background 140ms cubic-bezier(0.33,1,0.68,1)}.ds-nav-item::before{content:'';position:absolute;left:0;top:7px;bottom:7px;width:2.5px;background:oklch(0.70 0.13 235);border-radius:2px;box-shadow:0 0 8px oklch(0.70 0.13 235 / 0.30)}.ds-nav-item:hover{background:oklch(0.70 0.13 235 / 0.16)}.ds-nav-item:focus-visible{outline:2px solid oklch(0.70 0.13 235 / 0.30);outline-offset:2px}"
+    },
+    {
+      "name": "Card",
+      "kind": "card",
+      "refersTo": "card",
+      "description": "The console's main container — flat panel, Fraunces title, optional amber STEP marker.",
+      "html": "<div class=\"ds-card\"><div class=\"ds-card-head\"><span class=\"ds-step\">STEP 1</span><h3 class=\"ds-card-title\">Provider &amp; credentials</h3></div><p class=\"ds-card-body\">Pick a provider, add your API key, test the connection, then fetch models.</p></div>",
+      "css": ".ds-card{background:linear-gradient(180deg,oklch(0.21 0.025 256 / 0.92),oklch(0.20 0.023 258 / 0.92)),oklch(0.205 0.024 256);border:1px solid oklch(0.275 0.028 252);border-radius:4px;padding:22px}.ds-card-head{display:flex;align-items:baseline;gap:10px;margin-bottom:12px}.ds-card-title{font-family:Fraunces,Georgia,serif;font-size:17px;font-weight:600;color:oklch(0.93 0.012 235);margin:0}.ds-step{font-family:'IBM Plex Mono',Consolas,monospace;font-size:11px;color:oklch(0.80 0.14 75);letter-spacing:0.12em}.ds-card-body{font-family:'IBM Plex Sans',system-ui,sans-serif;font-size:13px;line-height:1.55;color:oklch(0.55 0.024 242);margin:0}"
+    },
+    {
+      "name": "Status Badge (ok)",
+      "kind": "chip",
+      "refersTo": "badge-status",
+      "description": "Mono uppercase state pill — tinted fill, full-strength status text.",
+      "html": "<span class=\"ds-badge-ok\">ready</span>",
+      "css": ".ds-badge-ok{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:3px;font-family:'IBM Plex Mono',Consolas,monospace;font-size:10.5px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;background:oklch(0.74 0.14 160 / 0.12);color:oklch(0.74 0.14 160);border:1px solid oklch(0.74 0.14 160 / 0.3)}"
+    },
+    {
+      "name": "LED Status Light",
+      "kind": "custom",
+      "refersTo": "led-online",
+      "description": "7px instrument dot with self-glow; green pulse = online, red static = offline.",
+      "html": "<span class=\"ds-led\" aria-label=\"online\"></span> <span class=\"ds-led ds-led-off\" aria-label=\"offline\"></span>",
+      "css": ".ds-led{width:7px;height:7px;border-radius:50%;display:inline-block;vertical-align:middle;margin:0 6px;background:oklch(0.74 0.14 160);box-shadow:0 0 8px oklch(0.74 0.14 160);animation:ds-led-pulse 2.4s ease-in-out infinite}.ds-led-off{background:oklch(0.68 0.19 25);box-shadow:0 0 8px oklch(0.68 0.19 25);animation:none}@keyframes ds-led-pulse{0%,100%{opacity:1}50%{opacity:0.35}}"
+    },
+    {
+      "name": "Citation-Numbered Search Results",
+      "kind": "custom",
+      "refersTo": null,
+      "description": "The research signature: CSS-counter [n] evidence rows under an answer.",
+      "html": "<div class=\"ds-cite-list\"><div class=\"ds-cite-item\"><a href=\"https://arxiv.org\">Attention efficiency: a survey</a><div class=\"ds-cite-snip\">We review 40+ papers on efficient attention mechanisms and their trade-offs.</div></div><div class=\"ds-cite-item\"><a href=\"https://example.org\">Sparse transformers at scale</a><div class=\"ds-cite-snip\">Sparse attention patterns cut quadratic cost while preserving quality.</div></div></div>",
+      "css": ".ds-cite-list{display:flex;flex-direction:column;gap:7px;counter-reset:ds-cite;font-family:'IBM Plex Sans',system-ui,sans-serif}.ds-cite-item{position:relative;padding:9px 12px 9px 34px;background:oklch(0.14 0.02 258);border:1px solid oklch(0.275 0.028 252);border-radius:3px;counter-increment:ds-cite;transition:border-color 120ms cubic-bezier(0.33,1,0.68,1)}.ds-cite-item::before{content:'[' counter(ds-cite) ']';position:absolute;left:10px;top:9px;font-family:'IBM Plex Mono',Consolas,monospace;font-size:10.5px;color:oklch(0.70 0.13 235)}.ds-cite-item:hover{border-color:oklch(0.70 0.13 235 / 0.30)}.ds-cite-item a{color:oklch(0.93 0.012 235);font-weight:600;font-size:13px;text-decoration:none;display:block}.ds-cite-item a:hover{color:oklch(0.70 0.13 235)}.ds-cite-snip{font-size:12px;line-height:1.5;color:oklch(0.72 0.022 240);margin-top:2px}"
+    },
+    {
+      "name": "Toast",
+      "kind": "custom",
+      "refersTo": null,
+      "description": "Mono notification, colored 3px left edge by type, the one surface allowed a drop shadow.",
+      "html": "<div class=\"ds-toast\">Loaded 4 models</div>",
+      "css": ".ds-toast{padding:11px 16px;border-radius:3px;font-family:'IBM Plex Mono',Consolas,monospace;font-size:12px;color:oklch(0.93 0.012 235);border:1px solid oklch(0.315 0.032 252);border-left-width:3px;border-left-color:oklch(0.74 0.14 160);background:oklch(0.205 0.024 256);box-shadow:0 10px 30px oklch(0 0 0 / 0.45);max-width:400px}"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Night Observatory",
+    "overview": "The console is a research instrument observed at night: a deep blue-black sky (oklch(0.17 0.021 256)) with warm-ink readouts and amber signal lights, not a template landing page. Density and scanability outrank expression — the visitor is completing a task (Operate mode), and brand identity lives in precise details: a numbered information architecture (01 · Session, STEP 1), mono-spaced data readouts, and small LED status lights that pulse like instrument hardware.\n\nMotion is restrained and mechanical: short (90–260 ms) eased transitions for state changes, a single hard 2px depth shadow under tactile buttons, and one permitted ambient flourish — the starfield and occasional meteor in the sidebar rail, which is the only living element on screen and is disabled entirely under prefers-reduced-motion.",
+    "keyCharacteristics": [
+      "Warm ink on deep blue-black — never pure black or pure white",
+      "Two signal colors with strict jobs: amber = action, blue = information",
+      "Mono type for anything that reads like data; serif (Fraunces) only for headings humans read first",
+      "Numbered IA: 01–07 view eyebrows, STEP 1/2/3 provider sequence",
+      "Tonal depth (recessed wells → raised panels), flat by default, no ambient drop shadows",
+      "3px corners, 1px hairline borders, 2px accent edges marking assistant output",
+      "LED status lights (7px, glowing, pulsing) for machine state"
+    ],
+    "rules": [
+      {
+        "name": "The Two Signal Colors Rule",
+        "body": "Amber means act and blue means read. They never swap jobs, and each appears on ≤10% of any panel — their rarity is the point. Status colors (green/yellow/red) describe machine state only.",
+        "section": "colors"
+      },
+      {
+        "name": "The Instrument Dark Rule",
+        "body": "No pure black, no pure white. Darkest surface is Well (oklch(0.15 0.019 258)); lightest text is Warm Ink (oklch(0.93 0.012 235)). Everything sits between, in the blue-black family.",
+        "section": "colors"
+      },
+      {
+        "name": "The Mono Speaks Data Rule",
+        "body": "IBM Plex Mono is used for anything the machine says — readouts, labels, buttons, badges, table headers, times, model IDs, key names, URLs in config views. It never carries prose.",
+        "section": "typography"
+      },
+      {
+        "name": "The Fraunces Is Human Rule",
+        "body": "The serif appears only on headings a human reads first (page, card, bubble headings, empty-state titles). Never on body text, never on controls.",
+        "section": "typography"
+      },
+      {
+        "name": "The Flat-By-Default Rule",
+        "body": "Cards, rows, and wells are flat at rest. No ambient drop shadow on containers, ever — if a surface needs to read as raised, it steps to Panel Raised lightness plus a border, not a shadow.",
+        "section": "elevation"
+      },
+      {
+        "name": "The 3px Rule",
+        "body": "Corners stay at 3px (small) or 4px (large containers). A new shape with a 6px+ radius is a different product.",
+        "section": "shapes"
+      },
+      {
+        "name": "The Dashed-Optional Rule",
+        "body": "If something is optional, collapsible, or empty, its border is dashed — the console's visual idiom for 'not required'.",
+        "section": "shapes"
+      }
+    ],
+    "dos": [
+      "Do use Warm Ink on Night Sky for body text, and Warm Ink Soft/Faint strictly for secondary and label tiers.",
+      "Do keep every label mono, uppercase, letter-spaced (0.12–0.18em) — the console's data voice.",
+      "Do number views (01 · Session … 07 · State) and multi-step flows (STEP 1/2/3) with the mono eyebrow pattern.",
+      "Do convey machine state with an LED (green pulse / red) plus a mono readout, not with prose alone.",
+      "Do mark assistant-generated content with the 2px Blue Signal left edge; user content with the amber tint.",
+      "Do use animation-fill-mode: both on every element whose visibility comes from an entering keyframe (BF-006 — the 'response vanished' bug).",
+      "Do honor prefers-reduced-motion: stars, meteors, and enter animations all switch off."
+    ],
+    "donts": [
+      "Don't use pure #000 or #fff anywhere — the Instrument Dark Rule owns the full range.",
+      "Don't let amber and blue cross jobs (amber = act, blue = read), and don't use status colors for emphasis.",
+      "Don't put a drop shadow on a card or container — depth is tonal; shadows belong to buttons (2px hard), toasts, and LED glow only.",
+      "Don't round anything past 4px, and don't put Fraunces on body text or controls.",
+      "Don't add new ambient animation — the sidebar sky is the single living element; everything else transitions 90–260ms on cubic-bezier(0.33, 1, 0.68, 1).",
+      "Don't write literal {{ in index.html (it is a Jinja2 template — BF-001), and never log or display unmasked keys (keys render as ••••last4 mono readouts)."
+    ]
+  }
+}
