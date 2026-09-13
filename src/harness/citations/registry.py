@@ -1,8 +1,7 @@
 # P5.T1 — SourceRegistry: assign sequential IDs, persist across turns, reference table
 from __future__ import annotations
 
-from dataclasses import dataclass, field
-from typing import Any
+from dataclasses import dataclass
 
 
 @dataclass

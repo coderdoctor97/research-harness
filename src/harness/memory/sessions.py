@@ -4,7 +4,8 @@ from __future__ import annotations
 import json
 import time
 from pathlib import Path
-from harness.citations.registry import SourceRegistry, Source
+
+from harness.citations.registry import Source, SourceRegistry
 
 
 class Session:
@@ -35,7 +36,7 @@ class Session:
         Path(path).write_text(json.dumps(data))
 
     @classmethod
-    def load(cls, path: str | Path) -> "Session":
+    def load(cls, path: str | Path) -> Session:
         data = json.loads(Path(path).read_text())
         reg = SourceRegistry()
         for s in data.get("sources", []):

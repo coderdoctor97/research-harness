@@ -1,13 +1,12 @@
 # P3.T5 + P3.T6 fixture tests
-import respx
-from unittest.mock import MagicMock, patch
-from harness.registry.executor import HttpExecutor
+from unittest.mock import patch
+
+from harness.config.models import EndpointDef
+from harness.registry.index import ToolRegistry
 from harness.registry.ratelimit import RateLimiter
 from harness.registry.tool import ToolResult
-from harness.registry.index import ToolRegistry
-from harness.tools.builtin.web_search import WebSearchTool, build_web_search
-from harness.tools.builtin.fetch_url import FetchUrlTool, build_fetch_url
-from harness.config.models import EndpointDef, CustomEndpointDef
+from harness.tools.builtin.fetch_url import FetchUrlTool
+from harness.tools.builtin.web_search import WebSearchTool
 
 
 # --- web_search ---

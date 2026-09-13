@@ -2,18 +2,21 @@
 from __future__ import annotations
 
 import time
-from harness.loop.agent import LoopState
-from harness.loop.parser import classify, CallType
+from typing import ClassVar
+
+import pytest
+
+from harness.loop.agent import LoopState, run_chat
+from harness.loop.parser import CallType, classify
 from harness.loop.recovery import correction_prompt
 from harness.registry.index import ToolRegistry
 from harness.registry.tool import Tool, ToolResult
-from harness.config.models import EndpointDef
 
 
 class EchoTool(Tool):
     name = "echo"
     description = "Echo input"
-    parameters = {"text": {"type": "string"}}
+    parameters: ClassVar[dict] = {"text": {"type": "string"}}
 
     def run(self, **params):
         return ToolResult(ok=True, data={"echo": params.get("text", "")})
@@ -115,3 +118,167 @@ def test_duplicate_guard():
     k3 = duplicate_guard_key("echo", {"text": "bye"})
     assert k1 == k2
     assert k1 != k3
+
+
+class SearchTool(Tool):
+    name = "web_search"
+    description = "Search web"
+    parameters: ClassVar[dict] = {"query": {"type": "string"}}
+
+    def run(self, **params):
+        return ToolResult(
+            ok=True,
+            data={
+                "results": [
+                    {
+                        "title": "Harness Note",
+                        "url": "https://example.com/harness",
+                        "snippet": f"Result for {params.get('query')}",
+                    }
+                ]
+            },
+        )
+
+
+class ScriptedClient:
+    model_name = "scripted-model"
+
+    def __init__(self, replies):
+        self.replies = list(replies)
+        self.prompts = []
+
+    def chat(self, prompt):
+        self.prompts.append(prompt)
+        return self.replies.pop(0)
+
+
+@pytest.mark.asyncio
+async def test_run_chat_drives_steps_1_to_7():
+    registry = ToolRegistry()
+    registry.register(SearchTool())
+    client = ScriptedClient([
+        '{"tool_calls": [{"name": "web_search", "arguments": {"query": "harness"}}]}',
+        "The harness result is useful [1]. https://example.com/harness",
+    ])
+
+    result = await run_chat(client, registry, "research harness?")
+
+    assert result["response"].startswith("The harness result")
+    assert "## Sources" in result["response"]
+    assert result["tool_calls"] == [{"name": "web_search", "arguments": {"query": "harness"}}]
+    assert result["sources"][0]["url"] == "https://example.com/harness"
+    assert "Available tools" in client.prompts[0]
+    assert "Result for harness" in client.prompts[1]
+    assert "[Source 1] Harness Note | https://example.com/harness" in client.prompts[1]
+
+
+@pytest.mark.asyncio
+async def test_run_chat_force_final_after_tool_cap():
+    registry = ToolRegistry()
+    registry.register(EchoTool())
+    client = ScriptedClient([
+        '{"tool_calls": [{"name": "echo", "arguments": {"text": "again"}}]}',
+        "Final after cap.",
+    ])
+
+    result = await run_chat(client, registry, "loop", max_tool_rounds=0)
+
+    assert result["response"] == "Final after cap."
+    assert "final answer" in client.prompts[-1].lower()
+
+
+@pytest.mark.asyncio
+async def test_run_chat_malformed_tools_off_at_five_strikes():
+    client = ScriptedClient(["", "", "", "", "", "Direct fallback answer."])
+
+    result = await run_chat(client, ToolRegistry(), "answer directly")
+
+    assert result["response"] == "Direct fallback answer."
+    assert "disabled" in client.prompts[-1].lower()
+
+
+class SleepTool(Tool):
+    name = "sleepy"
+    description = "Sleep then return"
+    parameters: ClassVar[dict] = {
+        "label": {"type": "string"},
+        "delay": {"type": "number"},
+    }
+
+    def run(self, **params):
+        time.sleep(float(params.get("delay", 0)))
+        label = params.get("label", "")
+        return ToolResult(ok=True, data={"label": label})
+
+
+@pytest.mark.asyncio
+async def test_run_chat_parallel_partial_timeout_injected():
+    registry = ToolRegistry()
+    registry.register(SleepTool())
+    client = ScriptedClient([
+        (
+            '{"tool_calls": ['
+            '{"name": "sleepy", "arguments": {"label": "fast", "delay": 0}},'
+            '{"name": "sleepy", "arguments": {"label": "slow", "delay": 0.1}}'
+            ']}'
+        ),
+        "Final with partial failure noted.",
+    ])
+
+    result = await run_chat(
+        client,
+        registry,
+        "parallel please",
+        max_parallel=2,
+        per_call_timeout=0.02,
+    )
+
+    assert result["response"] == "Final with partial failure noted."
+    assert len(result["tool_calls"]) == 2
+    assert '"label": "fast"' in client.prompts[1]
+    assert "Tool call timed out after 0.02 seconds" in client.prompts[1]
+
+
+@pytest.mark.asyncio
+async def test_run_chat_unknown_tool_error_injected():
+    client = ScriptedClient([
+        '{"tool_calls": [{"name": "missing_tool", "arguments": {}}]}',
+        "Fallback after missing tool.",
+    ])
+
+    result = await run_chat(client, ToolRegistry(), "use missing")
+
+    assert result["response"] == "Fallback after missing tool."
+    assert "Unknown tool: missing_tool" in client.prompts[1]
+
+
+@pytest.mark.asyncio
+async def test_run_chat_duplicate_tool_call_uses_cached_result():
+    registry = ToolRegistry()
+    registry.register(EchoTool())
+    client = ScriptedClient([
+        '{"tool_calls": [{"name": "echo", "arguments": {"text": "same"}}]}',
+        '{"tool_calls": [{"name": "echo", "arguments": {"text": "same"}}]}',
+        "Done after duplicate.",
+    ])
+
+    result = await run_chat(client, registry, "dedupe")
+
+    assert result["response"] == "Done after duplicate."
+    assert "Returning cached result" in client.prompts[2]
+
+
+@pytest.mark.asyncio
+async def test_run_chat_context_overflow_reports_budget_warning():
+    client = ScriptedClient(["Small answer."])
+
+    result = await run_chat(
+        client,
+        ToolRegistry(),
+        "tiny window",
+        history=[{"role": "user", "content": "x" * 500}],
+        context_window=20,
+    )
+
+    assert result["response"] == "Small answer."
+    assert result["context"]["warnings"]

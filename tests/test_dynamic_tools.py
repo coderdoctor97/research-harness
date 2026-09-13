@@ -2,12 +2,17 @@
 from __future__ import annotations
 
 import pytest
+
 from harness.config.models import CustomEndpointDef, EndpointDef
-from harness.registry.dynamic import build_dynamic_tool, _infer_schema
-from harness.registry.tool import ToolResult
-from harness.registry.validation_extras import validate_custom_endpoint, CustomEndpointError, group_by_mapping
+from harness.registry.dynamic import _infer_schema, build_dynamic_tool
 from harness.registry.fallback import execute_with_fallback
 from harness.registry.index import ToolRegistry
+from harness.registry.tool import ToolResult
+from harness.registry.validation_extras import (
+    CustomEndpointError,
+    group_by_mapping,
+    validate_custom_endpoint,
+)
 
 
 def test_dynamic_tool_basic():
@@ -75,7 +80,7 @@ def test_group_by_mapping():
 
 
 def test_fallback_on_primary_failure():
-    from unittest.mock import patch, MagicMock
+    from unittest.mock import patch
     primary = CustomEndpointDef(name="f1", endpoint=EndpointDef(url="http://fail1"), enabled=True)
     secondary = CustomEndpointDef(name="f2", endpoint=EndpointDef(url="http://fail2"), enabled=True)
     fail_result = ToolResult(ok=False, error="HTTP 500")
@@ -83,7 +88,7 @@ def test_fallback_on_primary_failure():
         t1 = build_dynamic_tool(primary)
         t2 = build_dynamic_tool(secondary)
         mock_build.side_effect = [t1, t2]
-        with patch.object(t1, "run", return_value=fail_result):
+        with patch.object(t1, "run", return_value=fail_result):  # noqa: SIM117
             with patch.object(t2, "run", return_value=ToolResult(ok=True, data={"result": "ok"})):
                 r = execute_with_fallback([primary, secondary], {})
     assert r.ok

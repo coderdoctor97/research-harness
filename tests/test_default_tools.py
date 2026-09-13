@@ -1,16 +1,15 @@
 # P8 — Default Tool Suite tests (P8.T1–T5)
 from __future__ import annotations
 
-import pytest
 from unittest.mock import patch
-from harness.tools.builtin.academic_search import AcademicSearchTool
-from harness.tools.builtin.news_search import NewsSearchTool
-from harness.tools.builtin.extract_links import ExtractLinksTool
-from harness.tools.builtin.summarize_page import SummarizePageTool
-from harness.tools.builtin.compute import ComputeTool, ComputeError
-from harness.registry.executor import HttpExecutor
-from harness.registry.tool import ToolResult
+
 from harness.llm.client import LLMClient
+from harness.registry.tool import ToolResult
+from harness.tools.builtin.academic_search import AcademicSearchTool
+from harness.tools.builtin.compute import ComputeTool
+from harness.tools.builtin.extract_links import ExtractLinksTool
+from harness.tools.builtin.news_search import NewsSearchTool
+from harness.tools.builtin.summarize_page import SummarizePageTool
 
 
 # --- academic_search ---

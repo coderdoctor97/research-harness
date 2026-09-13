@@ -1,9 +1,6 @@
 # P4.T4 — Malformed-output recovery: correction prompt, tools-off at 5 strikes, duplicate-call guard
 from __future__ import annotations
 
-from harness.loop.parser import classify, CallType
-
-
 CORRECTION_PROMPT = (
     "Your previous output could not be parsed as a valid tool call. "
     "Respond with a single tool call in the format:\n"
@@ -23,6 +20,7 @@ def correction_prompt(strikes: int) -> str:
 
 
 def duplicate_guard_key(name: str, params: dict) -> str:
-    import hashlib, json
+    import hashlib
+    import json
     raw = name + "|" + json.dumps(params, sort_keys=True)
     return hashlib.md5(raw.encode()).hexdigest()

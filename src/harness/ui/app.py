@@ -2,8 +2,9 @@
 from __future__ import annotations
 
 import os
+
 from fastapi import FastAPI, Request
-from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 
 templates = Jinja2Templates(directory=os.path.join(os.path.dirname(__file__), "templates"))
@@ -20,13 +21,13 @@ def create_application() -> FastAPI:
     async def health():
         return {"status": "ok"}
 
+    from harness.ui.routes_chat import mount as _mount_chat
+    from harness.ui.routes_config import mount as _mount_config
     from harness.ui.routes_endpoints import mount as _mount_endpoints
     from harness.ui.routes_keys import mount as _mount_keys
-    from harness.ui.routes_chat import mount as _mount_chat
     from harness.ui.routes_logs import mount as _mount_logs
-    from harness.ui.routes_config import mount as _mount_config
-    from harness.ui.routes_models import mount as _mount_models
     from harness.ui.routes_mcp import mount as _mount_mcp
+    from harness.ui.routes_models import mount as _mount_models
     _mount_endpoints(app)
     _mount_keys(app)
     _mount_chat(app)

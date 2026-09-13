@@ -1,27 +1,27 @@
 """LLM Client — OpenAI-compatible chat completions."""
 from __future__ import annotations
 
+import json
 import os
-from typing import Any
+import threading
+from typing import Any, ClassVar
 
 import httpx
 
-
-class LLMConnectionError(Exception):
-    pass
-
-
-class LLMResponseError(Exception):
-    pass
+from harness.llm.exceptions import LLMConnectionError, LLMResponseError
 
 
 class LLMClient:
-    """Public API: __init__(base_url, model_name, api_key_env=..., api_key=...)
+    """OpenAI-compatible client with one pooled HTTP client per endpoint config.
 
-    Works with any OpenAI-compatible endpoint (local or cloud). The API key
-    can be supplied directly (`api_key`) or resolved from an env var name
-    (`api_key_env`); a direct key wins over the env var.
+    Public API: ``__init__(base_url, model_name, api_key_env=..., api_key=...)``.
+    The API key can be supplied directly or resolved from an env var name; a
+    direct key wins over the env var. Headers stay per request, so the reusable
+    ``httpx.Client`` pool is keyed by endpoint URL and timeout, not by secret.
     """
+
+    _clients: ClassVar[dict[tuple[str, float], httpx.Client]] = {}
+    _pool_lock: ClassVar[threading.Lock] = threading.Lock()
 
     def __init__(
         self,
@@ -38,7 +38,21 @@ class LLMClient:
         self.api_key = api_key
         self.timeout = timeout
         self.max_tokens = max_tokens
-        self.client = httpx.Client(timeout=timeout)
+        self.client = self._pooled_client(self.base_url, timeout)
+
+    @classmethod
+    def _pooled_client(cls, base_url: str, timeout: float) -> httpx.Client:
+        key = (base_url, float(timeout))
+        with cls._pool_lock:
+            client = cls._clients.get(key)
+            if client is None:
+                client = httpx.Client(timeout=timeout)
+                cls._clients[key] = client
+            return client
+
+    @classmethod
+    def pool_size(cls) -> int:
+        return len(cls._clients)
 
     def _headers(self) -> dict[str, str]:
         h: dict[str, str] = {"Content-Type": "application/json"}
@@ -53,7 +67,7 @@ class LLMClient:
 
     def chat(self, message: str) -> str:
         url = f"{self.base_url}/chat/completions"
-        payload = {
+        payload: dict[str, Any] = {
             "model": self.model_name,
             "messages": [{"role": "user", "content": message}],
             "stream": False,
@@ -95,7 +109,7 @@ class LLMClient:
 
     def stream_chat(self, message: str):
         url = f"{self.base_url}/chat/completions"
-        payload = {
+        payload: dict[str, Any] = {
             "model": self.model_name,
             "messages": [{"role": "user", "content": message}],
             "stream": True,
@@ -111,7 +125,6 @@ class LLMClient:
             raise LLMConnectionError(f"Timeout: {exc}") from exc
         except httpx.HTTPStatusError as exc:
             raise LLMResponseError(f"HTTP {exc.response.status_code}") from exc
-        full_text = ""
         for line in r.text.splitlines():
             line = line.strip()
             if line.startswith("data: "):
@@ -119,10 +132,7 @@ class LLMClient:
                 if chunk == "[DONE]":
                     break
                 try:
-                    import json
                     obj = json.loads(chunk)
-                    delta = obj.get("choices", [{}])[0].get("delta", {}).get("content", "")
-                    full_text += delta
-                    yield delta
+                    yield obj.get("choices", [{}])[0].get("delta", {}).get("content", "")
                 except (json.JSONDecodeError, IndexError):
                     continue

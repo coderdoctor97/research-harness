@@ -2,8 +2,8 @@
 from __future__ import annotations
 
 import time
-from fastapi import FastAPI
 
+from fastapi import FastAPI
 
 _log: list[dict] = []
 

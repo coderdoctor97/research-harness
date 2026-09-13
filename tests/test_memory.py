@@ -1,16 +1,20 @@
 # P6.T6 — Memory & Context tests: token counter, budget, summarizer, cache, assembler, sessions
 from __future__ import annotations
 
-import time
 import os
 import tempfile
+import time
+from typing import ClassVar
 
-from harness.memory.tokens import count
+import pytest
+
+from harness.citations.registry import SourceRegistry
+from harness.memory.assembler import build_context
 from harness.memory.budget import compute
 from harness.memory.doccache import DocumentCache
-from harness.memory.assembler import build_context
 from harness.memory.sessions import Session
-from harness.citations.registry import SourceRegistry
+from harness.memory.tokens import count
+from harness.registry.tool import Tool, ToolResult
 
 
 # --- Token counter ---
@@ -87,7 +91,7 @@ def test_assembler_with_docs():
     history = [{"role": "user", "content": "What is AI?"}]
     docs = [{"content": "AI stands for Artificial Intelligence."}]
     budget = compute(context_window=4096)
-    ctx, report = build_context(sys_prompt, history, docs, budget)
+    ctx, _report = build_context(sys_prompt, history, docs, budget)
     assert "Artificial Intelligence" in ctx
 
 def test_assembler_eviction_when_over_budget():
@@ -95,7 +99,7 @@ def test_assembler_eviction_when_over_budget():
     history = [{"role": "user", "content": f"Question {i}: " + "word " * 200} for i in range(20)]
     docs = [{"content": "Document " * 500}]  # large doc
     budget = compute(context_window=2048, max_response_tokens=256)
-    ctx, report = build_context(sys_prompt, history, docs, budget)
+    _ctx, report = build_context(sys_prompt, history, docs, budget)
     # Aggressive eviction drops docs and keeps last 3 turns
     assert report["tokens"] <= budget["available"] + 100
     assert len(report["warnings"]) >= 0  # warnings logged, not raised
@@ -119,7 +123,7 @@ def test_twenty_turn_stay_in_budget():
         history.append({"role": "user", "content": f"Question {i}: tell me about topic {i}"})
         history.append({"role": "assistant", "content": f"Answer {i}: topic {i} involves several key facts and references [1]."})
     budget = compute(context_window=4096)
-    ctx, report = build_context(sys_prompt, history, [], budget)
+    _ctx, report = build_context(sys_prompt, history, [], budget)
     assert report["tokens"] <= budget["available"] + 100
 
 
@@ -149,8 +153,91 @@ def test_source_refs_preserved_across_turns():
     history = [{"role": "assistant", "content": "Based on [1], here is the answer."}]
     sys_prompt = "You are a helpful assistant."
     budget = compute(context_window=4096)
-    ctx, report = build_context(sys_prompt, history, [], budget)
+    ctx, _report = build_context(sys_prompt, history, [], budget)
     assert "earlier.com" not in ctx  # sources not auto-injected into context
     # But the registry still has the source
     assert reg.get(1) is not None
     assert reg.get(1).title == "Earlier Source"
+
+
+class _MemorySearchTool(Tool):
+    name = "memory_search"
+    description = "Return one cached document"
+    parameters: ClassVar[dict] = {"query": {"type": "string"}}
+
+    def run(self, **params):
+        return ToolResult(
+            ok=True,
+            data={
+                "results": [
+                    {
+                        "title": "Memory Doc",
+                        "url": "https://example.com/memory-doc",
+                        "snippet": f"cached snippet for {params.get('query')}",
+                    }
+                ]
+            },
+        )
+
+
+class _ScriptedCoreClient:
+    model_name = "scripted-model"
+
+    def __init__(self, replies):
+        self.replies = list(replies)
+        self.prompts = []
+
+    def chat(self, prompt):
+        self.prompts.append(prompt)
+        return self.replies.pop(0)
+
+
+@pytest.mark.asyncio
+async def test_core_run_chat_routes_documents_through_document_cache(tmp_path):
+    from harness.loop.agent import run_chat
+    from harness.registry.index import ToolRegistry
+    registry = ToolRegistry()
+    registry.register(_MemorySearchTool())
+    cache = DocumentCache(cache_dir=str(tmp_path), ttl=60)
+    client = _ScriptedCoreClient([
+        '{"tool_calls": [{"name": "memory_search", "arguments": {"query": "budget"}}]}',
+        "Budget answer [1].",
+    ])
+
+    result = await run_chat(client, registry, "cache docs", document_cache=cache)
+
+    assert result["response"].startswith("Budget answer")
+    cached = cache.get("https://example.com/memory-doc")
+    assert cached is not None
+    assert cached["content"] == "cached snippet for budget"
+    assert "cached snippet for budget" in client.prompts[1]
+
+
+@pytest.mark.asyncio
+async def test_core_twenty_turn_stress_budget_summary_and_resume(tmp_path):
+    from harness.loop.agent import run_chat
+    from harness.registry.index import ToolRegistry
+
+    registry = SourceRegistry()
+    session = Session("stress", registry)
+    for i in range(20):
+        session.add_turn("user", f"Question {i}: " + "detail " * 40)
+        session.add_turn("assistant", f"Answer {i}: " + "evidence [1] " * 40)
+    path = tmp_path / "session.json"
+    session.save(path)
+    loaded = Session.load(path)
+    client = _ScriptedCoreClient(["Resumed final answer."])
+
+    result = await run_chat(
+        client,
+        ToolRegistry(),
+        "resume this session",
+        history=loaded.history,
+        context_window=2048,
+    )
+
+    assert result["response"] == "Resumed final answer."
+    assert result["context"]["tokens"] <= compute(context_window=2048)["available"] + 100
+    assert result["context"]["summary"]["generated"] is True
+    assert "[Summary of turns" in client.prompts[0]
+    assert "resume this session" in client.prompts[0]
