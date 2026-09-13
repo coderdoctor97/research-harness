@@ -8,20 +8,20 @@ colors:
   well: "oklch(0.15 0.019 258)"
   warm-ink: "oklch(0.93 0.012 235)"
   warm-ink-soft: "oklch(0.72 0.022 240)"
-  warm-ink-faint: "oklch(0.55 0.024 242)"
+  warm-ink-faint: "oklch(0.68 0.024 242)"
   line: "oklch(0.315 0.032 252)"
   line-soft: "oklch(0.275 0.028 252)"
   amber-signal: "oklch(0.80 0.14 75)"
   amber-signal-soft: "oklch(0.80 0.14 75 / 0.10)"
   amber-signal-ring: "oklch(0.80 0.14 75 / 0.28)"
   blue-signal: "oklch(0.70 0.13 235)"
-  blue-signal-soft: "oklch(0.70 0.13 235 / 0.10)"
-  blue-signal-ring: "oklch(0.70 0.13 235 / 0.30)"
-  signal-green: "oklch(0.74 0.14 160)"
-  signal-green-soft: "oklch(0.74 0.14 160 / 0.12)"
+  blue-signal-soft: "oklch(0.70 0.13 235 / 0.06)"
+  blue-signal-ring: "oklch(0.70 0.13 235 / 0.40)"
+  signal-green: "oklch(0.76 0.14 160)"
+  signal-green-soft: "oklch(0.76 0.14 160 / 0.12)"
   signal-yellow: "oklch(0.82 0.14 85)"
-  signal-red: "oklch(0.68 0.19 25)"
-  signal-red-soft: "oklch(0.68 0.19 25 / 0.12)"
+  signal-red: "oklch(0.70 0.19 25)"
+  signal-red-soft: "oklch(0.70 0.19 25 / 0.12)"
 typography:
   display:
     fontFamily: "Fraunces, Georgia, 'Times New Roman', serif"
@@ -160,14 +160,14 @@ three-color status set — every color is a machine or action, never decoration.
 
 - **Blue Signal** (`oklch(0.70 0.13 235)`): the cool counterpart. Links in
   rendered answers, active nav state and its left bar, assistant-bubble left
-  edge, selected model cards, tab underline, focus rings (30 % alpha), text
+  edge, selected model cards, tab underline, focus rings (40 % alpha), text
   selection background, and typing dots.
 
 ### Tertiary
 
-- **Signal Green** (`oklch(0.74 0.14 160)`): success — online LEDs, `ok`/`ready`/`set` badges, ✓ states.
+- **Signal Green** (`oklch(0.76 0.14 160)`): success — online LEDs, `ok`/`ready`/`set` badges, ✓ states.
 - **Signal Yellow** (`oklch(0.82 0.14 85)`): warning — `warn` badges, "key needed", "on connect" states.
-- **Signal Red** (`oklch(0.68 0.19 25)`): error — offline LED, `err`/`fail` badges, destructive buttons, delete hovers.
+- **Signal Red** (`oklch(0.70 0.19 25)`): error — offline LED, `err`/`fail` badges, destructive buttons, delete hovers.
 
 ### Neutral
 
@@ -177,7 +177,7 @@ three-color status set — every color is a machine or action, never decoration.
 - **Well** (`oklch(0.15 0.019 258)`): recessed surfaces — inputs, code blocks, assistant bubbles, model cards. Darker than the background: wells sink, panels rise.
 - **Warm Ink** (`oklch(0.93 0.012 235)`): primary text — slightly cool, never white.
 - **Warm Ink Soft** (`oklch(0.72 0.022 240)`): secondary text, nav links, readouts, snippets.
-- **Warm Ink Faint** (`oklch(0.55 0.024 242)`): labels, timestamps, hints, icons at rest.
+- **Warm Ink Faint** (`oklch(0.68 0.024 242)`): labels, timestamps, hints, icons at rest. Raised from 0.55 in U4.2.2 (H-M1) to clear WCAG AA 4.5:1 on every surface it sits on — weakest is Panel at 4.65:1.
 - **Line** (`oklch(0.315 0.032 252)`): strong borders (inputs, buttons, tables, scrollbars).
 - **Line Soft** (`oklch(0.275 0.028 252)`): quiet borders (cards, rows, page-header rule).
 
@@ -252,7 +252,7 @@ atmosphere without elevation.
 ### Shadow Vocabulary
 
 - **Tactile depth** (`box-shadow: 0 2px 0 oklch(0.62 0.15 60 / 0.9)` on amber; `0 2px 0 oklch(0.17 0.02 256)` on secondary): hard 2 px edge under buttons — a physical switch, not a glow. Collapses to `inset 0 2px 5px` on `:active`.
-- **Toast** (`box-shadow: 0 10px 30px oklch(0 0 0 / 0.45)`): the only true drop shadow — reserved for the one floating surface (toasts).
+- **Float** (`box-shadow: 0 10px 30px oklch(0 0 0 / 0.45)`): the only true drop shadow — reserved for floating surfaces: toasts and the text-inspection popover.
 - **LED glow** (`box-shadow: 0 0 8px` of the LED color): instrument-light bloom, state-driven (green = online, red = offline), pulsing at 2.4 s.
 
 ### Named Rules
@@ -294,13 +294,13 @@ its border is dashed — the console's visual idiom for "not required".
 - **Primary:** Amber Signal background, dark text (`oklch(0.18 0.03 70)`), hard 2 px amber depth shadow.
 - **Secondary:** Panel Raised background, Warm Ink Soft text, 1 px Line border, hard 2 px dark shadow.
 - **Danger:** Signal Red Soft background, Signal Red text, 35 %-alpha red border.
-- **Hover / Focus / Active:** hover shifts the fill (amber → `oklch(0.84 0.14 78)`; secondary border → Warm Ink Faint); `:active` translates down 1.5 px, scales 0.98, and inverts the shadow to inset; disabled = 50 % opacity, no transform.
+- **Hover / Focus / Active:** hover shifts the fill (amber → `oklch(0.84 0.14 78)`; secondary border → Warm Ink Faint); `:focus-visible` = instant 2 px Blue Signal outline (offset 2 px, no transition); `:active` translates down 1.5 px, scales 0.98, and inverts the shadow to inset; disabled = 50 % opacity, no transform.
 
 ### Inputs / Fields
 
 - **Style:** Well background, 1 px Line border, 3 px radius, 9 px 12 px padding, 13.5 px Plex Sans; selects use an inline SVG chevron and `appearance:none`.
 - **Labels:** mono, 10.5 px, uppercase, 0.12em tracking, Warm Ink Faint, above the field.
-- **Focus:** border → Blue Signal + 3 px Blue Signal Ring glow. Outline removed in favor of the ring.
+- **Focus:** border → Blue Signal + 3 px Blue Signal Ring glow (instant — the ring is deliberately kept off the transition). Outline removed in favor of the ring. `:hover` → border Warm Ink Faint; `:disabled` → 55 % opacity, `not-allowed`.
 - **Placeholder:** Warm Ink Faint.
 
 ### Navigation (sidebar)
@@ -312,7 +312,7 @@ its border is dashed — the console's visual idiom for "not required".
 
 ### Badges & Readouts
 
-- **Badge:** mono 10.5 px / 600 uppercase, 0.06em tracking, 3 px 9 px padding, 3 px radius, 1 px tinted border. Variants map 1:1 to the color roles: `ok` (green), `warn` (yellow), `err` (red), `dim` (Panel Raised), `accent` (amber), `blue` (blue) — soft 10–12 % fill with the full-strength text.
+- **Badge:** mono 10.5 px / 600 uppercase, 0.06em tracking, 3 px 9 px padding, 3 px radius, 1 px tinted border. Variants map 1:1 to the color roles: `ok` (green), `warn` (yellow), `err` (red), `dim` (Panel Raised), `accent` (amber), `blue` (blue) — soft 6–12 % fill with the full-strength text (blue softened to 6 % in U4.2.2 for badge-text contrast).
 - **Readout:** plain mono 12 px, Warm Ink Soft — the console's default voice for values (latency, counts, status).
 
 ### Cards / Containers
@@ -341,7 +341,7 @@ its border is dashed — the console's visual idiom for "not required".
 
 ### Model Card (selectable grid item)
 
-- **Style:** Well background, 1 px Line Soft border, 3 px radius, 13 px 15 px padding.
+- **Style:** Well background, no border at rest (the well/panel tone shift carries the card edge), 3 px radius, 13 px 15 px padding.
 - **States:** hover → Blue Signal Ring border + translateY(-1 px); selected → Blue Signal border + Blue Signal Soft fill; press → scale 0.99.
 - **Content:** Plex Sans 600 name over a mono 10.5 px ID (wrap anywhere).
 

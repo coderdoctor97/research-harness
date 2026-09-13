@@ -8,6 +8,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
+/* Hallmark · system: DESIGN.md · genre: atmospheric · designed-as-app */
 /* ============================================================
    RESEARCH HARNESS CONSOLE — night-observatory identity
    Deep blue-black sky · amber signal accents · Fraunces display
@@ -20,19 +21,19 @@
   --well:oklch(0.15 0.019 258);
   --ink:oklch(0.93 0.012 235);
   --ink-2:oklch(0.72 0.022 240);
-  --ink-3:oklch(0.55 0.024 242);
-  --line:oklch(0.315 0.032 252);
+  --ink-3:oklch(0.68 0.024 242); /* U4.2.2 (H-M1): raised for AA — 0.68 = 4.65:1 on panel (weakest named surface) */
+  --line:oklch(0.315 0.032 252); /* ponytail: instrument hairline at 2.22:1 (tone shift identifies edges); revisit if edges lose definition on a lighter theme */
   --line-soft:oklch(0.275 0.028 252);
   --accent:oklch(0.80 0.14 75);
   --accent-2:oklch(0.70 0.13 235);
   --accent-soft:oklch(0.80 0.14 75 / 0.10);
   --accent-ring:oklch(0.80 0.14 75 / 0.28);
-  --blue-soft:oklch(0.70 0.13 235 / 0.10);
-  --blue-ring:oklch(0.70 0.13 235 / 0.30);
-  --ok:oklch(0.74 0.14 160);
+  --blue-soft:oklch(0.70 0.13 235 / 0.06); /* U4.2.2 (H-m6): darker badge bg = higher text contrast */
+  --blue-ring:oklch(0.70 0.13 235 / 0.40); /* U4.2.2 (H-M2): 3.35:1 on well (input host) */
+  --ok:oklch(0.76 0.14 160); /* U4.2.2 (H-m6) */
   --ok-soft:oklch(0.74 0.14 160 / 0.12);
   --warn:oklch(0.82 0.14 85);
-  --err:oklch(0.68 0.19 25);
+  --err:oklch(0.70 0.19 25); /* U4.2.2 (H-m6) */
   --err-soft:oklch(0.68 0.19 25 / 0.12);
   --font-display:"Fraunces",Georgia,"Times New Roman",serif;
   --font-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
@@ -40,9 +41,25 @@
   --sidebar-w:248px;
   --sidebar-w-collapsed:66px;
   --ease:cubic-bezier(0.33,1,0.68,1);
+  /* U4.1.3 (H-M5) — lifted off-root values: recurring pairs + named system families */
+  --side-hairline:oklch(0.26 0.03 252 / 0.7);
+  --btn-ink:oklch(0.18 0.03 70);
+  --btn-amber-hover:oklch(0.84 0.14 78);
+  --shadow-tactile-primary:0 2px 0 oklch(0.62 0.15 60 / 0.9);
+  --shadow-tactile-secondary:0 2px 0 oklch(0.17 0.02 256);
+  --shadow-tactile-inset:inset 0 2px 5px oklch(0 0 0 / 0.3);
+  --shadow-float:0 10px 30px oklch(0 0 0 / 0.45);
+  --sky-star:oklch(0.88 0.05 240);
+  --sky-star-glow:0 0 6px 1px oklch(0.85 0.09 240 / 0.55);
+  --sky-meteor:linear-gradient(90deg, oklch(0.92 0.09 240 / 0.95), oklch(0.90 0.10 240 / 0) 85%);
+  --sky-meteor-core:oklch(0.95 0.05 240);
+  --sky-meteor-glow:0 0 7px 1.5px oklch(0.88 0.10 240 / 0.8);
+  --code-bg:oklch(0.135 0.02 258);
+  --code-zebra:oklch(0.24 0.03 256 / 0.3);
+  --control-h:40px; /* U4.2.1 (H-m8) — shared input/button height */
 }
 *{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%}
+html,body{height:100%;overflow-x:clip}
 body{
   background:var(--bg);color:var(--ink);
   font-family:var(--font-body);font-size:14px;line-height:1.55;
@@ -54,10 +71,10 @@ body{
 .app{display:flex;height:100vh;overflow:hidden}
 .main{
   flex:1;overflow-y:auto;padding:34px 40px 60px;scroll-behavior:smooth;
+  /* U4.1.3 (H-m11): 2 glows kept (allowance), 1px starfield dots + base — one-off composition values, see DESIGN.md */
   background:
     radial-gradient(55% 44% at 88% -8%, oklch(0.38 0.09 250 / 0.22), transparent 62%),
     radial-gradient(46% 40% at -4% 104%, oklch(0.32 0.08 232 / 0.17), transparent 60%),
-    radial-gradient(30% 26% at 55% 0%, oklch(0.30 0.06 260 / 0.12), transparent 70%),
     radial-gradient(oklch(0.93 0.02 235 / 0.028) 1px, transparent 1px) 0 0/26px 26px,
     linear-gradient(180deg, oklch(0.175 0.023 254), oklch(0.16 0.019 260));
 }
@@ -70,6 +87,7 @@ body{
   width:var(--sidebar-w);flex-shrink:0;display:flex;flex-direction:column;
   background:linear-gradient(180deg, oklch(0.155 0.028 252), oklch(0.13 0.022 262));
   border-right:1px solid var(--line-soft);position:relative;z-index:10;overflow:hidden;
+  /* ponytail: animating width (not transform) — transform distorts the nav SVG icons; revisit if the icon set becomes distortion-tolerant */
   transition:width 200ms var(--ease);
 }
 body.sidebar-collapsed .sidebar{width:var(--sidebar-w-collapsed)}
@@ -78,19 +96,19 @@ body.sidebar-collapsed .sidebar{width:var(--sidebar-w-collapsed)}
 .sidebar-sky{position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:0}
 .star{
   position:absolute;width:2px;height:2px;border-radius:50%;
-  background:oklch(0.88 0.05 240);opacity:0.2;
+  background:var(--sky-star);opacity:0.2;
   animation:twinkle 3s ease-in-out infinite;
 }
-.star-big{width:3px;height:3px;box-shadow:0 0 6px 1px oklch(0.85 0.09 240 / 0.55)}
+.star-big{width:3px;height:3px;box-shadow:var(--sky-star-glow)}
 @keyframes twinkle{0%,100%{opacity:0.12;transform:scale(0.8)}50%{opacity:0.9;transform:scale(1.15)}}
 .meteor{
   position:absolute;height:1.5px;width:76px;border-radius:2px;pointer-events:none;opacity:0;
-  background:linear-gradient(90deg, oklch(0.92 0.09 240 / 0.95), oklch(0.90 0.10 240 / 0) 85%);
+  background:var(--sky-meteor);
   animation:meteor-fall linear forwards;
 }
 .meteor::after{
   content:"";position:absolute;left:-1px;top:-1.3px;width:4px;height:4px;border-radius:50%;
-  background:oklch(0.95 0.05 240);box-shadow:0 0 7px 1.5px oklch(0.88 0.10 240 / 0.8);
+  background:var(--sky-meteor-core);box-shadow:var(--sky-meteor-glow);
 }
 @keyframes meteor-fall{
   0%{opacity:0;transform:rotate(-38deg) translateX(0)}
@@ -99,7 +117,7 @@ body.sidebar-collapsed .sidebar{width:var(--sidebar-w-collapsed)}
 }
 .sidebar>*{position:relative;z-index:1}
 
-.sidebar-brand{padding:20px 18px 16px;border-bottom:1px solid oklch(0.26 0.03 252 / 0.7)}
+.sidebar-brand{padding:20px 18px 16px;border-bottom:1px solid var(--side-hairline)}
 .brand-row{display:flex;align-items:center;gap:11px}
 .monogram{
   width:34px;height:34px;flex-shrink:0;display:flex;align-items:center;justify-content:center;
@@ -172,7 +190,7 @@ body.sidebar-collapsed .collapse-btn svg{transform:rotate(180deg)}
 .session-empty{font-family:var(--font-mono);font-size:10.5px;color:var(--ink-3);padding:8px 10px;line-height:1.6}
 
 .sidebar-footer{
-  padding:12px 18px;border-top:1px solid oklch(0.26 0.03 252 / 0.7);
+  padding:12px 18px;border-top:1px solid var(--side-hairline);
   font-family:var(--font-mono);font-size:10.5px;color:var(--ink-3);
   display:flex;align-items:center;gap:8px;white-space:nowrap;
 }
@@ -197,7 +215,7 @@ body.sidebar-collapsed .sidebar-footer{justify-content:center;padding-left:0;pad
 
 /* ---------- page scaffolding ---------- */
 .view{display:none;max-width:1060px}
-.view.active{display:block;animation:view-in 260ms var(--ease)}
+.view.active{display:block;animation:view-in 260ms var(--ease) both}
 @keyframes view-in{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
 .page-header{margin-bottom:26px;border-bottom:1px solid var(--line-soft);padding-bottom:18px}
 .eyebrow{
@@ -224,10 +242,15 @@ label.field>span{
 input,select,textarea{
   width:100%;background:var(--well);border:1px solid var(--line);color:var(--ink);
   padding:9px 12px;border-radius:3px;font-size:13.5px;font-family:var(--font-body);
-  transition:border-color 140ms var(--ease),box-shadow 140ms var(--ease);
+  transition:border-color 140ms var(--ease);
 }
+input,select{height:var(--control-h)}
 input::placeholder,textarea::placeholder{color:var(--ink-3)}
 input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent-2);box-shadow:0 0 0 3px var(--blue-ring)}
+input:hover,select:hover,textarea:hover{border-color:var(--ink-3)}
+input:disabled,select:disabled,textarea:disabled{opacity:.55;cursor:not-allowed}
+button:focus-visible{outline:2px solid var(--accent-2);outline-offset:2px}
+button:focus:not(:focus-visible){outline:none}
 select{
   appearance:none;
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238fa3c8' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
@@ -240,20 +263,20 @@ select{
 /* ---------- buttons (tactile) ---------- */
 button,.btn{
   display:inline-flex;align-items:center;justify-content:center;gap:7px;
-  padding:9px 18px;border-radius:3px;border:1px solid transparent;cursor:pointer;
+  padding:9px 18px;height:var(--control-h);border-radius:3px;border:1px solid transparent;cursor:pointer;
   font-family:var(--font-mono);font-size:12px;font-weight:600;letter-spacing:0.04em;
   transition:transform 90ms var(--ease),background 140ms var(--ease),border-color 140ms var(--ease),box-shadow 140ms var(--ease),color 140ms var(--ease);
 }
 button:active:not(:disabled),.btn:active:not(:disabled){transform:translateY(1.5px) scale(0.98)}
-.btn-primary{background:var(--accent);color:oklch(0.18 0.03 70);border-color:var(--accent);box-shadow:0 2px 0 oklch(0.62 0.15 60 / 0.9)}
-.btn-primary:hover{background:oklch(0.84 0.14 78)}
-.btn-primary:active:not(:disabled){box-shadow:inset 0 2px 5px oklch(0 0 0 / 0.28)}
-.btn-secondary{background:var(--panel-2);color:var(--ink-2);border-color:var(--line);box-shadow:0 2px 0 oklch(0.17 0.02 256)}
+.btn-primary{background:var(--accent);color:var(--btn-ink);border-color:var(--accent);box-shadow:var(--shadow-tactile-primary)}
+.btn-primary:hover{background:var(--btn-amber-hover)}
+.btn-primary:active:not(:disabled){box-shadow:var(--shadow-tactile-inset)}
+.btn-secondary{background:var(--panel-2);color:var(--ink-2);border-color:var(--line);box-shadow:var(--shadow-tactile-secondary)}
 .btn-secondary:hover{border-color:var(--ink-3);color:var(--ink)}
-.btn-secondary:active:not(:disabled){box-shadow:inset 0 2px 5px oklch(0 0 0 / 0.3)}
+.btn-secondary:active:not(:disabled){box-shadow:var(--shadow-tactile-inset)}
 .btn-danger{background:var(--err-soft);color:var(--err);border-color:oklch(0.68 0.19 25 / 0.35)}
 .btn-danger:hover{background:oklch(0.68 0.19 25 / 0.2)}
-.btn-sm{padding:5px 12px;font-size:11px}
+.btn-sm{padding:5px 12px;font-size:11px;height:28px}
 button:disabled{opacity:0.5;cursor:not-allowed;transform:none!important}
 
 /* ---------- badges & readouts ---------- */
@@ -312,13 +335,13 @@ tbody tr:last-child td{border-bottom:none}
   width:30px;height:30px;flex-shrink:0;border-radius:3px;display:flex;align-items:center;justify-content:center;
   font-family:var(--font-mono);font-size:10.5px;font-weight:600;
 }
-.message.user .msg-avatar{background:var(--accent);color:oklch(0.18 0.03 70)}
+.message.user .msg-avatar{background:var(--accent);color:var(--btn-ink)}
 .message.assistant .msg-avatar{background:var(--well);color:var(--accent-2);border:1px solid var(--line)}
 .msg-stack{min-width:0}
 .msg-bubble{padding:11px 15px;border-radius:4px;font-size:13.5px;line-height:1.6;overflow-wrap:break-word}
 .message.user .msg-bubble{background:var(--accent-soft);border:1px solid var(--accent-ring)}
 .message.assistant .msg-bubble{background:var(--well);border:1px solid var(--line-soft);border-left:2px solid var(--accent-2)}
-.msg-bubble pre{background:oklch(0.135 0.02 258);border:1px solid var(--line-soft);border-radius:3px;padding:11px;margin-top:8px;overflow-x:auto;font-size:12px;line-height:1.5}
+.msg-bubble pre{background:var(--code-bg);border:1px solid var(--line-soft);border-radius:3px;padding:11px;margin-top:8px;overflow-x:auto;font-size:12px;line-height:1.5}
 .msg-bubble pre code{background:none;border:none;padding:0;color:var(--ink)}
 .msg-bubble code{font-family:var(--font-mono);font-size:12px;color:var(--accent);background:oklch(0.235 0.03 256 / 0.7);border:1px solid var(--line-soft);border-radius:3px;padding:1px 5px}
 .msg-bubble p{margin-bottom:8px}.msg-bubble p:last-child{margin-bottom:0}
@@ -339,14 +362,14 @@ tbody tr:last-child td{border-bottom:none}
 .msg-bubble table{border-collapse:collapse;margin:10px 0;max-width:100%;display:block;overflow-x:auto}
 .msg-bubble th,.msg-bubble td{border:1px solid var(--line-soft);padding:7px 10px;text-align:left;vertical-align:top;font-size:12.5px;line-height:1.5}
 .msg-bubble th{background:oklch(0.24 0.03 256 / 0.55);color:var(--ink);font-family:var(--font-mono);font-size:10.5px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;white-space:nowrap}
-.msg-bubble tbody tr:nth-child(even) td{background:oklch(0.24 0.03 256 / 0.3)}
+.msg-bubble tbody tr:nth-child(even) td{background:var(--code-zebra)}
 .msg-bubble tbody tr:last-child td{border-bottom:1px solid var(--line-soft)}
 .msg-meta{font-family:var(--font-mono);font-size:10.5px;color:var(--ink-3);margin-top:6px}
 .message.user .msg-meta{text-align:right}
-.chat-bar{display:flex;gap:10px;padding:15px 20px;border-top:1px solid var(--line-soft);background:var(--panel)}
+.chat-bar{display:flex;align-items:center;gap:10px;padding:15px 20px;border-top:1px solid var(--line-soft);background:var(--panel)}
 .chat-bar input{flex:1;margin-bottom:0}
 .typing-indicator{display:none;align-items:center;gap:12px;padding:2px 22px 10px}
-.typing-indicator.visible{display:flex;animation:msg-in 180ms var(--ease)}
+.typing-indicator.visible{display:flex;animation:msg-in 180ms var(--ease) both}
 .typing-dots{display:flex;gap:4px;padding:11px 15px;background:var(--well);border:1px solid var(--line-soft);border-left:2px solid var(--accent-2);border-radius:4px}
 .typing-dots span{width:6px;height:6px;border-radius:50%;background:var(--accent-2);animation:bounce 1.3s ease-in-out infinite}
 .typing-dots span:nth-child(2){animation-delay:0.15s}
@@ -360,7 +383,7 @@ tbody tr:last-child td{border-bottom:none}
 }
 .search-results{margin-top:10px;display:flex;flex-direction:column;gap:7px;counter-reset:cite}
 .search-result-item{
-  position:relative;padding:9px 12px 9px 34px;background:oklch(0.14 0.02 258);border:1px solid var(--line-soft);border-radius:3px;
+  position:relative;padding:9px 12px 9px 34px;background:var(--well);border:1px solid var(--line-soft);border-radius:3px;
   counter-increment:cite;transition:border-color 120ms var(--ease);
 }
 .search-result-item::before{
@@ -384,7 +407,7 @@ tbody tr:last-child td{border-bottom:none}
 .conn-stat b{display:block;font-size:14px;color:var(--ink);font-weight:600}
 .model-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px}
 .model-card{
-  background:var(--well);border:1px solid var(--line-soft);border-radius:3px;padding:13px 15px;cursor:pointer;
+  background:var(--well);border:1px solid transparent;border-radius:3px;padding:13px 15px;cursor:pointer;
   transition:border-color 140ms var(--ease),transform 90ms var(--ease),background 140ms var(--ease);
 }
 .model-card:hover{border-color:var(--blue-ring);transform:translateY(-1px)}
@@ -404,7 +427,7 @@ tbody tr:last-child td{border-bottom:none}
 .key-row{display:flex;align-items:center;gap:14px;padding:11px 14px;border-bottom:1px solid var(--line-soft)}
 .key-row:hover{background:var(--panel-2)}
 .key-row:last-child{border-bottom:none}
-.key-name{font-family:var(--font-mono);font-size:12px;font-weight:600;min-width:170px}
+.key-name{font-family:var(--font-mono);font-size:12px;font-weight:600;min-width:170px;overflow-wrap:anywhere}
 .key-value-masked{font-family:var(--font-mono);font-size:12px;color:var(--ink-3);flex:1;letter-spacing:1px}
 .key-actions{display:flex;gap:6px}
 .mcp-server-card{background:var(--panel);border:1px solid var(--line-soft);border-radius:4px;padding:18px;margin-bottom:12px}
@@ -419,7 +442,7 @@ tbody tr:last-child td{border-bottom:none}
 }
 .preset-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
 .preset-card{
-  background:var(--well);border:1px solid var(--line-soft);border-radius:4px;padding:16px;
+  background:var(--well);border:1px solid transparent;border-radius:4px;padding:16px;
   display:flex;flex-direction:column;gap:8px;transition:border-color 140ms var(--ease);
 }
 .preset-card:hover{border-color:var(--line)}
@@ -448,13 +471,13 @@ details.advanced .advanced-body{padding:4px 16px 16px}
 .toast{
   padding:11px 16px;border-radius:3px;font-family:var(--font-mono);font-size:12px;color:var(--ink);
   border:1px solid var(--line);border-left-width:3px;background:var(--panel);
-  box-shadow:0 10px 30px oklch(0 0 0 / 0.45);max-width:400px;animation:toast-in 240ms var(--ease);
+  box-shadow:var(--shadow-float);max-width:400px;animation:toast-in 240ms var(--ease) both;
 }
 .toast.success{border-left-color:var(--ok)}
 .toast.error{border-left-color:var(--err)}
 .toast.info{border-left-color:var(--accent-2)}
 @keyframes toast-in{from{opacity:0;transform:translateX(16px)}to{opacity:1;transform:none}}
-.toast.removing{opacity:0;transform:translateX(16px);transition:all 200ms var(--ease)}
+.toast.removing{opacity:0;transform:translateX(16px);transition:opacity 200ms var(--ease),transform 200ms var(--ease)}
 .hidden{display:none!important}
 
 /* ---------- reactive text inspection (U2 — capability #4) ---------- */
@@ -462,7 +485,7 @@ details.advanced .advanced-body{padding:4px 16px 16px}
   position:fixed;z-index:900;width:min(420px,calc(100vw - 16px));
   max-height:min(320px,60vh);display:flex;flex-direction:column;
   background:var(--panel);border:1px solid var(--line);border-left:2px solid var(--accent-2);
-  border-radius:3px;box-shadow:0 10px 30px oklch(0 0 0 / 0.45);
+  border-radius:3px;box-shadow:var(--shadow-float);
   animation:inspect-in 180ms var(--ease) both;
 }
 .inspect.measuring{visibility:hidden}
@@ -491,11 +514,13 @@ details.advanced .advanced-body{padding:4px 16px 16px}
   .main{padding:20px 16px 48px}
   .message{max-width:96%}
   .row{flex-direction:column;align-items:stretch}
+  .key-name{min-width:0}
   .model-grid,.preset-grid{grid-template-columns:1fr}
 }
 @media (prefers-reduced-motion: reduce){
   .star,.meteor{display:none}
   .view.active,.message,.toast,.typing-indicator.visible,.inspect{animation:none}
+  .typing-dots span,.led,.spinner-sm{animation:none}
 }
 </style>
 </head>
@@ -511,39 +536,39 @@ details.advanced .advanced-body{padding:4px 16px 16px}
           <div class="brand-sub">LLM Console</div>
         </div>
         <button id="sidebarToggle" class="collapse-btn" title="Toggle sidebar" aria-label="Toggle sidebar">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>
         </button>
       </div>
     </div>
     <nav>
       <div class="nav-label">Console</div>
       <a data-view="chat" class="active" title="Chat">
-        <span class="nav-icon"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>
+        <span class="nav-icon"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>
         <span class="nav-txt">Chat</span>
       </a>
       <a data-view="models" title="AI Provider">
-        <span class="nav-icon"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/><line x1="20" y1="9" x2="23" y2="9"/><line x1="20" y1="14" x2="23" y2="14"/><line x1="1" y1="9" x2="4" y2="9"/><line x1="1" y1="14" x2="4" y2="14"/></svg></span>
+        <span class="nav-icon"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/><line x1="20" y1="9" x2="23" y2="9"/><line x1="20" y1="14" x2="23" y2="14"/><line x1="1" y1="9" x2="4" y2="9"/><line x1="1" y1="14" x2="4" y2="14"/></svg></span>
         <span class="nav-txt">AI Provider</span>
       </a>
       <a data-view="keys" title="Keys">
-        <span class="nav-icon"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg></span>
+        <span class="nav-icon"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg></span>
         <span class="nav-txt">Keys</span>
       </a>
       <div class="nav-label" style="margin-top:10px">Instrumentation</div>
       <a data-view="endpoints" title="Endpoints">
-        <span class="nav-icon"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></span>
+        <span class="nav-icon"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></span>
         <span class="nav-txt">Endpoints</span>
       </a>
       <a data-view="mcp" title="MCP Services">
-        <span class="nav-icon"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg></span>
+        <span class="nav-icon"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg></span>
         <span class="nav-txt">MCP Services</span>
       </a>
       <a data-view="logs" title="Logs">
-        <span class="nav-icon"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></span>
+        <span class="nav-icon"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></span>
         <span class="nav-txt">Logs</span>
       </a>
       <a data-view="config" title="Config">
-        <span class="nav-icon"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg></span>
+        <span class="nav-icon"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg></span>
         <span class="nav-txt">Config</span>
       </a>
     </nav>
@@ -583,7 +608,7 @@ details.advanced .advanced-body{padding:4px 16px 16px}
         </div>
         <div id="chatMessages" class="chat-messages">
           <div class="empty-state" id="chatEmptyState">
-            <div class="empty-icon">✳</div>
+            <div class="empty-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
             <h4>Start a conversation</h4>
             <p>Send a message to begin. Browsing tools are on by default — no setup required.</p>
           </div>
@@ -664,7 +689,7 @@ details.advanced .advanced-body{padding:4px 16px 16px}
         </div>
         <div id="modelGrid" class="model-grid"></div>
         <div id="modelEmpty" class="empty-state" style="display:none">
-          <div class="empty-icon">◌</div>
+          <div class="empty-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/><line x1="20" y1="9" x2="23" y2="9"/><line x1="20" y1="14" x2="23" y2="14"/><line x1="1" y1="9" x2="4" y2="9"/><line x1="1" y1="14" x2="4" y2="14"/></svg></div>
           <h4>No models loaded</h4>
           <p>Test the connection, then press “Fetch models” to list what this endpoint serves.</p>
         </div>
@@ -772,7 +797,7 @@ details.advanced .advanced-body{padding:4px 16px 16px}
         <div class="card-header"><h3>Registered endpoints</h3></div>
         <table><thead><tr><th>Name</th><th>URL</th><th>Method</th><th>Key env</th><th>Actions</th></tr></thead><tbody id="epTable"></tbody></table>
         <div id="epEmpty" class="empty-state" style="display:none">
-          <div class="empty-icon">⌾</div>
+          <div class="empty-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div>
           <h4>No manual endpoints</h4>
           <p>That's fine — the free built-in services cover browsing and search. Add an endpoint only when you have a specific API to wire in.</p>
         </div>
@@ -826,7 +851,7 @@ details.advanced .advanced-body{padding:4px 16px 16px}
         </div>
         <table><thead><tr><th>Time</th><th>Tool</th><th>Params</th><th>Status</th><th>Duration</th></tr></thead><tbody id="logsTable"></tbody></table>
         <div id="logsEmpty" class="empty-state" style="display:none">
-          <div class="empty-icon">≡</div>
+          <div class="empty-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
           <h4>No logs yet</h4>
           <p>Tool executions will appear here once you start chatting.</p>
         </div>
@@ -1080,7 +1105,7 @@ function buildAssistantBubble(content, sources = [], toolCalls = []) {
   if (sources && sources.length) bubble += formatSearchResults(sources);
   if (toolCalls && toolCalls.length) {
     bubble += '<div class="tool-calls">' + toolCalls.map(t =>
-      `<span class="tool-call-badge">⚙ ${escapeHtml(t.name || t)}</span>`).join("") + "</div>";
+      `<span class="tool-call-badge"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg> ${escapeHtml(t.name || t)}</span>`).join("") + "</div>";
   }
   return bubble;
 }
@@ -1147,7 +1172,7 @@ $("chatClear").addEventListener("click", () => {
 });
 
 // ===== session history (sidebar) =====
-const SESSION_ICON = '<svg class="s-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>';
+const SESSION_ICON = '<svg class="s-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>';
 
 async function loadSessions() {
   try {
@@ -1175,6 +1200,8 @@ async function loadSessions() {
       });
       item.querySelector(".session-del").addEventListener("click", async (e) => {
         e.stopPropagation();
+        // ponytail: native confirm() is the error-prevention floor; undo would need per-action restore paths (YAGNI) — revisit if delete-mistakes recur
+        if (!confirm("Delete this session?")) return;
         try {
           await api(`/api/chat/sessions/${encodeURIComponent(s.id)}`, { method: "DELETE" });
           if (s.id === currentSessionId) {
@@ -1183,7 +1210,6 @@ async function loadSessions() {
             chatMessages.appendChild(chatEmptyState);
             chatEmptyState.style.display = "";
           }
-          showToast("Session deleted", "success");
           loadSessions();
         } catch (err) { showToast("Error: " + err.message, "error"); }
       });
@@ -1268,7 +1294,6 @@ async function testConnection() {
       $("connMsg").innerHTML = `<b style="color:var(--ok)">connected</b> — ${escapeHtml(r.base_url)}`;
       $("connLatency").textContent = r.latency_ms + " ms";
       $("connModelCount").textContent = r.models_count;
-      showToast("Connection OK · " + r.models_count + " models", "success");
     } else {
       $("connLed").className = "led off";
       $("connMsg").innerHTML = `<b style="color:var(--err)">failed</b> — ${escapeHtml(r.error || "unknown error")}${r.hint ? "<br>" + escapeHtml(r.hint) : ""}`;
@@ -1315,9 +1340,8 @@ async function fetchModels() {
         card.addEventListener("click", () => selectModel(m.id));
         grid.appendChild(card);
       }
-      if (!currentModel) selectModel(models[0].id, true);
+      if (!currentModel) selectModel(models[0].id);
     }
-    showToast("Loaded " + models.length + " models", "success");
     // Fetch succeeded → make this the active provider immediately so chat works.
     await saveBackend(true);
   } catch (err) {
@@ -1327,7 +1351,7 @@ async function fetchModels() {
     btn.innerHTML = "Fetch models";
   }
 }
-function selectModel(id, silent = false) {
+function selectModel(id) {
   currentModel = id;
   const m = cachedModels.find(x => x.id === id);
   const label = (m && (m.name || m.id)) || id;
@@ -1338,7 +1362,6 @@ function selectModel(id, silent = false) {
   selectedModelLabel.className = "badge badge-ok";
   document.querySelectorAll(".model-card").forEach(c =>
     c.classList.toggle("selected", c.querySelector(".model-id")?.textContent === id));
-  if (!silent) showToast("Selected model: " + label, "success");
 }
 $("fetchModels").addEventListener("click", fetchModels);
 async function saveBackend(silent = false) {
@@ -1491,6 +1514,7 @@ window.testEp = async function(name) {
   } catch (e) { showToast(decodeURIComponent(name) + ": " + e.message, "error"); }
 };
 window.removeEp = async function(name) {
+  if (!confirm("Remove endpoint " + decodeURIComponent(name) + "?")) return;
   try {
     await api(`/api/endpoints/${name}`, { method: "DELETE" });
     showToast("Endpoint removed", "success");
@@ -1560,7 +1584,7 @@ function renderMcpServers(data) {
   container.innerHTML = "";
   const servers = data.servers || [];
   if (!servers.length) {
-    container.innerHTML = '<div class="empty-state" style="padding:26px"><div class="empty-icon">▢</div><h4>No servers</h4><p>Install a preset above or add a manual server below.</p></div>';
+    container.innerHTML = '<div class="empty-state" style="padding:26px"><div class="empty-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg></div><h4>No servers</h4><p>Install a preset above or add a manual server below.</p></div>';
     return;
   }
   for (const srv of servers) {
@@ -1586,6 +1610,7 @@ function renderMcpServers(data) {
   }
 }
 window.removeMcp = async function(name) {
+  if (!confirm("Remove MCP server " + decodeURIComponent(name) + "?")) return;
   try {
     await api(`/api/mcp/servers/${name}`, { method: "DELETE" });
     showToast("Removed: " + decodeURIComponent(name), "success");
@@ -1646,6 +1671,7 @@ $("cfgExport").addEventListener("click", async () => {
 $("cfgImportBtn").addEventListener("click", async () => {
   const text = $("cfgImport").value;
   if (!text) { showToast("Config text required", "error"); return; }
+  if (!confirm("Import will overwrite the current configuration. Continue?")) return;
   try {
     await api("/api/config/import", { method: "POST", body: JSON.stringify({ config: text }) });
     $("cfgStatus").textContent = "imported ✓";
