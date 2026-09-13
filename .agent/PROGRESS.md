@@ -170,7 +170,7 @@
 | AI | A3 Citation Pipeline Integration | TODO | 0/6 | — | — | Capability #3; needs A2 |
 | AI | A4 Ingestion & Tool Surface | TODO | 0/6 | — | — | Capability #2; parallel with A3 |
 | AI | A5 Research Validation & Tuning | TODO | 0/6 | — | — | Scenarios R1/R2 + §10 regression |
-| UI | U1 Skill-Driven Baseline & Audit | IN_PROGRESS | 2/6 | 0 (read-only) | — | U1.1 done: DESIGN.md + sidecar. Next: U1.2 dual audit |
+| UI | U1 Skill-Driven Baseline & Audit | IN_PROGRESS | 4/6 | 0 (read-only) | — | U1.1+U1.2 done (audit baseline 0C/6M/11m + 29/40). Next: U1.3 rank & freeze |
 | UI | U2 Reactive Text Inspection | TODO | 0/11 | — | — | Capability #4; U2.3 needs A2/A3 |
 | UI | U3 Research Output Rendering | TODO | 0/7 | — | — | Needs A3.2.1 + E3.2.2 contracts |
 | UI | U4 Console Polish & Consistency | TODO | 0/7 | — | — | Punch-list execution |
@@ -190,10 +190,77 @@
 |---|---|---|
 | 2026-09-13 | Efficiency skills vendored | `ponytail` (+audit/debt/review) & `i-have-adhd` installed to `.claude/skills/` |
 | 2026-09-13 | U1.1 skill pass (impeccable document · scan mode) | `DESIGN.md` (20 OKLCH tokens, 5 type roles, 9 components) + `.impeccable/design.json` sidecar; 0 `ponytail:` markers (no code) |
+| 2026-09-13 | U1.2 skill pass (hallmark audit · impeccable critique) | Baseline: 0 critical / 6 major / 11 minor (58 gates) + critique 29/40; contrast computed for 24 pairs (10 fail); 0 `ponytail:` markers (no code) |
 | — | ponytail-audit (E1.1.1) | pending |
 | — | ponytail-debt harvests | pending — 0 markers, 0 no-trigger |
 | — | Program net-LOC | 0 (baseline: src 3,666 py + 1,663 template; 233 tests) |
 
 ## Execution Log (adhd-format, newest first)
 
+- **2026-09-13 — U1 sub-phase 1.2 of 3 done (2/2 tasks; U1 total 4/6).** Dual scored audit complete, read-only, zero edits. **Hallmark audit: 0 critical · 6 major · 11 minor** (58 gates, v1.1.0). **Impeccable critique: 29/40 (Good, 72.5%)** — degraded single-context run (no sub-agent tools / no engine binary / no browser in harness; static review). Headline findings: (1) `--ink-3` tertiary-text tier fails WCAG AA 3.71–4.17:1 everywhere it's used, (2) focus ring 2.90:1 < 3:1 + transitioning ring + no `:focus-visible` matrix, (3) 38 off-token color values on a DESIGN.md-managed project, (4) no `overflow-x: clip` + `.key-row` 320px risk, (5) destructive actions without confirm/undo, (6) 4 celebratory toasts on visible effects. Full punch list with home-task mapping below. Win: U1.3 now ranks a scored list; U5.1 re-scores against this baseline. Next: **U1.3 — prioritize & freeze the punch list** (~30 min).
+
 - **2026-09-13 — U1 sub-phase 1.1 of 3 done (2/2 tasks; U1 total 2/6).** The console's design language is now documented: `DESIGN.md` at repo root — 20 OKLCH tokens, Fraunces/IBM Plex hierarchy, named rules (Two Signal Colors, Instrument Dark, Mono Speaks Data, Flat-By-Default, The 3px Rule, Dashed-Optional), North Star "The Night Observatory" — plus the `.impeccable/design.json` sidecar (9 drop-in components). Tokens verified 1:1 against `index.html` `:root` by script; usage log updated (U1.1.2). Win: U2/U3/U4 tasks that say "against DESIGN.md tokens" now have a source of truth. Ladder rung: 2 (reuse — tokens extracted from existing CSS, nothing re-invented). Next: **U1.2 — dual scored audit** (`hallmark audit` + `/impeccable critique`), ~1–1.5 h.
+
+---
+
+## U1.2 Scored Audit Baseline (2026-09-13 — U5.1 re-scores against this)
+
+**Targets:** `src/harness/ui/templates/index.html` (1,663 lines) + all 7 panels.
+**Skills:** `hallmark audit` (58 gates — installed v1.1.0; plan text said 57, version delta) + `/impeccable critique` (degraded single-context: no sub-agent tools, engine binary unavailable, no browser in harness → static/manual review; `impeccable detect` could not run).
+
+### Hallmark audit — 0 critical · 6 major · 11 minor
+
+| ID | Gate(s) | Tell | Where (index.html) | Severity | Fix |
+|----|---------|------|--------------------|----------|-----|
+| H-M1 | 40/41 | Tertiary text tier `--ink-3` fails AA: 3.96:1 on bg, 3.71:1 on panel (labels, hints, table headers 9.5–12 px), 4.17:1 on sidebar (session time) | `:root` L23; users at L111,125,165,204,221,279,292 | **major** | Raise `--ink-3` → `oklch(0.60 0.024 242)` (one token; re-verify ≥4.5:1 on all three surfaces) |
+| H-M2 | 40 | Focus ring `--blue-ring` (30 %) = 2.90:1 on bg, 2.96:1 on well — under 3:1 | `:root` L31; users L230 | **major** | Raise alpha 0.30 → 0.40 (one token) |
+| H-M3 | 15/26 | Focus ring transitions in (input `box-shadow 140ms`) + missing state matrix: zero `:focus-visible` in file; inputs lack `:hover`/`:disabled`; buttons rely on UA-default focus | L226-230 (inputs), L243-258 (buttons) | **major** | Add ~5 rules: `button:focus-visible{outline:2px solid var(--accent-2);outline-offset:2px}` (instant, no transition), `input:hover`, `input:disabled{opacity:.55;cursor:not-allowed}`, ring off the transition |
+| H-M4 | 34 | No `overflow-x: clip` on html/body (hard requirement); `.key-row` (min-width:170px + flex, no wrap) overflows at ~320 px (static analysis — no browser in harness to confirm) | `*`/`html,body` L46; `.key-row` L~560 | **major** | `html,body{overflow-x:clip}` + narrow-width rule for `.key-row` (wrap or shrink min-width) |
+| H-M5 | 48 | Mid-render token improvisation on a DESIGN.md-managed project: 38 inline color values outside `:root` (36 distinct oklch + 1 hex `#8fa3c8` in the select-chevron data-URI) — drift risk vs DESIGN.md | L52-93 (sky/main), L106, L142, L248-253 (buttons), L261-268 (badges), L321-343 (bubble), L351, L433-440 | **major** | Lift recurring values to `:root` tokens (`--btn-ink`, `--btn-amber-hover`, `--shadow-tactile-*`, `--sky-*`, `--chevron`, `--code-bg`, `--code-zebra`…), reference by `var()` |
+| H-M6 | audit verb | Missing system reference: no `/* Hallmark · … */` stamp tying the template to DESIGN.md (mandatory on a system-managed project since U1.1) | `<style>` top (L10-15 comment) | **major** | One-line stamp: `/* Hallmark · system: DESIGN.md · genre: atmospheric · designed-as-app */` |
+| H-m1 | 10 | `transition:all 200ms` (unspecified properties) | L457 `.toast.removing` | minor | `transition:opacity 200ms var(--ease),transform 200ms var(--ease)` |
+| H-m2 | 14 | Sidebar animates layout property `width` (200 ms) | L73 `.sidebar` | minor | `ponytail:` tag accepted exception (transform rail distorts icons) or grid-template-columns animation |
+| H-m3 | 16 | Celebratory toasts on already-visible effects: "Connection OK" (panel shows stats), "Loaded N models" (grid populates), "Selected model" (badge+card update), "Session deleted" (row vanishes); borderline: "Key set", "Generation settings saved" | JS `testConnection`, `fetchModels`, `selectModel`, session-del handler | minor | Silent success; keep toasts for failures + invisible effects ("Provider saved") |
+| H-m4 | 27 | `prefers-reduced-motion` misses: `.typing-dots span` bounce, `.led` pulse, `.spinner-sm` spin keep running | L471-474 (block), L179/L272/L351 (animations) | minor | Add `.typing-dots span,.led,.spinner-sm{animation:none}` to the block |
+| H-m5 | 33 | Decorative SVGs lack `aria-hidden="true"` (only `.sidebar-sky` div has it): 7 nav icons, session icons (JS-injected), collapse-btn svg | L~590-640 (nav), JS `SESSION_ICON` | minor | `aria-hidden="true"` on all decorative svgs |
+| H-m6 | 40 | Badge contrast near-misses: ok 4.41:1, err 3.64:1, blue 4.32:1 (warn passes 4.84:1) | `:root` L32-36, L262-268 | minor | Nudge: `--ok` L→0.76, `--err` L→0.70 or err-soft alpha→0.16, `--blue-ring`/blue-soft alpha→0.14 |
+| H-m7 | 40 | Hairline `--line` = 1.48:1 on bg (<3:1 non-text) — tone shift (panel vs bg) carries most edge identification | `:root` L24 | minor | Raise `--line` → ~0.36 or `ponytail:` tag as deliberate instrument hairline |
+| H-m8 | 39 | Input ≈41 px vs button ≈39 px on same `.row` forms (flex-end, no shared height; both under 44 px floor) | L224-230, L243-258, `.row` L238 | minor | One shared control-height token (e.g. 40 px) applied to both |
+| H-m9 | 36 | `.chat-bar` flex row (input+button) has no explicit `align-items` (stretches by default) | L~455 `.chat-bar` | minor | `align-items:center` |
+| H-m10 | 24 | No named spacing scale; dense odd paddings (8.5/11/13/15 px) not on a 4 pt grid | throughout | minor | Optional 8 pt rationalization in U4.1.3 consistency pass |
+| H-m11 | 29/30/4 | 3 static background radial glows (atmospheric allowance 2) · unicode dingbats as icons (✳ ◌ ⌾ ≡ ▢ in empty states, ⚙ in tool chips) instead of the existing inline-SVG set · `.model-card`/`.preset-card` nested inside `.card` containers | L52-56, L~470-540 (empty states), L~430 (tool chip), L~470-500 (grids) | minor | Merge two glows · swap dingbats for inline SVG (set exists) · de-emphasize inner-card borders or promote outer to section |
+
+**Passing with notes (not punch-listed):** exactly 3 font families (gate 37 ceiling — mono is the +1 data register, DESIGN.md "Mono Speaks Data Rule" documents this as identity; gate 38 pass-by-design) · `--page-header p` at 64ch (gate 25) · N3 side-rail nav, no footer/hero (42-45 n/a) · starfield = brand-motivated identity, aria-hidden ✓, reduced-motion ✓ for stars/meteors · no `#000`/`#fff` base colors · no invented metrics · no re-drawn chrome · single inline-SVG icon set (Lucide-style paths).
+
+### Impeccable critique — 29/40 (Good, 72.5 %) — degraded single-context
+
+| # | Heuristic | Score | Key issue |
+|---|-----------|-------|-----------|
+| 1 | Visibility of System Status | 4 | LEDs + typing dots + badges + tool chips + latency/model stats — excellent |
+| 2 | Match System / Real World | 3 | Jargon leaks: "MCP" unexpanded, "Base URL", "{query} placeholder" |
+| 3 | User Control and Freedom | 3 | No undo; deletes are immediate; config import overwrites silently |
+| 4 | Consistency and Standards | 3 | Strong component system; deviations = off-token colors (H-M5), 2 px control-height drift (H-m8) |
+| 5 | Error Prevention | 2 | Key-paste guard + placeholders exist, but no confirm on session/endpoint/MCP delete or config import; no inline validation |
+| 6 | Recognition Rather Than Recall | 4 | Visible labels, session history, preset descriptions, hints, guided empty states |
+| 7 | Flexibility and Efficiency | 2 | Enter-to-send is the only accelerator; no shortcuts, session search, or batch actions |
+| 8 | Aesthetic and Minimalist | 3 | Dense and focused; one ambient element; noise = success-toast clutter (H-m3) |
+| 9 | Error Recovery | 3 | Specific causes + next steps ("— check the AI Provider tab"), connection hints, retryable |
+| 10 | Help and Documentation | 2 | Contextual hints + empty states; no in-console help entry, tooltips, or docs link |
+| **Total** | | **29/40** | **Good** |
+
+**Design specificity verdict:** high — the night-observatory instrument identity (LEDs, numbered 01–07 IA, STEP sequence, citation-numbered evidence rows, mono readouts) is product-specific; nothing is category-interchangeable.
+**Priority issues:** P1 confirm/undo on destructive actions · P1 a11y cluster (H-M1/H-M2/H-M3/H-m5/H-m4) · P1 token discipline (H-M5) · P2 toast noise (H-m3) · P2 mobile safety (H-M4/H-m8/H-m9) · P3 polish cluster (H-m1/m2/m6/m7/m10/m11, H-M6 stamp).
+**Persona red flags:** Alex (power user): no keyboard path beyond Enter, no session search, no bulk delete. Sam (a11y): ink-3 labels fail AA, sub-3:1 transitioning focus ring, UA-default button focus, unhidden decorative SVGs. Jordan (first-timer): "MCP Services" unexpanded, "{query}" jargon, no docs link.
+**Cognitive load:** low-moderate — one near-fail (MCP view stacks 4 sections + advanced = 5 blocks).
+**Contrast computation:** 24 pairs measured (OKLCH→sRGB→WCAG): 14 pass, 10 fail (all listed in H-M1/M2/M6/m7 above).
+
+### Provisional home mapping (frozen by U1.3.2)
+
+| Item(s) | Home task |
+|---------|-----------|
+| H-M1, H-M2, H-M3, H-m4, H-m5, H-m6, H-m7 | U4.2.2 (keyboard/focus + a11y audit) |
+| H-M4, H-m8, H-m9 | U4.2.1 (adapt/responsive) |
+| H-M5, H-M6, H-m1, H-m2, H-m10, H-m11 | U4.1.2 (BF-rule/token sweep) + U4.1.3 (coherence pass) |
+| H-m3 | U4.1.1 (rank-3 polish item) |
+| P1 confirm/undo (critique) | U4.1.1 — needs U1.3 rank-1/2 decision (touches 4 JS handlers; not a BF rule but an error-prevention gap) |
+| P2 docs link (critique #10) | U4.1.1 or reject as out-of-plan scope (no new features) |
