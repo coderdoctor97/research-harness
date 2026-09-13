@@ -73,3 +73,40 @@ In **05 · MCP Services** you can additionally:
 **04 · Endpoints** wires classic HTTP tool APIs (Serper, etc.) when you have
 them: name + URL template + method + key env var, with a per-endpoint **Test**
 button. Not required for browsing — the built-ins cover that.
+
+## 4. Research workflow (multi-query fan-out)
+
+`harness.research.run_research(question, llm_chat, run_tool)` is the single
+entry point for research-grade answers (capability #1 + #3):
+
+1. **Decompose** — one LLM call turns the question into 3–5 targeted queries
+   (malformed output falls back to the original question, never crashes).
+2. **Fan-out** — queries run in parallel (`max_parallel`, per-call timeout);
+   partial failures are noted, not fatal.
+3. **Aggregate** — results are URL-deduped and registered into the
+   `SourceRegistry` in fan-out order (stable citation IDs).
+4. **Synthesize + citation pipeline** — the answer is generated against the
+   source pool, then passes the full `citations/` pipeline: orphan `[n]`
+   removed, fabricated URLs stripped, bare URLs link-formatted, Sources
+   section deduped/capped, keys scrubbed.
+
+### Citation metadata contract (consumed by the UI — frozen at A3.2)
+
+`run_research` returns:
+
+```json
+{
+  "answer": "…validated markdown with [n] citations and a ## Sources section…",
+  "queries": ["query 1", "query 2"],
+  "sources": [{"id": 1, "title": "…", "url": "https://…"}],
+  "citations": {"1": {"url": "https://…", "title": "…"}},
+  "report": {"warnings": [], "stripped_urls": [], "redacted_keys": []},
+  "failures": [{"query": "…", "error": "…"}],
+  "degraded": false
+}
+```
+
+- `citations` maps source id → url/title so the UI renders `[n]` anchors
+  without re-parsing markdown.
+- `degraded: true` means every search backend failed; `answer` is an honest
+  §8-style notice (no crash, no hanging loop).

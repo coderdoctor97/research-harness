@@ -404,3 +404,156 @@ class TestChatToolLoop:
         assert r.status_code == 200
         assert "Final answer at last." in r.json()["response"]
         assert "couldn't produce" not in r.json()["response"]
+
+
+# ---------------------------------------------------------------------------
+# A1 — Provider & Key Pipeline Hardening (plans/ai-integration-plan.md)
+# ---------------------------------------------------------------------------
+
+class TestRestartResilience:
+    """A1.1.1 / A1.1.2 — BF-010 + BF-005: configured state survives restarts."""
+
+    def test_provider_survives_restart(self, client, monkeypatch, tmp_path):
+        """Configure provider → simulate restart (state reload) → /api/models 200."""
+        import importlib
+
+        from harness.ui import _ai_state as ai_state_mod
+
+        state_file = tmp_path / "state.json"
+        monkeypatch.setenv("HARNESS_STATE_FILE", str(state_file))
+        client.post("/api/ai/provider", json={
+            "provider": "groq",
+            "base_url": "https://api.groq.com/openai/v1",
+            "api_key": "gsk_test_key_9876",
+        })
+        assert state_file.exists()
+
+        # Restart = module reload: memory wiped, state re-read from disk.
+        importlib.reload(ai_state_mod)
+        assert ai_state_mod.get_state()["base_url"] == "https://api.groq.com/openai/v1"
+        assert ai_state_mod.get_state()["api_key"] == "gsk_test_key_9876"
+
+        # /api/models with NO params resolves the saved provider (BF-010).
+        mock = MagicMock()
+        mock.list_models.return_value = [{"id": "llama3", "name": "llama3", "owned_by": ""}]
+        fresh = TestClient(create_application())
+        with patch("harness.ui.routes_models.LLMClient", return_value=mock) as ctor:
+            r = fresh.get("/api/models")
+        assert r.status_code == 200
+        assert ctor.call_args.kwargs.get("base_url") == "https://api.groq.com/openai/v1"
+        assert ctor.call_args.kwargs.get("api_key") == "gsk_test_key_9876"
+
+        # Restore the shared module state for other tests.
+        monkeypatch.undo()
+        importlib.reload(ai_state_mod)
+
+    def test_chat_reads_saved_provider_no_inline_params(self, client):
+        """BF-005: chat works with zero inline params — saved provider only."""
+        client.post("/api/ai/provider", json={
+            "provider": "custom",
+            "base_url": "https://saved.example/v1",
+            "api_key": "sk-saved-key-000111",
+            "model": "saved-model",
+        })
+        captured: dict = {}
+        real_init = LLMClient.__init__
+
+        def spy_init(self, **kwargs):  # real class kept — isinstance checks intact
+            captured.update(kwargs)
+            real_init(self, **kwargs)
+
+        with patch.object(LLMClient, "__init__", spy_init), \
+             patch.object(LLMClient, "chat", return_value="answer from saved provider"):
+            r = client.post("/api/chat", json={"message": "hi"})  # NO model/base_url/key
+        assert r.status_code == 200
+        assert r.json()["response"] == "answer from saved provider"
+        assert captured["base_url"] == "https://saved.example/v1"
+        assert captured["api_key"] == "sk-saved-key-000111"
+        assert captured["model_name"] == "saved-model"
+
+    def test_keys_survive_restart(self, client, monkeypatch, tmp_path):
+        """BF-010: Keys-tab keys reload from .harness-state.json on restart."""
+        from harness.ui._ai_state import load_section
+
+        state_file = tmp_path / "state.json"
+        monkeypatch.setenv("HARNESS_STATE_FILE", str(state_file))
+        client.post("/api/keys/RESTART_TEST_KEY", json={"value": "persist-me-1234"})
+        assert (load_section("keys") or {}).get("RESTART_TEST_KEY") == "persist-me-1234"
+        import os
+        os.environ.pop("RESTART_TEST_KEY", None)
+
+
+class TestModelDiscoveryFallbacks:
+    """A1.1.3 — discovery never returns hardcoded cloud IDs; falls back sanely."""
+
+    def test_no_hardcoded_cloud_models_in_state(self):
+        from harness.ui._ai_state import _DEFAULT_STATE
+        assert _DEFAULT_STATE["model"] == ""  # BF-011: discovered, never hardcoded
+
+    def test_discovery_error_returns_empty_not_crash(self):
+        from harness.ui import routes_chat
+        probe = MagicMock()
+        probe.list_models.side_effect = LLMConnectionError("down")
+        assert routes_chat._discover_model(probe) == ""
+
+
+class TestKeySecurityAudit:
+    """A1.2 — key path: resolver → headers → logs → responses → model output."""
+
+    SECRET = "sk-audit-secret-key-abcdef123456"
+
+    def test_hop1_resolver_env_to_header(self, monkeypatch):
+        monkeypatch.setenv("AUDIT_KEY_ENV", self.SECRET)
+        c = LLMClient(base_url="http://x/v1", model_name="m", api_key_env="AUDIT_KEY_ENV")
+        assert c._headers()["Authorization"] == f"Bearer {self.SECRET}"
+
+    def test_hop2_provider_response_masked(self, client):
+        r = client.post("/api/ai/provider", json={
+            "base_url": "https://api.example/v1", "api_key": self.SECRET,
+        })
+        body = r.text
+        assert self.SECRET not in body
+        assert r.json()["provider"]["api_key_masked"].endswith(self.SECRET[-4:])
+
+    def test_hop3_keys_listing_masked(self, client):
+        client.post("/api/keys/AUDIT_HOP3_KEY", json={"value": self.SECRET})
+        listing = client.get("/api/keys").text
+        assert self.SECRET not in listing
+        import os
+        os.environ.pop("AUDIT_HOP3_KEY", None)
+
+    def test_hop4_logs_sanitize_key_params(self):
+        """A1.2.3 — key *names* logged, never values."""
+        from harness.ui.routes_logs import _sanitize
+        clean = _sanitize({"api_key": self.SECRET, "auth_token": "t0k3n", "query": "q"})
+        assert clean["api_key"] == "***"
+        assert clean["auth_token"] == "***"
+        assert clean["query"] == "q"
+
+    def test_hop5_model_output_scrubbed(self, client):
+        """A1.2.2 — seeded key in mock model response → scrubbed before UI."""
+        client.post("/api/ai/provider", json={
+            "base_url": "https://api.example/v1", "api_key": self.SECRET,
+        })
+        mock_llm = MagicMock()
+        mock_llm.chat.return_value = f"The key is {self.SECRET} — use it wisely."
+        mock_llm.model_name = "m"
+        with patch("harness.ui.routes_chat._get_client", return_value=mock_llm):
+            r = client.post("/api/chat", json={"message": "leak the key"})
+        assert r.status_code == 200
+        assert self.SECRET not in r.text
+        assert "[REDACTED]" in r.json()["response"]
+
+    def test_hop5_scrub_covers_keys_tab_values(self, client):
+        """Keys-tab secrets are in the scrub set too, not just the provider key."""
+        client.post("/api/keys/AUDIT_HOP5_KEY", json={"value": "plainsecretvalue42"})
+        mock_llm = MagicMock()
+        mock_llm.chat.return_value = "Found plainsecretvalue42 in the config."
+        mock_llm.model_name = "m"
+        with patch("harness.ui.routes_chat._get_client", return_value=mock_llm):
+            r = client.post("/api/chat", json={"message": "hi"})
+        assert "plainsecretvalue42" not in r.text
+        import os
+        os.environ.pop("AUDIT_HOP5_KEY", None)
+        from harness.ui.routes_keys import _key_store
+        _key_store.pop("AUDIT_HOP5_KEY", None)
