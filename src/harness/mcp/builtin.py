@@ -26,16 +26,12 @@ USER_AGENT = (
     "(KHTML, like Gecko) Chrome/126.0 Safari/537.36 llm-research-harness/0.1"
 )
 
-<<<<<<< HEAD
 # A4.1.1 (Crawl4AI pattern): also strip structural noise — nav, footer,
 # header, aside, form — so page chrome/banners never reach the LLM.
 _TAG_RE = re.compile(
     r"<(script|style|noscript|svg|head|nav|footer|header|aside|form|iframe)[^>]*>.*?</\1>",
     re.S | re.I,
 )
-=======
-_TAG_RE = re.compile(r"<(script|style|noscript|svg|head)[^>]*>.*?</\1>", re.DOTALL | re.IGNORECASE)
->>>>>>> master
 _ANY_TAG_RE = re.compile(r"<[^>]+>")
 _WS_RE = re.compile(r"[ \t\r\f\v]+")
 _NL_RE = re.compile(r"\n{3,}")

@@ -96,31 +96,6 @@ def test_clean_final_text_strips_bare_json():
     assert _clean_final_text(raw) == ""
 
 
-<<<<<<< HEAD
-def test_fit_context_no_window_returns_unchanged():
-    from harness.ui.routes_chat import _fit_context
-    lines = ["[system] prompt", "[user] question", "[tool:x] result"]
-    assert _fit_context(lines, None) == lines
-    assert _fit_context(lines, 0) == lines
-
-
-def test_fit_context_keeps_head_and_trims_oldest():
-    from harness.ui.routes_chat import _fit_context
-    lines = [
-        "[system] prompt",
-        "[user] question",
-        "[tool:a] " + "A" * 100,   # oldest tool result → trimmed first
-        "[tool:b] " + "B" * 100,   # most recent → kept fully
-    ]
-    out = _fit_context(lines, context_window=40)  # 160 char budget
-    assert out[0] == "[system] prompt"
-    assert out[1] == "[user] question"
-    joined = "\n".join(out)
-    # newest tool result survives intact; oldest is truncated to fit the budget
-    assert "B" * 100 in joined
-    assert "A" * 100 not in joined
-
-
 def _mock_llm(reply: str):
     from unittest.mock import MagicMock
     mock = MagicMock()
@@ -204,8 +179,6 @@ def test_inspect_does_not_pollute_sessions(client):
     assert len(cs.list_sessions()) == before  # ephemeral loupe, not conversation history
 
 
-=======
->>>>>>> master
 def test_logs_endpoint(client):
     r = client.get("/api/logs")
     assert r.status_code == 200
