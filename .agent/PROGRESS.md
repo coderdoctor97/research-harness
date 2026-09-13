@@ -170,7 +170,7 @@
 | AI | A3 Citation Pipeline Integration | TODO | 0/6 | — | — | Capability #3; needs A2 |
 | AI | A4 Ingestion & Tool Surface | TODO | 0/6 | — | — | Capability #2; parallel with A3 |
 | AI | A5 Research Validation & Tuning | TODO | 0/6 | — | — | Scenarios R1/R2 + §10 regression |
-| UI | U1 Skill-Driven Baseline & Audit | TODO | 0/6 | 0 (read-only) | — | Start here (parallel with E1) |
+| UI | U1 Skill-Driven Baseline & Audit | IN_PROGRESS | 2/6 | 0 (read-only) | — | U1.1 done: DESIGN.md + sidecar. Next: U1.2 dual audit |
 | UI | U2 Reactive Text Inspection | TODO | 0/11 | — | — | Capability #4; U2.3 needs A2/A3 |
 | UI | U3 Research Output Rendering | TODO | 0/7 | — | — | Needs A3.2.1 + E3.2.2 contracts |
 | UI | U4 Console Polish & Consistency | TODO | 0/7 | — | — | Punch-list execution |
@@ -189,6 +189,11 @@
 | Date | Event | Result |
 |---|---|---|
 | 2026-09-13 | Efficiency skills vendored | `ponytail` (+audit/debt/review) & `i-have-adhd` installed to `.claude/skills/` |
+| 2026-09-13 | U1.1 skill pass (impeccable document · scan mode) | `DESIGN.md` (20 OKLCH tokens, 5 type roles, 9 components) + `.impeccable/design.json` sidecar; 0 `ponytail:` markers (no code) |
 | — | ponytail-audit (E1.1.1) | pending |
 | — | ponytail-debt harvests | pending — 0 markers, 0 no-trigger |
 | — | Program net-LOC | 0 (baseline: src 3,666 py + 1,663 template; 233 tests) |
+
+## Execution Log (adhd-format, newest first)
+
+- **2026-09-13 — U1 sub-phase 1.1 of 3 done (2/2 tasks; U1 total 2/6).** The console's design language is now documented: `DESIGN.md` at repo root — 20 OKLCH tokens, Fraunces/IBM Plex hierarchy, named rules (Two Signal Colors, Instrument Dark, Mono Speaks Data, Flat-By-Default, The 3px Rule, Dashed-Optional), North Star "The Night Observatory" — plus the `.impeccable/design.json` sidecar (9 drop-in components). Tokens verified 1:1 against `index.html` `:root` by script; usage log updated (U1.1.2). Win: U2/U3/U4 tasks that say "against DESIGN.md tokens" now have a source of truth. Ladder rung: 2 (reuse — tokens extracted from existing CSS, nothing re-invented). Next: **U1.2 — dual scored audit** (`hallmark audit` + `/impeccable critique`), ~1–1.5 h.
