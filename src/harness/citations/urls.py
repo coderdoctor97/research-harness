@@ -2,8 +2,8 @@
 from __future__ import annotations
 
 import re
-from harness.citations.registry import SourceRegistry
 
+from harness.citations.registry import SourceRegistry
 
 _URL_RE = re.compile(r"https?://[^\s)>\]']+")
 

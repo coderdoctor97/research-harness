@@ -23,12 +23,12 @@ class MCPClient:
         self._process: Any = None
         self._request_id = 0
         self._url: str | None = None
-        self._sse_mode = command.startswith("http://") or command.startswith("https://")
+        self._sse_mode = command.startswith(("http://", "https://"))
         if self._sse_mode:
             self._url = self.command.rstrip("/") + "/sse"
 
     async def connect(self) -> None:
-        if self.command.startswith("http://") or self.command.startswith("https://"):
+        if self.command.startswith(("http://", "https://")):
             self._sse_mode = True
             self._url = self.command.rstrip("/") + "/sse"
             return
@@ -43,7 +43,7 @@ class MCPClient:
             )
         except FileNotFoundError:
             raise MCPConnectionError(f"Command not found: {self.command}")
-        except Exception as exc:
+        except OSError as exc:
             raise MCPConnectionError(f"Failed to start: {exc}") from exc
 
     async def disconnect(self) -> None:
@@ -51,8 +51,9 @@ class MCPClient:
             try:
                 self._process.stdin.close()
                 await self._process.wait()
-            except Exception:
-                pass
+            except (OSError, RuntimeError, AttributeError):
+                self._process = None
+                return
             self._process = None
 
     async def initialize(self) -> dict:
@@ -88,11 +89,11 @@ class MCPClient:
             if not raw:
                 raise MCPConnectionError("Server closed connection")
             return json.loads(raw.decode()).get("result", {})
-        except asyncio.TimeoutError:
+        except TimeoutError:
             raise MCPConnectionError("Timeout waiting for response")
         except MCPConnectionError:
             raise
-        except Exception as exc:
+        except (OSError, json.JSONDecodeError, AttributeError) as exc:
             raise MCPConnectionError(f"Request failed: {exc}") from exc
 
     async def _request_sse(self, payload: dict) -> dict:
@@ -110,5 +111,5 @@ class MCPClient:
         try:
             await self.initialize()
             return True
-        except Exception:
+        except MCPConnectionError:
             return False

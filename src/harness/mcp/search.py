@@ -1,15 +1,15 @@
 # Search MCP — integration with DuckDuckGo MCP for web search
 from __future__ import annotations
 
-from typing import Any
+from typing import ClassVar
 
-from harness.mcp.client import MCPClient, MCPConnectionError
+from harness.mcp.client import MCPClient
 
 
 class SearchMCPTool:
     name = "web_search_mcp"
     description = "Search the web using DuckDuckGo via MCP"
-    parameters = {
+    parameters: ClassVar[dict] = {
         "query": {"type": "string", "description": "Search query"},
         "max_results": {"type": "integer", "description": "Max results (default 5)", "default": 5},
     }
@@ -23,7 +23,7 @@ class SearchMCPTool:
         try:
             result = await self._client.call_tool("web_search", {"query": query, "max_results": max_results})
             return {"ok": True, "data": result, "query": query}
-        except Exception as exc:
+        except Exception as exc:  # noqa: BLE001 - MCP boundary returns errors as tool payloads
             return {"ok": False, "error": str(exc)}
 
 

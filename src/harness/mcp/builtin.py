@@ -9,6 +9,7 @@ Default services provided:
 """
 from __future__ import annotations
 
+import asyncio
 import html as _html
 import json
 import re
@@ -17,27 +18,34 @@ from urllib.parse import parse_qs, unquote, urljoin, urlparse
 
 import httpx
 
+from harness.registry.index import ToolRegistry
+from harness.registry.tool import Tool, ToolResult
+
 USER_AGENT = (
     "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 "
     "(KHTML, like Gecko) Chrome/126.0 Safari/537.36 llm-research-harness/0.1"
 )
 
+<<<<<<< HEAD
 # A4.1.1 (Crawl4AI pattern): also strip structural noise — nav, footer,
 # header, aside, form — so page chrome/banners never reach the LLM.
 _TAG_RE = re.compile(
     r"<(script|style|noscript|svg|head|nav|footer|header|aside|form|iframe)[^>]*>.*?</\1>",
     re.S | re.I,
 )
+=======
+_TAG_RE = re.compile(r"<(script|style|noscript|svg|head)[^>]*>.*?</\1>", re.DOTALL | re.IGNORECASE)
+>>>>>>> master
 _ANY_TAG_RE = re.compile(r"<[^>]+>")
 _WS_RE = re.compile(r"[ \t\r\f\v]+")
 _NL_RE = re.compile(r"\n{3,}")
-_HREF_RE = re.compile(r"""<a\b[^>]*href\s*=\s*["']([^"']+)["'][^>]*>(.*?)</a>""", re.S | re.I)
+_HREF_RE = re.compile(r"""<a\b[^>]*href\s*=\s*["']([^"']+)["'][^>]*>(.*?)</a>""", re.DOTALL | re.IGNORECASE)
 
 
 def strip_html(raw: str) -> str:
     """Crush HTML to readable plain text (no external deps)."""
     text = _TAG_RE.sub(" ", raw)
-    text = re.sub(r"<(br|/p|/div|/li|/h[1-6]|/tr)\s*/?>", "\n", text, flags=re.I)
+    text = re.sub(r"<(br|/p|/div|/li|/h[1-6]|/tr)\s*/?>", "\n", text, flags=re.IGNORECASE)
     text = _ANY_TAG_RE.sub(" ", text)
     text = _html.unescape(text)
     text = _WS_RE.sub(" ", text)
@@ -123,7 +131,7 @@ _DDG_RESULT_RE = re.compile(
     r"""<a[^>]*class=["']result__a["'][^>]*href=["']([^"']+)["'][^>]*>(.*?)</a>"""
     r""".*?"""
     r"""<a[^>]*class=["']result__snippet["'][^>]*>(.*?)</a>""",
-    re.S,
+    re.DOTALL,
 )
 
 # DuckDuckGo Lite markup (fallback endpoint, single-quoted attributes)
@@ -131,13 +139,13 @@ _DDG_LITE_RE = re.compile(
     r"""<a[^>]*href=["']([^"']+)["'][^>]*class=["']result-link["'][^>]*>(.*?)</a>"""
     r""".*?"""
     r"""<td[^>]*class=["']result-snippet["'][^>]*>(.*?)</td>""",
-    re.S,
+    re.DOTALL,
 )
 _DDG_LITE_RE_ALT = re.compile(
     r"""<a[^>]*class=["']result-link["'][^>]*href=["']([^"']+)["'][^>]*>(.*?)</a>"""
     r""".*?"""
     r"""<td[^>]*class=["']result-snippet["'][^>]*>(.*?)</td>""",
-    re.S,
+    re.DOTALL,
 )
 
 
@@ -284,6 +292,26 @@ BUILTIN_SERVERS: dict[str, BuiltinServer] = {
     FETCHER_SERVER.name: FETCHER_SERVER,
     SEARCH_SERVER.name: SEARCH_SERVER,
 }
+
+
+class BuiltinTool(Tool):
+    def __init__(self, server: BuiltinServer, tool: dict) -> None:
+        self.name = tool["name"]
+        self.description = tool.get("description", "")
+        self.parameters = tool.get("inputSchema", {"type": "object", "properties": {}})
+        self._server = server
+
+    def run(self, **params) -> ToolResult:
+        result = asyncio.run(self._server.call_tool(self.name, params))
+        return ToolResult(ok=bool(result.get("ok")), data=result, error=result.get("error"))
+
+
+def builtin_tool_registry() -> ToolRegistry:
+    registry = ToolRegistry()
+    for server in BUILTIN_SERVERS.values():
+        for tool in server.list_tools():
+            registry.register(BuiltinTool(server, tool))
+    return registry
 
 
 def server_entries() -> list[dict]:

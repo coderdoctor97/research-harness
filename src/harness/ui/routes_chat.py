@@ -11,12 +11,14 @@ import json
 import re
 import time
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Query
+from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 
 from harness.citations.scrubber import scrub
 from harness.llm.client import LLMClient, LLMConnectionError, LLMResponseError
-from harness.mcp.builtin import BUILTIN_SERVERS
+from harness.loop.agent import run_chat, run_chat_stream
+from harness.mcp.builtin import builtin_tool_registry
 from harness.ui import _chat_state
 from harness.ui._ai_state import get_state, update_state
 
@@ -27,29 +29,6 @@ class ChatMessage(BaseModel):
     message: str
     model: str | None = None
     session_id: str | None = None
-
-
-def _tool_docs() -> str:
-    lines = []
-    for server in BUILTIN_SERVERS.values():
-        for tool in server.list_tools():
-            params = ", ".join(tool.get("inputSchema", {}).get("properties", {}).keys())
-            lines.append(f"- {tool['name']}({params}): {tool['description']} [server: {server.name}]")
-    return "\n".join(lines)
-
-
-def _build_system_prompt() -> str:
-    return (
-        "You are a research assistant powered by LLM Research Harness. "
-        "You can browse the web using the built-in tools below.\n\n"
-        "Available tools:\n" + _tool_docs() + "\n\n"
-        "When you need a tool, reply with a tool call in ONE of these forms:\n"
-        '  {"tool_calls": [{"name": "<tool>", "arguments": { ... }}]}\n'
-        '  <tool_call>{"name": "<tool>", "arguments": { ... }}</tool_call>\n\n'
-        "After the tool results are provided, answer the user's question in plain "
-        "text and cite the sources (title + URL) you used. Do NOT include the "
-        "tool-call markup or JSON in your final answer. Be concise."
-    )
 
 
 def _get_client(model: str | None) -> LLMClient:
@@ -103,7 +82,7 @@ _NON_CHAT_RE = re.compile(
 def _discover_model(client: LLMClient) -> str:
     try:
         models = client.list_models()
-    except Exception:
+    except (LLMConnectionError, LLMResponseError):
         return ""
     ids = [m.get("id", "") for m in models if m.get("id")]
     if not ids:
@@ -117,24 +96,46 @@ def _discover_model(client: LLMClient) -> str:
     return ids[0]
 
 
-def _maybe_resolve_model(client: LLMClient, explicit_model: str | None) -> None:
+async def _maybe_resolve_model(client: LLMClient, explicit_model: str | None) -> None:
     if explicit_model or not isinstance(client, LLMClient):
         return
     if get_state().get("model"):
         return
-    discovered = _discover_model(client)
+    discovered = await asyncio.to_thread(_discover_model, client)
     if discovered:
         update_state(model=discovered)
         client.model_name = discovered
 
 
-_TOOL_BLOCK_RE = re.compile(r"<\s*/?\s*(?:antml:)?tool_call\s*>", re.IGNORECASE)
-_TOOL_BLOCK_PAIR_RE = re.compile(
-    r"<\s*(?:antml:)?tool_call\s*>.*?<\s*/\s*(?:antml:)?tool_call\s*>",
-    re.IGNORECASE | re.DOTALL,
-)
+def _persist_chat(msg: ChatMessage, result: dict, client: LLMClient) -> dict:
+    session = _chat_state.get_session(msg.session_id) if msg.session_id else None
+    if session is None:
+        session = _chat_state.create_session(msg.message)
+    _chat_state.append_message(session, {"role": "user", "content": msg.message, "ts": time.time()})
+
+    final_text = result["response"] or (
+        "I gathered information with my browsing tools, but couldn't produce a clean "
+        "summary this time. Please try rephrasing the question."
+    )
+    response = {
+        "response": final_text,
+        "tool_calls": result.get("tool_calls", []),
+        "sources": result.get("sources", []),
+        "model": msg.model or client.model_name,
+        "session_id": session["id"],
+    }
+    _chat_state.append_message(session, {
+        "role": "assistant",
+        "content": final_text,
+        "tool_calls": response["tool_calls"],
+        "sources": response["sources"],
+        "model": response["model"],
+        "ts": time.time(),
+    })
+    return response
 
 
+<<<<<<< HEAD
 def _extract_tool_calls(text: str) -> list[dict]:
     """Extract tool call requests from LLM output (bugfix.json BF-013).
 
@@ -287,11 +288,16 @@ def _run_tool_sync(name: str, arguments: dict) -> dict:
 
     with concurrent.futures.ThreadPoolExecutor(max_workers=1) as pool:
         return pool.submit(_runner).result()
+=======
+def _sse(event: dict) -> str:
+    return f"event: {event['type']}\ndata: {json.dumps(event, ensure_ascii=False)}\n\n"
+>>>>>>> master
 
 
 def mount(app: FastAPI) -> None:
     async def _handle_chat(msg: ChatMessage, allow_model_retry: bool) -> dict:
         client = _get_client(msg.model)
+<<<<<<< HEAD
         _maybe_resolve_model(client, msg.model)  # BF-011: discover+persist if unset
         transcript = [
             f"[system] {_build_system_prompt()}",
@@ -381,27 +387,67 @@ def mount(app: FastAPI) -> None:
                 "I gathered information with my browsing tools, but couldn't "
                 "produce a clean summary this time. Please try rephrasing the "
                 "question."
+=======
+        await _maybe_resolve_model(client, msg.model)  # BF-011: discover+persist if unset
+        try:
+            result = await run_chat(
+                client,
+                builtin_tool_registry(),
+                msg.message,
+                max_tool_rounds=MAX_TOOL_ROUNDS,
+                context_window=get_state().get("context_window") or None,
+>>>>>>> master
             )
-        _chat_state.append_message(session, {
-            "role": "assistant",
-            "content": final_text,
-            "tool_calls": tool_calls_seen,
-            "sources": sources,
-            "model": used_model,
-            "ts": time.time(),
-        })
+        except LLMConnectionError as exc:
+            raise HTTPException(
+                503,
+                detail=f"Cannot reach the AI endpoint: {exc} — open “02 · AI Provider”, "
+                "enter your base URL + API key, press Test, then Save as default.",
+            ) from exc
+        except LLMResponseError as exc:
+            # BF-011: stale saved model (provider deprecated it) → forget it, rediscover, retry once.
+            if allow_model_retry and not msg.model and "404" in str(exc):
+                update_state(model="")
+                return await _handle_chat(msg, allow_model_retry=False)
+            raise HTTPException(502, detail=str(exc)) from exc
 
-        return {
-            "response": final_text,
-            "tool_calls": tool_calls_seen,
-            "sources": sources,
-            "model": used_model,
-            "session_id": session["id"],
-        }
+        return _persist_chat(msg, result, client)
 
     @app.post("/api/chat")
     async def chat(msg: ChatMessage):
         return await _handle_chat(msg, allow_model_retry=True)
+
+    def _stream_response(msg: ChatMessage) -> StreamingResponse:
+        async def events():
+            client = _get_client(msg.model)
+            await _maybe_resolve_model(client, msg.model)
+            try:
+                async for event in run_chat_stream(
+                    client,
+                    builtin_tool_registry(),
+                    msg.message,
+                    max_tool_rounds=MAX_TOOL_ROUNDS,
+                    context_window=get_state().get("context_window") or None,
+                ):
+                    if event["type"] == "final":
+                        event.update(_persist_chat(msg, event, client))
+                    yield _sse(event)
+            except (LLMConnectionError, LLMResponseError) as exc:
+                yield _sse({"type": "error", "error": str(exc)})
+
+        return StreamingResponse(events(), media_type="text/event-stream")
+
+    @app.post("/api/chat/stream")
+    async def chat_stream(msg: ChatMessage):
+        return _stream_response(msg)
+
+    @app.get("/api/chat/stream")
+    async def chat_stream_get(
+        message: str = Query(default=""),
+        model: str | None = Query(default=None),
+        session_id: str | None = Query(default=None),
+    ):
+        return _stream_response(ChatMessage(message=message, model=model, session_id=session_id))
 
     @app.get("/api/chat/sessions")
     async def list_sessions():

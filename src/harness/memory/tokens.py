@@ -9,5 +9,5 @@ def count(text: str) -> int:
         import tiktoken
         enc = tiktoken.get_encoding("cl100k_base")
         return len(enc.encode(text))
-    except Exception:
+    except (ImportError, RuntimeError):
         return max(1, len(text) // 4)

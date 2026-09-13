@@ -1,8 +1,11 @@
 # P10.T8 — 15-scenario acceptance run (plan.md §10)
 from __future__ import annotations
 
+<<<<<<< HEAD
 import time
 
+=======
+>>>>>>> master
 import pytest
 
 from harness.citations.scrubber import scrub

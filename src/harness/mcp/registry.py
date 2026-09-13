@@ -2,11 +2,10 @@
 from __future__ import annotations
 
 import asyncio
-from typing import Any
 
-from harness.mcp.client import MCPClient, MCPConnectionError
 from harness.mcp.browser import BrowserMCP
-from harness.mcp.search import SearchMCP
+from harness.mcp.client import MCPClient, MCPConnectionError
+from harness.mcp.search import SearchMCP, SearchMCPTool
 from harness.registry.tool import Tool, ToolResult
 
 
@@ -33,7 +32,7 @@ class MCPToolDefinition(Tool):
             return ToolResult(ok=True, data=result)
         except MCPConnectionError as exc:
             return ToolResult(ok=False, error=str(exc))
-        except Exception as exc:
+        except (OSError, RuntimeError, ValueError) as exc:
             return ToolResult(ok=False, error=str(exc))
 
 
@@ -50,7 +49,7 @@ class MCPToolRegistry:
         client = MCPClient(command=command, args=args, env=env)
         await client.connect()
         try:
-            init_result = await client.initialize()
+            await client.initialize()
             tools_data = await client.list_tools()
         except Exception as exc:
             await client.disconnect()

@@ -4,10 +4,9 @@ from __future__ import annotations
 import ast
 import operator
 import re
-from typing import Any
+from typing import Any, ClassVar
 
 from harness.registry.tool import Tool, ToolResult
-
 
 _ALLOWED_NAMES = {
     "pi": 3.141592653589793,
@@ -39,7 +38,7 @@ _ALLOWED_BINOPS = {
 class ComputeTool(Tool):
     name = "compute"
     description = "Evaluate a safe arithmetic expression"
-    parameters = {"expression": {"type": "string", "description": "Arithmetic expression to evaluate", "required": True}}
+    parameters: ClassVar[dict] = {"expression": {"type": "string", "description": "Arithmetic expression to evaluate", "required": True}}
 
     def run(self, **params) -> ToolResult:
         expr = params.get("expression", "")

@@ -1,12 +1,12 @@
 # P5.T7 — Citation pipeline: validate→urls→links→sources→scrub
 from __future__ import annotations
 
-from harness.citations.validate import validate as validate_cites
-from harness.citations.urls import validate_urls
 from harness.citations.links import format_links
-from harness.citations.sources import ensure_sources_section
-from harness.citations.scrubber import scrub
 from harness.citations.registry import SourceRegistry
+from harness.citations.scrubber import scrub
+from harness.citations.sources import ensure_sources_section
+from harness.citations.urls import validate_urls
+from harness.citations.validate import validate as validate_cites
 
 
 def finalize(

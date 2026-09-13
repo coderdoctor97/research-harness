@@ -3,10 +3,8 @@ from __future__ import annotations
 
 import hashlib
 import json
-import os
 import time
 from pathlib import Path
-from typing import Any
 
 
 class DocumentCache:
@@ -36,7 +34,7 @@ class DocumentCache:
                     fp.unlink(missing_ok=True)
                     return None
                 return data
-            except Exception:
+            except (OSError, json.JSONDecodeError, TypeError):
                 return None
         return None
 
@@ -47,8 +45,8 @@ class DocumentCache:
         fp = self.cache_dir / f"{k}.json"
         try:
             fp.write_text(json.dumps(data))
-        except Exception:
-            pass
+        except OSError:
+            return
 
     def clear(self) -> None:
         self._mem.clear()

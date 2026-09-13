@@ -3,7 +3,6 @@ from __future__ import annotations
 
 from harness.registry.index import ToolRegistry
 
-
 FALLBACK_INSTRUCTION = (
     "If the user's question can be answered from your training knowledge "
     "without external tools, answer directly without calling any tools."

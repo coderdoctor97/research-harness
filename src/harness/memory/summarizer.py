@@ -9,6 +9,27 @@ _SUMMARY_PROMPT = (
 )
 
 
+def summarize_history(turns: list[dict], *, start: int = 0, keep_last: int = 6) -> tuple[str, list[dict]]:
+    """Deterministic fallback summarizer for context assembly.
+
+    It keeps the newest turns verbatim and compresses older turns without another LLM
+    call, so the shared core can stay within budget even when the model client is a
+    scripted test double or already busy answering the user.
+    """
+    if len(turns) <= keep_last:
+        return "", turns
+    old_turns = turns[:-keep_last]
+    recent_turns = turns[-keep_last:]
+    end = start + len(old_turns) - 1
+    snippets = []
+    for turn in old_turns[-3:]:
+        role = turn.get("role", "?")
+        content = " ".join(str(turn.get("content", "")).split())[:120]
+        snippets.append(f"{role}: {content}")
+    summary = f"[Summary of turns {start}–{end}] " + " | ".join(snippets)
+    return summary, recent_turns
+
+
 def summarize_turns(
     client: LLMClient,
     turns: list[dict],
@@ -23,5 +44,5 @@ def summarize_turns(
     try:
         result = client.chat(prompt)
         return result.strip()
-    except Exception:
+    except Exception:  # noqa: BLE001 - summarizer fallback must not break context assembly
         return f"[Summary of turns {start}–{end}] {len(turns)} turns summarized."

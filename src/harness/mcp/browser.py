@@ -1,15 +1,15 @@
 # Browser MCP — integration with browsermcp for browser automation
 from __future__ import annotations
 
-from typing import Any
+from typing import ClassVar
 
-from harness.mcp.client import MCPClient, MCPConnectionError
+from harness.mcp.client import MCPClient
 
 
 class BrowserMCPTool:
     name = "browser_automation"
     description = "Automate browser interactions (navigate, click, type, screenshot, etc.)"
-    parameters = {
+    parameters: ClassVar[dict] = {
         "action": {"type": "string", "description": "Action to perform: navigate, click, type, screenshot, scroll, snapshot"},
         "url": {"type": "string", "description": "URL for navigate action"},
         "selector": {"type": "string", "description": "CSS selector for click/type actions"},
@@ -25,7 +25,7 @@ class BrowserMCPTool:
         try:
             result = await self._client.call_tool("browser_" + action, args)
             return {"ok": True, "data": result}
-        except Exception as exc:
+        except Exception as exc:  # noqa: BLE001 - MCP boundary returns errors as tool payloads
             return {"ok": False, "error": str(exc)}
 
 

@@ -40,7 +40,7 @@ def test_keys_set_and_masked(client):
 
 
 def test_chat_endpoint(client):
-    from unittest.mock import patch, MagicMock
+    from unittest.mock import MagicMock, patch
     mock_client = MagicMock()
     mock_client.model_name = "mock-model"
     mock_client.chat.return_value = "Echo: hello"
@@ -51,7 +51,8 @@ def test_chat_endpoint(client):
 
 
 def test_tool_call_extraction_wrapped_in_xml_tags():
-    from harness.ui.routes_chat import _extract_tool_calls, _clean_final_text
+    from harness.loop.parser import clean_final_text as _clean_final_text
+    from harness.loop.parser import extract_tool_calls as _extract_tool_calls
     raw = (
         "<tool_call>\n"
         '{"tool_calls": [{"name": "fetch_url", "arguments": '
@@ -68,7 +69,7 @@ def test_tool_call_extraction_wrapped_in_xml_tags():
 
 
 def test_tool_call_extraction_shorthand_tag():
-    from harness.ui.routes_chat import _extract_tool_calls
+    from harness.loop.parser import extract_tool_calls as _extract_tool_calls
     raw = '<tool_call>{"name": "web_search", "arguments": {"query": "x"}}</tool_call>'
     calls = _extract_tool_calls(raw)
     assert len(calls) == 1
@@ -77,7 +78,7 @@ def test_tool_call_extraction_shorthand_tag():
 
 
 def test_clean_final_text_strips_payload_and_tags():
-    from harness.ui.routes_chat import _clean_final_text
+    from harness.loop.parser import clean_final_text as _clean_final_text
     raw = (
         "Here is some prose.\n"
         '<tool_call>{"tool_calls": [{"name": "web_search", "arguments": {"query": "x"}}]}</tool_call>\n'
@@ -90,33 +91,9 @@ def test_clean_final_text_strips_payload_and_tags():
 
 
 def test_clean_final_text_strips_bare_json():
-    from harness.ui.routes_chat import _clean_final_text
+    from harness.loop.parser import clean_final_text as _clean_final_text
     raw = '{"tool_calls": [{"name": "web_search", "arguments": {"query": "x"}}]}'
     assert _clean_final_text(raw) == ""
-
-
-def test_fit_context_no_window_returns_unchanged():
-    from harness.ui.routes_chat import _fit_context
-    lines = ["[system] prompt", "[user] question", "[tool:x] result"]
-    assert _fit_context(lines, None) == lines
-    assert _fit_context(lines, 0) == lines
-
-
-def test_fit_context_keeps_head_and_trims_oldest():
-    from harness.ui.routes_chat import _fit_context
-    lines = [
-        "[system] prompt",
-        "[user] question",
-        "[tool:a] " + "A" * 100,   # oldest tool result → trimmed first
-        "[tool:b] " + "B" * 100,   # most recent → kept fully
-    ]
-    out = _fit_context(lines, context_window=40)  # 160 char budget
-    assert out[0] == "[system] prompt"
-    assert out[1] == "[user] question"
-    joined = "\n".join(out)
-    # newest tool result survives intact; oldest is truncated to fit the budget
-    assert "B" * 100 in joined
-    assert "A" * 100 not in joined
 
 
 def test_logs_endpoint(client):

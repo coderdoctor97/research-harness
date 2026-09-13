@@ -135,6 +135,6 @@ def mount(app: FastAPI) -> None:
             raise HTTPException(400, f"not a built-in server: {server_name}")
         try:
             result = await asyncio.wait_for(server.call_tool(tool_name, arguments), timeout=30)
-        except asyncio.TimeoutError:
+        except TimeoutError:
             raise HTTPException(504, "tool call timed out")
         return {"server": server_name, "tool": tool_name, "result": result}
