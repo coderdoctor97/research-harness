@@ -2,6 +2,7 @@
 # Flow: pick provider preset -> set API key -> test connection -> fetch models.
 from __future__ import annotations
 
+import asyncio
 import os
 import time
 
@@ -61,7 +62,7 @@ def mount(app: FastAPI) -> None:
             api_key_env=api_key_env,
         )
         try:
-            models = client.list_models()
+            models = await asyncio.to_thread(client.list_models)
             return {"models": models}
         except LLMConnectionError as exc:
             raise HTTPException(503, str(exc))
@@ -118,7 +119,7 @@ def mount(app: FastAPI) -> None:
         )
         started = time.perf_counter()
         try:
-            models = client.list_models()
+            models = await asyncio.to_thread(client.list_models)
         except LLMConnectionError as exc:
             return {"ok": False, "base_url": base_url, "error": str(exc),
                     "hint": "Is the server running? Check the base URL (include /v1)."}
