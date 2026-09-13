@@ -25,6 +25,7 @@ Usage log (newest first):
 
 | Date | Skills | Action |
 |------|--------|--------|
+| 2026-09-13 | impeccable (document) · ponytail · i-have-adhd | **U1.1** — scan-mode `document` pass over `src/harness/ui/templates/index.html`: extracted the 20 OKLCH tokens + Fraunces/IBM Plex hierarchy + components into `DESIGN.md` (frontmatter + 8 sections, North Star "The Night Observatory") and the `.impeccable/design.json` sidecar (9 drop-in components, ramps, shadows, motion). No UI edits (U1 is read-only). |
 | 2026-09-13 | ponytail · i-have-adhd | Vendored as the **mandatory efficiency layer** for the `plans/` improvement program (agent.md §1): ponytail governs implementation (ladder, minimal diffs, `ponytail:` debt tags, audit/review/debt at gates); i-have-adhd governs reporting (action-first, numbered, state-restating). Roadmap item #1 now installed. |
 | 2026-09-12 | hallmark · impeccable · frontend-design | Full console redesign + AI-provider flow + MCP service cards |
 
