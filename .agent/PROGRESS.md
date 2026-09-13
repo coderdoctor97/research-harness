@@ -147,3 +147,48 @@
 - [x] P10.T6 `[P]` User docs
 - [x] P10.T7 `[P]` Developer docs
 - [x] P10.T8 `[S]` Packaging + 15-scenario acceptance run
+
+---
+
+# IMPROVEMENT PROGRAM TRACKER (appended 2026-09-13 — build phases 1–10 above stay as history)
+
+> Plans: `plans/engine-improvement-plan.md` · `plans/ai-integration-plan.md` · `plans/ui-improvement-plan.md`
+> Protocol: `.agent/agent.md` §4. Efficiency layer always on: ponytail (code) + i-have-adhd (reports).
+> Entries are append-only, adhd-format: state restated, wins visible, one next action.
+
+## Phase Status
+
+| Plan | Phase | Status | Tasks done | Net LOC Δ | Tests | Notes |
+|---|---|---|---|---|---|---|
+| Engine | E1 Baseline Audit & Debt Map | TODO | 0/8 | 0 (read-only) | — | Start here (parallel with U1, A1) |
+| Engine | E2 Single Orchestration Core | TODO | 0/9 | — | — | Keystone; blocks A2 |
+| Engine | E3 Streaming End-to-End | TODO | 0/7 | — | — | Blocks U3.3 |
+| Engine | E4 Robustness & Performance | TODO | 0/6 | — | — | Parallel-safe after E2 |
+| Engine | E5 Structural Hygiene & Sign-off | TODO | 0/6 | — | — | Final engine gate |
+| AI | A1 Provider & Key Hardening | TODO | 0/7 | — | — | Independent; parallel-safe |
+| AI | A2 Multi-Query Research Workflow | TODO | 0/9 | — | — | Capability #1; needs E2 |
+| AI | A3 Citation Pipeline Integration | TODO | 0/6 | — | — | Capability #3; needs A2 |
+| AI | A4 Ingestion & Tool Surface | TODO | 0/6 | — | — | Capability #2; parallel with A3 |
+| AI | A5 Research Validation & Tuning | TODO | 0/6 | — | — | Scenarios R1/R2 + §10 regression |
+| UI | U1 Skill-Driven Baseline & Audit | TODO | 0/6 | 0 (read-only) | — | Start here (parallel with E1) |
+| UI | U2 Reactive Text Inspection | TODO | 0/11 | — | — | Capability #4; U2.3 needs A2/A3 |
+| UI | U3 Research Output Rendering | TODO | 0/7 | — | — | Needs A3.2.1 + E3.2.2 contracts |
+| UI | U4 Console Polish & Consistency | TODO | 0/7 | — | — | Punch-list execution |
+| UI | U5 Skill Verification & Sign-off | TODO | 0/5 | — | — | Re-score gates |
+
+## Frozen Contracts (SYNC points)
+
+| Contract | Frozen by | Consumed by | Status |
+|---|---|---|---|
+| Core loop API (shared CLI+UI) | E2.3 | A2, U2.3 | — |
+| SSE event schema (token/tool_call/tool_result/final) | E3.3 | U3.3 | — |
+| Citation metadata map (source id → url/title) | A3.2 | U2.3, U3.1 | — |
+
+## Efficiency Ledger
+
+| Date | Event | Result |
+|---|---|---|
+| 2026-09-13 | Efficiency skills vendored | `ponytail` (+audit/debt/review) & `i-have-adhd` installed to `.claude/skills/` |
+| — | ponytail-audit (E1.1.1) | pending |
+| — | ponytail-debt harvests | pending — 0 markers, 0 no-trigger |
+| — | Program net-LOC | 0 (baseline: src 3,666 py + 1,663 template; 233 tests) |

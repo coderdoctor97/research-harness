@@ -1,0 +1,62 @@
+{
+  "$schema": "architectural-references/v1",
+  "project": "research-harness",
+  "purpose": "Registry of architectural benchmarks and integration blueprints for the research-harness. These are NOT runtime tools — they are reference foundations an agent studies to design/upgrade the corresponding harness subsystem. For active callable runtime tools, see the `skills/` layer (src/harness/tools/, registry, MCP built-ins).",
+  "distinction": {
+    "skills/": "Active, callable runtime tools invoked by the agent loop at run time (web_search, fetch_url, academic_search, compute, MCP built-ins, etc.).",
+    "references/": "Architectural reference foundations — external projects studied as benchmarks/blueprints when designing or upgrading a subsystem. Never imported or called at runtime."
+  },
+  "product_identity": {
+    "kind": "autonomous academic/deep-research engine (not a conversational chatbot)",
+    "capabilities": [
+      "Multi-query web/paper searches",
+      "Ingesting and converting live web content into LLM-ready clean markdown",
+      "Generating synthesized, research-grade responses with verified inline citations and clickable anchor hyperlinks",
+      "Reactive UI text inspection — highlighting a phrase/term triggers an anchored definition or deeper contextual breakdown"
+    ]
+  },
+  "references": {
+    "research_engine_harness": {
+      "name": "Perplexica",
+      "repo": "https://github.com/ItzCrazyKns/Perplexica",
+      "role": "Agent Orchestration & Citation Pipeline",
+      "architectural_pattern": "Multi-query search generation, vector re-ranking, and prompt-level inline citation hyperlinking."
+    },
+    "content_extraction": {
+      "name": "Crawl4AI",
+      "repo": "https://github.com/unclecode/crawl4ai",
+      "role": "High-Fidelity Web Scraper & HTML-to-Markdown Pipeline",
+      "architectural_pattern": "Async Playwright crawler, noise stripping (banners/footers), structured markdown extraction, and raw link harvesting."
+    },
+    "search_retrieval_backend": {
+      "name": "SearXNG",
+      "repo": "https://github.com/searxng/searxng",
+      "role": "Self-Hosted Metasearch API Provider",
+      "architectural_pattern": "Zero-cost, unmetered JSON aggregation across 70+ search engines (academic, general web, code)."
+    },
+    "standardized_tooling_protocol": {
+      "name": "MCP Reference Servers",
+      "repo": "https://github.com/modelcontextprotocol/servers",
+      "role": "Model Context Protocol Tool Integration",
+      "architectural_pattern": "Standardized local STDIO/SSE tool interfaces, specifically mcp-server-fetch for chunked markdown web extraction."
+    },
+    "selection_anchor_engine": {
+      "name": "Floating UI",
+      "repo": "https://github.com/floating-ui/floating-ui",
+      "role": "Dynamic Viewport Positioning for Highlight Popovers",
+      "architectural_pattern": "Virtual coordinate positioning via window.getSelection() and collision-aware tooltip boundary management."
+    },
+    "interactive_text_document": {
+      "name": "Tiptap",
+      "repo": "https://github.com/ueberdosis/tiptap",
+      "role": "Rich Interactive Text Nodes & Selection Listeners",
+      "architectural_pattern": "ProseMirror-based interactive node views, BubbleMenu for selection triggers, and rich citation metadata nodes."
+    }
+  },
+  "capability_mapping": {
+    "multi-query web/paper searches": ["research_engine_harness", "search_retrieval_backend"],
+    "live web content → clean markdown": ["content_extraction", "standardized_tooling_protocol"],
+    "synthesized responses with inline citations + anchors": ["research_engine_harness", "interactive_text_document"],
+    "reactive UI text inspection (highlight → anchored breakdown)": ["selection_anchor_engine", "interactive_text_document"]
+  }
+}

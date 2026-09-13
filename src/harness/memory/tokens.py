@@ -3,6 +3,8 @@ from __future__ import annotations
 
 
 def count(text: str) -> int:
+    if not text:
+        return 0
     try:
         import tiktoken
         enc = tiktoken.get_encoding("cl100k_base")

@@ -19,6 +19,11 @@ class ToolCall:
 
 def classify(text: str) -> tuple[CallType, str | ToolCall | None]:
     """Return (type, payload). Payload is final-answer text or ToolCall."""
+    # 0) Strip <tool_call>…</tool_call> XML wrappers (Qwen/Anthropic-style
+    #    models emit these; they are markup, not answer text).
+    text = re.sub(
+        r"<\s*/?\s*(?:antml:)?tool_call\s*>", "", text, flags=re.IGNORECASE
+    ).strip()
     # 1) Try OpenAI native function_calls JSON
     try:
         import json

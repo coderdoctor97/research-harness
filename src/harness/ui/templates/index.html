@@ -1,167 +1,842 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>LLM Research Harness</title><style>:root{--bg-primary:oklch(0.15 0.02 260);--bg-secondary:oklch(0.18 0.02 260);--bg-tertiary:oklch(0.22 0.02 260);--bg-elevated:oklch(0.25 0.02 260);--text-primary:oklch(0.92 0.01 260);--text-secondary:oklch(0.7 0.01 260);--text-tertiary:oklch(0.5 0.01 260);--accent:oklch(0.65 0.2 260);--accent-hover:oklch(0.7 0.22 260);--accent-glow:oklch(0.65 0.2 260 / 0.25);--accent-subtle:oklch(0.65 0.15 260 / 0.1);--border:oklch(0.25 0.02 260);--border-light:oklch(0.3 0.02 260);--success:oklch(0.7 0.15 150);--warning:oklch(0.8 0.15 80);--error:oklch(0.65 0.2 25);--radius-sm:6px;--radius-md:10px;--radius-lg:14px;--transition:200ms cubic-bezier(0.4,0,0.2,1);--sidebar-w:220px}*{box-sizing:border-box;margin:0;padding:0}html,body{height:100%;background:var(--bg-primary);color:var(--text-primary);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}.app{display:flex;height:100vh;overflow:hidden}.sidebar{width:var(--sidebar-w);background:var(--bg-secondary);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;position:relative;z-index:10}.sidebar::after{content:"";position:absolute;top:0;right:-1px;bottom:0;width:1px;background:linear-gradient(to bottom,transparent,var(--accent-glow),transparent);pointer-events:none}.sidebar-brand{padding:20px 20px 16px;border-bottom:1px solid var(--border);margin-bottom:8px}.sidebar-brand h1{font-size:15px;font-weight:700;color:var(--text-primary);display:flex;align-items:center;gap:10px}.sidebar-brand .icon{width:28px;height:28px;border-radius:var(--radius-sm);background:linear-gradient(135deg,var(--accent),oklch(0.55 0.25 300));display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:white;box-shadow:0 2px 8px var(--accent-glow)}.sidebar-brand .subtitle{font-size:11px;color:var(--text-tertiary);margin-top:2px;padding-left:38px}.sidebar nav{flex:1;padding:4px 10px}.sidebar nav a{display:flex;align-items:center;gap:10px;padding:10px 12px;color:var(--text-secondary);text-decoration:none;border-radius:var(--radius-sm);cursor:pointer;font-size:13px;font-weight:500;transition:all var(--transition);position:relative;margin-bottom:2px;border:none;background:transparent;width:100%;text-align:left;font-family:inherit}.sidebar nav a:hover{background:var(--bg-tertiary);color:var(--text-primary)}.sidebar nav a.active{background:var(--accent-subtle);color:var(--accent)}.sidebar nav a.active::before{content:"";position:absolute;left:-10px;top:6px;bottom:6px;width:3px;border-radius:0 3px 3px 0;background:var(--accent);box-shadow:0 0 8px var(--accent-glow)}.sidebar nav a .nav-icon{width:18px;height:18px;display:flex;align-items:center;justify-content:center;opacity:0.7;flex-shrink:0}.sidebar nav a.active .nav-icon{opacity:1}.sidebar-footer{padding:12px 16px;border-top:1px solid var(--border);font-size:11px;color:var(--text-tertiary);display:flex;align-items:center;gap:6px}.status-dot{width:6px;height:6px;border-radius:50%;background:var(--success);animation:pulse-dot 2s ease-in-out infinite}@keyframes pulse-dot{0%,100%{opacity:1}50%{opacity:0.4}}.main{flex:1;overflow-y:auto;padding:28px 32px;background:var(--bg-primary);scroll-behavior:smooth}.main::-webkit-scrollbar{width:6px}.main::-webkit-scrollbar-track{background:transparent}.main::-webkit-scrollbar-thumb{background:var(--border-light);border-radius:3px}.view{display:none;max-width:1100px}.view.active{display:block;animation:fadeSlideIn 300ms ease forwards}@keyframes fadeSlideIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}.page-header{margin-bottom:24px}.page-header h2{font-size:22px;font-weight:700;margin-bottom:4px}.page-header p{font-size:13px;color:var(--text-tertiary)}.card{background:var(--bg-secondary);border:1px solid var(--border);border-radius:var(--radius-md);padding:20px;margin-bottom:16px;transition:border-color var(--transition)}input,select,textarea{background:var(--bg-primary);border:1px solid var(--border);color:var(--text-primary);padding:9px 14px;border-radius:var(--radius-sm);font-size:13px;font-family:inherit;transition:border-color var(--transition),box-shadow var(--transition);width:100%}input::placeholder,textarea::placeholder{color:var(--text-tertiary)}input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-glow)}select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238b949e' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:32px}button,.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:9px 18px;border:none;border-radius:var(--radius-sm);cursor:pointer;font-size:13px;font-weight:600;font-family:inherit;transition:all var(--transition)}.btn-primary{background:var(--accent);color:white;box-shadow:0 1px 3px var(--accent-glow)}.btn-primary:hover{background:var(--accent-hover);box-shadow:0 2px 8px var(--accent-glow);transform:translateY(-1px)}.btn-secondary{background:var(--bg-tertiary);color:var(--text-secondary);border:1px solid var(--border)}.btn-secondary:hover{background:var(--bg-elevated);color:var(--text-primary)}.btn-danger{background:oklch(0.4 0.15 25 / 0.15);color:var(--error);border:1px solid oklch(0.4 0.15 25 / 0.3)}.btn-danger:hover{background:oklch(0.45 0.15 25 / 0.25)}.btn-sm{padding:5px 12px;font-size:12px}.row{display:flex;gap:10px;align-items:flex-end;margin-bottom:10px}.row>*{flex:1}table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:10px 14px;border-bottom:1px solid var(--border);font-size:13px}th{color:var(--text-tertiary);font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:0.5px}tbody tr{transition:background var(--transition)}tbody tr:hover{background:var(--bg-tertiary)}tbody tr:last-child td{border-bottom:none}.badge{display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;gap:4px}.badge-success{background:oklch(0.7 0.15 150 / 0.12);color:var(--success)}.badge-warning{background:oklch(0.8 0.15 80 / 0.12);color:var(--warning)}.badge-error{background:oklch(0.65 0.2 25 / 0.12);color:var(--error)}.badge-neutral{background:var(--bg-tertiary);color:var(--text-secondary)}.hidden{display:none!important}.spinner-sm{width:12px;height:12px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin 0.6s linear infinite;display:inline-block;vertical-align:middle}@keyframes spin{to{transform:rotate(360deg)}}.chat-container{display:flex;flex-direction:column;height:calc(100vh - 96px);max-height:800px;background:var(--bg-secondary);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden}.chat-header{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:1px solid var(--border)}.chat-header-left{display:flex;align-items:center;gap:12px}.chat-header-left h3{font-size:14px;font-weight:600}.model-selector{background:var(--bg-tertiary);border:1px solid var(--border);color:var(--text-primary);padding:6px 30px 6px 12px;border-radius:var(--radius-sm);font-size:12px;font-family:inherit;cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238b949e' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;min-width:180px}.model-selector:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-glow)}.chat-messages{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:16px}.chat-messages::-webkit-scrollbar{width:5px}.chat-messages::-webkit-scrollbar-track{background:transparent}.chat-messages::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}.message{display:flex;gap:12px;max-width:85%;animation:msgIn 250ms ease forwards;opacity:0}@keyframes msgIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}.message.user{align-self:flex-end;flex-direction:row-reverse}.message.assistant{align-self:flex-start}.msg-avatar{width:32px;height:32px;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0}.message.user .msg-avatar{background:linear-gradient(135deg,oklch(0.65 0.2 260),oklch(0.55 0.25 300));color:white}.message.assistant .msg-avatar{background:linear-gradient(135deg,var(--bg-tertiary),var(--bg-elevated));color:var(--accent);border:1px solid var(--border)}.msg-bubble{padding:12px 16px;border-radius:var(--radius-md);font-size:13.5px;line-height:1.6}.message.user .msg-bubble{background:var(--accent);color:white;border-bottom-right-radius:4px}.message.assistant .msg-bubble{background:var(--bg-tertiary);border:1px solid var(--border);border-bottom-left-radius:4px}.msg-bubble pre{background:var(--bg-primary);padding:12px;border-radius:var(--radius-sm);overflow-x:auto;margin-top:8px;font-size:12px;line-height:1.5;border:1px solid var(--border)}.msg-bubble code{font-family:"SF Mono",Monaco,monospace;font-size:12px}.msg-bubble p{margin-bottom:8px}.msg-bubble p:last-child{margin-bottom:0}.msg-bubble a{color:var(--accent);text-decoration:none}.msg-bubble a:hover{text-decoration:underline}.msg-meta{font-size:11px;color:var(--text-tertiary);margin-top:6px;display:flex;gap:10px}.message.user .msg-meta{justify-content:flex-end}.chat-bar{display:flex;gap:10px;padding:16px 20px;border-top:1px solid var(--border);background:var(--bg-secondary)}.chat-bar input{margin-bottom:0;flex:1}.chat-bar button:disabled{opacity:0.5;cursor:not-allowed;transform:none!important}.typing-indicator{display:none;align-items:center;gap:12px;padding:4px 0}.typing-indicator.visible{display:flex;animation:msgIn 200ms ease forwards}.typing-dots{display:flex;gap:4px;padding:12px 16px;background:var(--bg-tertiary);border:1px solid var(--border);border-radius:var(--radius-md);border-bottom-left-radius:4px}.typing-dots span{width:7px;height:7px;border-radius:50%;background:var(--text-tertiary);animation:bounce 1.4s ease-in-out infinite}.typing-dots span:nth-child(2){animation-delay:0.15s}.typing-dots span:nth-child(3){animation-delay:0.3s}@keyframes bounce{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-6px)}}.empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;color:var(--text-tertiary);gap:12px;padding:40px}.empty-state .empty-icon{width:48px;height:48px;border-radius:var(--radius-md);background:var(--bg-tertiary);display:flex;align-items:center;justify-content:center;font-size:20px;border:1px solid var(--border)}.empty-state h4{font-size:14px;color:var(--text-secondary);font-weight:600}.empty-state p{font-size:12px;text-align:center;max-width:300px}.tool-calls{margin-top:8px;display:flex;flex-wrap:wrap;gap:6px}.tool-call-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;background:var(--accent-subtle);border:1px solid var(--accent-glow);border-radius:20px;font-size:11px;color:var(--accent)}.search-results{margin-top:8px;display:flex;flex-direction:column;gap:8px}.search-result-item{padding:10px 14px;background:var(--bg-primary);border:1px solid var(--border);border-radius:var(--radius-sm);transition:border-color var(--transition)}.search-result-item:hover{border-color:var(--border-light)}.search-result-item a{color:var(--accent);text-decoration:none;font-weight:600;font-size:13px;display:block;margin-bottom:3px}.search-result-item a:hover{text-decoration:underline}.search-result-item .snippet{font-size:12px;color:var(--text-secondary);line-height:1.5}.toast-container{position:fixed;top:20px;right:20px;z-index:1000;display:flex;flex-direction:column;gap:8px}.toast{padding:12px 18px;border-radius:var(--radius-sm);font-size:13px;color:var(--text-primary);border:1px solid var(--border);box-shadow:0 8px 30px rgba(0,0,0,0.5);animation:toastIn 300ms ease forwards;backdrop-filter:blur(12px);max-width:380px}.toast.success{background:oklch(0.18 0.02 150 / 0.9);border-color:oklch(0.4 0.15 150 / 0.3)}.toast.error{background:oklch(0.18 0.02 25 / 0.9);border-color:oklch(0.4 0.15 25 / 0.3)}.toast.info{background:oklch(0.18 0.02 260 / 0.9);border-color:var(--accent-glow)}@keyframes toastIn{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}@keyframes toastOut{from{opacity:1}to{opacity:0;transform:translateX(20px)}}.toast.removing{animation:toastOut 200ms ease forwards}.config-viewer{background:var(--bg-primary);border:1px solid var(--border);border-radius:var(--radius-sm);padding:16px;font-family:"SF Mono",Monaco,monospace;font-size:12px;line-height:1.6;color:var(--text-secondary);overflow:auto;white-space:pre-wrap;word-break:break-word;max-height:400px}.model-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}.model-card{background:var(--bg-tertiary);border:1px solid var(--border);border-radius:var(--radius-md);padding:16px;transition:all var(--transition);cursor:pointer}.model-card:hover{border-color:var(--accent);box-shadow:0 0 20px var(--accent-glow);transform:translateY(-2px)}.model-card.selected{border-color:var(--accent);background:var(--accent-subtle)}.model-card .model-name{font-weight:600;font-size:14px;margin-bottom:4px}.model-card .model-id{font-family:"SF Mono",Monaco,monospace;font-size:11px;color:var(--text-tertiary)}.mcp-server-card{background:var(--bg-tertiary);border:1px solid var(--border);border-radius:var(--radius-md);padding:16px;transition:all var(--transition)}.mcp-server-card:hover{border-color:var(--border-light)}.mcp-server-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}.mcp-server-header h4{font-size:14px;font-weight:600}.mcp-tools-list{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}.mcp-tool-tag{padding:3px 10px;background:var(--bg-primary);border:1px solid var(--border);border-radius:20px;font-size:11px;color:var(--text-secondary);font-family:"SF Mono",Monaco,monospace}.tabs{display:flex;gap:2px;border-bottom:1px solid var(--border);margin-bottom:16px}.tab{padding:8px 16px;font-size:13px;font-weight:500;color:var(--text-secondary);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all var(--transition);background:none;border-top:none;border-left:none;border-right:none;font-family:inherit}.tab:hover{color:var(--text-primary)}.tab.active{color:var(--accent);border-bottom-color:var(--accent)}.key-row{display:flex;align-items:center;gap:12px;padding:10px 14px;border-bottom:1px solid var(--border);transition:background var(--transition)}.key-row:hover{background:var(--bg-tertiary)}.key-row:last-child{border-bottom:none}.key-name{font-weight:600;font-size:13px;min-width:100px}.key-value-masked{font-family:"SF Mono",Monaco,monospace;font-size:12px;color:var(--text-secondary);flex:1}.key-actions{display:flex;gap:6px}.mcp-add-form{display:flex;gap:10px;align-items:flex-end;margin-bottom:16px}.mcp-add-form>*{flex:1}@media (max-width:768px){.sidebar{width:60px}.sidebar-brand h1 span,.sidebar-brand .subtitle,.sidebar nav a span{display:none}.sidebar nav a{justify-content:center;padding:12px}.sidebar nav a.active::before{display:none}.main{padding:16px}.message{max-width:95%}.model-grid{grid-template-columns:1fr}}</style></head><body><div class="app"><aside class="sidebar"><div class="sidebar-brand"><h1><div class="icon">LH</div><span>LLM Harness</span></h1><div class="subtitle">Research Engine</div></div><nav><a data-view="chat" class="active"><span class="nav-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span><span>Chat</span></a><a data-view="models"><span class="nav-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span><span>Models</span></a><a data-view="keys"><span class="nav-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2l-2 2m-7.6 7.6a5 5 0 1 1-7.2 0"/><path d="M14.5 8.5L21 2"/></svg></span><span>Keys</span></a><a data-view="endpoints"><span class="nav-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></span><span>Endpoints</span></a><a data-view="mcp"><span class="nav-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg></span><span>MCP</span></a><a data-view="logs"><span class="nav-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></span><span>Logs</span></a><a data-view="config"><span class="nav-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span><span>Config</span></a></nav><div class="sidebar-footer"><span class="status-dot"></span><span id="sidebarStatus">Server running</span></div></aside>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>LLM Research Harness — Console</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   RESEARCH HARNESS CONSOLE — night-observatory identity
+   Deep blue-black sky · amber signal accents · Fraunces display
+   Twinkling stars + meteors in the sidebar rail
+   ============================================================ */
+:root{
+  --bg:oklch(0.17 0.021 256);
+  --panel:oklch(0.205 0.024 256);
+  --panel-2:oklch(0.245 0.026 256);
+  --well:oklch(0.15 0.019 258);
+  --ink:oklch(0.93 0.012 235);
+  --ink-2:oklch(0.72 0.022 240);
+  --ink-3:oklch(0.55 0.024 242);
+  --line:oklch(0.315 0.032 252);
+  --line-soft:oklch(0.275 0.028 252);
+  --accent:oklch(0.80 0.14 75);
+  --accent-2:oklch(0.70 0.13 235);
+  --accent-soft:oklch(0.80 0.14 75 / 0.10);
+  --accent-ring:oklch(0.80 0.14 75 / 0.28);
+  --blue-soft:oklch(0.70 0.13 235 / 0.10);
+  --blue-ring:oklch(0.70 0.13 235 / 0.30);
+  --ok:oklch(0.74 0.14 160);
+  --ok-soft:oklch(0.74 0.14 160 / 0.12);
+  --warn:oklch(0.82 0.14 85);
+  --err:oklch(0.68 0.19 25);
+  --err-soft:oklch(0.68 0.19 25 / 0.12);
+  --font-display:"Fraunces",Georgia,"Times New Roman",serif;
+  --font-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --font-mono:"IBM Plex Mono","SFMono-Regular",Consolas,monospace;
+  --sidebar-w:248px;
+  --sidebar-w-collapsed:66px;
+  --ease:cubic-bezier(0.33,1,0.68,1);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  background:var(--bg);color:var(--ink);
+  font-family:var(--font-body);font-size:14px;line-height:1.55;
+  -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
+}
+::selection{background:var(--blue-ring)}
+
+/* ---------- shell ---------- */
+.app{display:flex;height:100vh;overflow:hidden}
+.main{
+  flex:1;overflow-y:auto;padding:34px 40px 60px;scroll-behavior:smooth;
+  background:
+    radial-gradient(55% 44% at 88% -8%, oklch(0.38 0.09 250 / 0.22), transparent 62%),
+    radial-gradient(46% 40% at -4% 104%, oklch(0.32 0.08 232 / 0.17), transparent 60%),
+    radial-gradient(30% 26% at 55% 0%, oklch(0.30 0.06 260 / 0.12), transparent 70%),
+    radial-gradient(oklch(0.93 0.02 235 / 0.028) 1px, transparent 1px) 0 0/26px 26px,
+    linear-gradient(180deg, oklch(0.175 0.023 254), oklch(0.16 0.019 260));
+}
+.main::-webkit-scrollbar{width:8px}
+.main::-webkit-scrollbar-thumb{background:var(--line);border-radius:4px}
+.main::-webkit-scrollbar-track{background:transparent}
+
+/* ---------- sidebar: observatory rail with a living sky ---------- */
+.sidebar{
+  width:var(--sidebar-w);flex-shrink:0;display:flex;flex-direction:column;
+  background:linear-gradient(180deg, oklch(0.155 0.028 252), oklch(0.13 0.022 262));
+  border-right:1px solid var(--line-soft);position:relative;z-index:10;overflow:hidden;
+  transition:width 200ms var(--ease);
+}
+body.sidebar-collapsed .sidebar{width:var(--sidebar-w-collapsed)}
+
+/* the sky layer: stars + meteors */
+.sidebar-sky{position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:0}
+.star{
+  position:absolute;width:2px;height:2px;border-radius:50%;
+  background:oklch(0.88 0.05 240);opacity:0.2;
+  animation:twinkle 3s ease-in-out infinite;
+}
+.star-big{width:3px;height:3px;box-shadow:0 0 6px 1px oklch(0.85 0.09 240 / 0.55)}
+@keyframes twinkle{0%,100%{opacity:0.12;transform:scale(0.8)}50%{opacity:0.9;transform:scale(1.15)}}
+.meteor{
+  position:absolute;height:1.5px;width:76px;border-radius:2px;pointer-events:none;opacity:0;
+  background:linear-gradient(90deg, oklch(0.92 0.09 240 / 0.95), oklch(0.90 0.10 240 / 0) 85%);
+  animation:meteor-fall linear forwards;
+}
+.meteor::after{
+  content:"";position:absolute;left:-1px;top:-1.3px;width:4px;height:4px;border-radius:50%;
+  background:oklch(0.95 0.05 240);box-shadow:0 0 7px 1.5px oklch(0.88 0.10 240 / 0.8);
+}
+@keyframes meteor-fall{
+  0%{opacity:0;transform:rotate(-38deg) translateX(0)}
+  10%{opacity:1}
+  100%{opacity:0;transform:rotate(-38deg) translateX(-220px)}
+}
+.sidebar>*{position:relative;z-index:1}
+
+.sidebar-brand{padding:20px 18px 16px;border-bottom:1px solid oklch(0.26 0.03 252 / 0.7)}
+.brand-row{display:flex;align-items:center;gap:11px}
+.monogram{
+  width:34px;height:34px;flex-shrink:0;display:flex;align-items:center;justify-content:center;
+  border:1.5px solid var(--accent);color:var(--accent);border-radius:3px;
+  font-family:var(--font-mono);font-size:13px;font-weight:600;letter-spacing:0.5px;
+  background:var(--accent-soft);
+}
+.brand-title{font-family:var(--font-display);font-size:16.5px;font-weight:600;letter-spacing:0.01em;line-height:1.15}
+.brand-sub{font-family:var(--font-mono);font-size:9.5px;letter-spacing:0.14em;text-transform:uppercase;color:var(--ink-3);margin-top:2px}
+.collapse-btn{
+  margin-left:auto;flex-shrink:0;width:26px;height:26px;padding:0;border-radius:3px;
+  background:transparent;border:1px solid var(--line);color:var(--ink-3);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:color 140ms var(--ease),border-color 140ms var(--ease),transform 90ms var(--ease);
+}
+.collapse-btn:hover{color:var(--ink);border-color:var(--ink-3)}
+.collapse-btn:active{transform:scale(0.92)}
+.collapse-btn svg{transition:transform 200ms var(--ease)}
+body.sidebar-collapsed .collapse-btn svg{transform:rotate(180deg)}
+
+.sidebar nav{padding:12px 12px 4px}
+.nav-label{
+  font-family:var(--font-mono);font-size:9.5px;letter-spacing:0.16em;text-transform:uppercase;
+  color:var(--ink-3);padding:8px 10px 6px;white-space:nowrap;
+}
+.sidebar nav a{
+  display:flex;align-items:center;gap:11px;width:100%;padding:8.5px 10px;margin-bottom:1px;
+  color:var(--ink-2);text-decoration:none;border:none;background:transparent;cursor:pointer;
+  font-family:var(--font-body);font-size:13.5px;font-weight:500;border-radius:3px;
+  transition:background 140ms var(--ease),color 140ms var(--ease),transform 90ms var(--ease);
+  text-align:left;position:relative;white-space:nowrap;
+}
+.sidebar nav a .nav-icon{width:18px;height:18px;flex-shrink:0;display:flex;align-items:center;justify-content:center;opacity:0.75;transition:opacity 140ms var(--ease)}
+.sidebar nav a:hover{background:var(--blue-soft);color:var(--ink)}
+.sidebar nav a:hover .nav-icon{opacity:1}
+.sidebar nav a:active{transform:scale(0.975)}
+.sidebar nav a.active{background:var(--blue-soft);color:var(--ink)}
+.sidebar nav a.active .nav-icon{opacity:1;color:var(--accent-2)}
+.sidebar nav a.active::before{
+  content:"";position:absolute;left:-12px;top:7px;bottom:7px;width:2.5px;background:var(--accent-2);border-radius:2px;
+  box-shadow:0 0 8px var(--blue-ring);
+}
+
+/* sessions history block */
+.sessions-block{flex:1;display:flex;flex-direction:column;min-height:0;padding:6px 12px 8px}
+.sessions-head{display:flex;align-items:center;justify-content:space-between;padding:4px 10px 6px}
+.sessions-head .nav-label{padding:0}
+.session-list{flex:1;overflow-y:auto;min-height:40px}
+.session-list::-webkit-scrollbar{width:5px}
+.session-list::-webkit-scrollbar-thumb{background:var(--line);border-radius:3px}
+.session-item{
+  display:flex;align-items:center;gap:9px;width:100%;padding:7px 10px;margin-bottom:1px;border:none;
+  background:transparent;border-radius:3px;cursor:pointer;text-align:left;font-family:var(--font-body);
+  color:var(--ink-2);transition:background 140ms var(--ease),transform 90ms var(--ease);position:relative;
+}
+.session-item:hover{background:oklch(0.24 0.03 254 / 0.6)}
+.session-item:active{transform:scale(0.98)}
+.session-item.active{background:var(--blue-soft);color:var(--ink)}
+.session-item .s-icon{width:14px;height:14px;flex-shrink:0;color:var(--ink-3)}
+.session-item.active .s-icon{color:var(--accent-2)}
+.session-meta{flex:1;min-width:0;display:flex;flex-direction:column}
+.session-title{font-size:12.5px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.session-time{font-family:var(--font-mono);font-size:9.5px;color:var(--ink-3)}
+.session-del{
+  display:none;flex-shrink:0;width:18px;height:18px;padding:0;border:none;border-radius:3px;cursor:pointer;
+  background:transparent;color:var(--ink-3);font-size:11px;line-height:1;align-items:center;justify-content:center;
+}
+.session-item:hover .session-del{display:flex}
+.session-del:hover{color:var(--err);background:var(--err-soft)}
+.session-empty{font-family:var(--font-mono);font-size:10.5px;color:var(--ink-3);padding:8px 10px;line-height:1.6}
+
+.sidebar-footer{
+  padding:12px 18px;border-top:1px solid oklch(0.26 0.03 252 / 0.7);
+  font-family:var(--font-mono);font-size:10.5px;color:var(--ink-3);
+  display:flex;align-items:center;gap:8px;white-space:nowrap;
+}
+.led{width:7px;height:7px;border-radius:50%;background:var(--ok);box-shadow:0 0 8px var(--ok);animation:led-pulse 2.4s ease-in-out infinite;flex-shrink:0}
+.led.off{background:var(--err);box-shadow:0 0 8px var(--err)}
+@keyframes led-pulse{0%,100%{opacity:1}50%{opacity:0.35}}
+
+/* collapsed rail */
+body.sidebar-collapsed .brand-text,
+body.sidebar-collapsed .nav-label,
+body.sidebar-collapsed .nav-txt,
+body.sidebar-collapsed .sessions-block,
+body.sidebar-collapsed .sidebar-footer .foot-txt{display:none}
+body.sidebar-collapsed .brand-row{justify-content:center;gap:0}
+body.sidebar-collapsed .collapse-btn{position:absolute;top:66px;left:50%;transform:translateX(-50%);margin:0}
+body.sidebar-collapsed .collapse-btn svg{transform:none}
+body.sidebar-collapsed .sidebar-brand{padding-bottom:44px}
+body.sidebar-collapsed .sidebar nav{padding-top:8px}
+body.sidebar-collapsed .sidebar nav a{justify-content:center;padding:10px}
+body.sidebar-collapsed .sidebar nav a.active::before{left:-12px}
+body.sidebar-collapsed .sidebar-footer{justify-content:center;padding-left:0;padding-right:0}
+
+/* ---------- page scaffolding ---------- */
+.view{display:none;max-width:1060px}
+.view.active{display:block;animation:view-in 260ms var(--ease)}
+@keyframes view-in{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.page-header{margin-bottom:26px;border-bottom:1px solid var(--line-soft);padding-bottom:18px}
+.eyebrow{
+  font-family:var(--font-mono);font-size:10.5px;letter-spacing:0.18em;text-transform:uppercase;
+  color:var(--accent);margin-bottom:8px;display:block;
+}
+.page-header h2{font-family:var(--font-display);font-size:27px;font-weight:600;letter-spacing:-0.01em;margin-bottom:5px}
+.page-header p{font-size:13px;color:var(--ink-3);max-width:64ch}
+.card{
+  background:linear-gradient(180deg, oklch(0.21 0.025 256 / 0.92), oklch(0.20 0.023 258 / 0.92)),var(--panel);
+  border:1px solid var(--line-soft);border-radius:4px;padding:22px;margin-bottom:18px;
+}
+.card-header{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:16px;flex-wrap:wrap}
+.card-header h3{font-family:var(--font-display);font-size:17px;font-weight:600}
+.step-no{font-family:var(--font-mono);font-size:11px;color:var(--accent);letter-spacing:0.12em;margin-right:10px}
+.hint{font-size:12px;color:var(--ink-3);margin-top:8px}
+
+/* ---------- form controls ---------- */
+label.field{display:block;margin-bottom:12px}
+label.field>span{
+  display:block;font-family:var(--font-mono);font-size:10.5px;letter-spacing:0.12em;
+  text-transform:uppercase;color:var(--ink-3);margin-bottom:6px;
+}
+input,select,textarea{
+  width:100%;background:var(--well);border:1px solid var(--line);color:var(--ink);
+  padding:9px 12px;border-radius:3px;font-size:13.5px;font-family:var(--font-body);
+  transition:border-color 140ms var(--ease),box-shadow 140ms var(--ease);
+}
+input::placeholder,textarea::placeholder{color:var(--ink-3)}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent-2);box-shadow:0 0 0 3px var(--blue-ring)}
+select{
+  appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238fa3c8' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 12px center;padding-right:34px;cursor:pointer;
+}
+.row{display:flex;gap:12px;align-items:flex-end;margin-bottom:12px}
+.row>*{flex:1}
+.row label.field{margin-bottom:0}
+
+/* ---------- buttons (tactile) ---------- */
+button,.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:7px;
+  padding:9px 18px;border-radius:3px;border:1px solid transparent;cursor:pointer;
+  font-family:var(--font-mono);font-size:12px;font-weight:600;letter-spacing:0.04em;
+  transition:transform 90ms var(--ease),background 140ms var(--ease),border-color 140ms var(--ease),box-shadow 140ms var(--ease),color 140ms var(--ease);
+}
+button:active:not(:disabled),.btn:active:not(:disabled){transform:translateY(1.5px) scale(0.98)}
+.btn-primary{background:var(--accent);color:oklch(0.18 0.03 70);border-color:var(--accent);box-shadow:0 2px 0 oklch(0.62 0.15 60 / 0.9)}
+.btn-primary:hover{background:oklch(0.84 0.14 78)}
+.btn-primary:active:not(:disabled){box-shadow:inset 0 2px 5px oklch(0 0 0 / 0.28)}
+.btn-secondary{background:var(--panel-2);color:var(--ink-2);border-color:var(--line);box-shadow:0 2px 0 oklch(0.17 0.02 256)}
+.btn-secondary:hover{border-color:var(--ink-3);color:var(--ink)}
+.btn-secondary:active:not(:disabled){box-shadow:inset 0 2px 5px oklch(0 0 0 / 0.3)}
+.btn-danger{background:var(--err-soft);color:var(--err);border-color:oklch(0.68 0.19 25 / 0.35)}
+.btn-danger:hover{background:oklch(0.68 0.19 25 / 0.2)}
+.btn-sm{padding:5px 12px;font-size:11px}
+button:disabled{opacity:0.5;cursor:not-allowed;transform:none!important}
+
+/* ---------- badges & readouts ---------- */
+.badge{
+  display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:3px;
+  font-family:var(--font-mono);font-size:10.5px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;
+  border:1px solid transparent;
+}
+.badge-ok{background:var(--ok-soft);color:var(--ok);border-color:oklch(0.74 0.14 160 / 0.3)}
+.badge-warn{background:oklch(0.82 0.14 85 / 0.12);color:var(--warn);border-color:oklch(0.82 0.14 85 / 0.3)}
+.badge-err{background:var(--err-soft);color:var(--err);border-color:oklch(0.68 0.19 25 / 0.3)}
+.badge-dim{background:var(--panel-2);color:var(--ink-2);border-color:var(--line)}
+.badge-accent{background:var(--accent-soft);color:var(--accent);border-color:var(--accent-ring)}
+.badge-blue{background:var(--blue-soft);color:var(--accent-2);border-color:var(--blue-ring)}
+.readout{font-family:var(--font-mono);font-size:12px;color:var(--ink-2)}
+.spinner-sm{width:12px;height:12px;border:2px solid var(--line);border-top-color:var(--accent-2);border-radius:50%;animation:spin 0.6s linear infinite;display:inline-block}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ---------- tables ---------- */
+table{width:100%;border-collapse:collapse}
+th,td{text-align:left;padding:10px 14px;border-bottom:1px solid var(--line-soft);font-size:13px;vertical-align:middle}
+th{
+  font-family:var(--font-mono);font-size:10px;font-weight:600;letter-spacing:0.14em;
+  text-transform:uppercase;color:var(--ink-3);
+}
+tbody tr{transition:background 120ms var(--ease)}
+tbody tr:hover{background:var(--panel-2)}
+tbody tr:last-child td{border-bottom:none}
+
+/* ---------- empty states ---------- */
+.empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:44px 20px;color:var(--ink-3);text-align:center}
+.empty-icon{
+  width:44px;height:44px;border:1px dashed var(--line);border-radius:4px;
+  display:flex;align-items:center;justify-content:center;font-size:18px;color:var(--accent-2);
+}
+.empty-state h4{font-family:var(--font-display);font-size:15px;font-weight:600;color:var(--ink-2)}
+.empty-state p{font-size:12.5px;max-width:40ch}
+
+/* ---------- chat ---------- */
+.chat-container{
+  display:flex;flex-direction:column;height:calc(100vh - 180px);min-height:420px;
+  background:var(--panel);border:1px solid var(--line-soft);border-radius:4px;overflow:hidden;
+}
+.chat-header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 20px;border-bottom:1px solid var(--line-soft);flex-wrap:wrap}
+.chat-header-left{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.chat-header-left h3{font-family:var(--font-display);font-size:15px;font-weight:600}
+.model-selector{width:auto;min-width:200px;padding:6px 30px 6px 10px;font-size:12px;font-family:var(--font-mono)}
+.chat-messages{flex:1;overflow-y:auto;padding:22px;display:flex;flex-direction:column;gap:18px}
+.chat-messages::-webkit-scrollbar{width:6px}
+.chat-messages::-webkit-scrollbar-thumb{background:var(--line);border-radius:3px}
+.message{display:flex;gap:12px;max-width:86%;animation:msg-in 220ms var(--ease) both}
+@keyframes msg-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.message.user{align-self:flex-end;flex-direction:row-reverse}
+.message.assistant{align-self:flex-start}
+.msg-avatar{
+  width:30px;height:30px;flex-shrink:0;border-radius:3px;display:flex;align-items:center;justify-content:center;
+  font-family:var(--font-mono);font-size:10.5px;font-weight:600;
+}
+.message.user .msg-avatar{background:var(--accent);color:oklch(0.18 0.03 70)}
+.message.assistant .msg-avatar{background:var(--well);color:var(--accent-2);border:1px solid var(--line)}
+.msg-stack{min-width:0}
+.msg-bubble{padding:11px 15px;border-radius:4px;font-size:13.5px;line-height:1.6;overflow-wrap:break-word}
+.message.user .msg-bubble{background:var(--accent-soft);border:1px solid var(--accent-ring)}
+.message.assistant .msg-bubble{background:var(--well);border:1px solid var(--line-soft);border-left:2px solid var(--accent-2)}
+.msg-bubble pre{background:oklch(0.135 0.02 258);border:1px solid var(--line-soft);border-radius:3px;padding:11px;margin-top:8px;overflow-x:auto;font-size:12px;line-height:1.5}
+.msg-bubble pre code{background:none;border:none;padding:0;color:var(--ink)}
+.msg-bubble code{font-family:var(--font-mono);font-size:12px;color:var(--accent);background:oklch(0.235 0.03 256 / 0.7);border:1px solid var(--line-soft);border-radius:3px;padding:1px 5px}
+.msg-bubble p{margin-bottom:8px}.msg-bubble p:last-child{margin-bottom:0}
+.msg-bubble h1,.msg-bubble h2,.msg-bubble h3,.msg-bubble h4{
+  font-family:var(--font-display);font-weight:600;line-height:1.3;margin:12px 0 6px;color:var(--ink);
+}
+.msg-bubble h1{font-size:17px}.msg-bubble h2{font-size:15.5px}.msg-bubble h3{font-size:14.5px}.msg-bubble h4{font-size:13.5px}
+.msg-bubble h1:first-child,.msg-bubble h2:first-child,.msg-bubble h3:first-child,.msg-bubble h4:first-child,.msg-bubble p:first-child{margin-top:0}
+.msg-bubble ul,.msg-bubble ol{margin:4px 0 8px;padding-left:20px;display:flex;flex-direction:column;gap:3px}
+.msg-bubble li::marker{color:var(--accent-2)}
+.msg-bubble blockquote{
+  border-left:2px solid var(--accent);background:var(--blue-soft);color:var(--ink-2);
+  padding:6px 12px;margin:8px 0;border-radius:0 3px 3px 0;
+}
+.msg-bubble hr{border:none;border-top:1px solid var(--line-soft);margin:10px 0}
+.msg-bubble a{color:var(--accent-2);text-decoration:none;border-bottom:1px dotted var(--blue-ring)}
+.msg-bubble a:hover{border-bottom-style:solid;color:var(--ink)}
+.msg-bubble table{border-collapse:collapse;margin:10px 0;max-width:100%;display:block;overflow-x:auto}
+.msg-bubble th,.msg-bubble td{border:1px solid var(--line-soft);padding:7px 10px;text-align:left;vertical-align:top;font-size:12.5px;line-height:1.5}
+.msg-bubble th{background:oklch(0.24 0.03 256 / 0.55);color:var(--ink);font-family:var(--font-mono);font-size:10.5px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;white-space:nowrap}
+.msg-bubble tbody tr:nth-child(even) td{background:oklch(0.24 0.03 256 / 0.3)}
+.msg-bubble tbody tr:last-child td{border-bottom:1px solid var(--line-soft)}
+.msg-meta{font-family:var(--font-mono);font-size:10.5px;color:var(--ink-3);margin-top:6px}
+.message.user .msg-meta{text-align:right}
+.chat-bar{display:flex;gap:10px;padding:15px 20px;border-top:1px solid var(--line-soft);background:var(--panel)}
+.chat-bar input{flex:1;margin-bottom:0}
+.typing-indicator{display:none;align-items:center;gap:12px;padding:2px 22px 10px}
+.typing-indicator.visible{display:flex;animation:msg-in 180ms var(--ease)}
+.typing-dots{display:flex;gap:4px;padding:11px 15px;background:var(--well);border:1px solid var(--line-soft);border-left:2px solid var(--accent-2);border-radius:4px}
+.typing-dots span{width:6px;height:6px;border-radius:50%;background:var(--accent-2);animation:bounce 1.3s ease-in-out infinite}
+.typing-dots span:nth-child(2){animation-delay:0.15s}
+.typing-dots span:nth-child(3){animation-delay:0.3s}
+@keyframes bounce{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-5px)}}
+.tool-calls{margin-top:9px;display:flex;flex-wrap:wrap;gap:6px}
+.tool-call-badge{
+  display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:3px;
+  background:var(--blue-soft);border:1px solid var(--blue-ring);
+  font-family:var(--font-mono);font-size:10.5px;color:var(--accent-2);
+}
+.search-results{margin-top:10px;display:flex;flex-direction:column;gap:7px;counter-reset:cite}
+.search-result-item{
+  position:relative;padding:9px 12px 9px 34px;background:oklch(0.14 0.02 258);border:1px solid var(--line-soft);border-radius:3px;
+  counter-increment:cite;transition:border-color 120ms var(--ease);
+}
+.search-result-item::before{
+  content:"[" counter(cite) "]";position:absolute;left:10px;top:9px;
+  font-family:var(--font-mono);font-size:10.5px;color:var(--accent-2);
+}
+.search-result-item:hover{border-color:var(--blue-ring)}
+.search-result-item a{color:var(--ink);font-weight:600;font-size:13px;display:block;text-decoration:none}
+.search-result-item a:hover{color:var(--accent-2)}
+.search-result-item .snippet{font-size:12px;color:var(--ink-2);line-height:1.5;margin-top:2px}
+
+/* ---------- AI provider flow ---------- */
+.conn-panel{
+  display:flex;align-items:center;gap:14px;flex-wrap:wrap;
+  background:var(--well);border:1px solid var(--line-soft);border-radius:3px;
+  padding:13px 16px;margin-top:6px;
+}
+.conn-panel .conn-msg{font-size:12.5px;color:var(--ink-2);flex:1;min-width:200px}
+.conn-stats{display:flex;gap:18px;flex-wrap:wrap}
+.conn-stat{font-family:var(--font-mono);font-size:11px;color:var(--ink-3)}
+.conn-stat b{display:block;font-size:14px;color:var(--ink);font-weight:600}
+.model-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px}
+.model-card{
+  background:var(--well);border:1px solid var(--line-soft);border-radius:3px;padding:13px 15px;cursor:pointer;
+  transition:border-color 140ms var(--ease),transform 90ms var(--ease),background 140ms var(--ease);
+}
+.model-card:hover{border-color:var(--blue-ring);transform:translateY(-1px)}
+.model-card:active{transform:translateY(0) scale(0.99)}
+.model-card.selected{border-color:var(--accent-2);background:var(--blue-soft)}
+.model-card .model-name{font-weight:600;font-size:13.5px;margin-bottom:3px}
+.model-card .model-id{font-family:var(--font-mono);font-size:10.5px;color:var(--ink-3);overflow-wrap:anywhere}
+
+/* ---------- keys / endpoints / mcp ---------- */
+.tabs{display:flex;gap:0;border-bottom:1px solid var(--line-soft);margin-bottom:18px}
+.tab{
+  padding:9px 18px;background:none;border:none;border-bottom:2px solid transparent;border-radius:0;
+  font-family:var(--font-mono);font-size:11.5px;font-weight:500;letter-spacing:0.06em;color:var(--ink-3);cursor:pointer;
+}
+.tab:hover{color:var(--ink)}
+.tab.active{color:var(--accent-2);border-bottom-color:var(--accent-2)}
+.key-row{display:flex;align-items:center;gap:14px;padding:11px 14px;border-bottom:1px solid var(--line-soft)}
+.key-row:hover{background:var(--panel-2)}
+.key-row:last-child{border-bottom:none}
+.key-name{font-family:var(--font-mono);font-size:12px;font-weight:600;min-width:170px}
+.key-value-masked{font-family:var(--font-mono);font-size:12px;color:var(--ink-3);flex:1;letter-spacing:1px}
+.key-actions{display:flex;gap:6px}
+.mcp-server-card{background:var(--panel);border:1px solid var(--line-soft);border-radius:4px;padding:18px;margin-bottom:12px}
+.mcp-server-card:hover{border-color:var(--line)}
+.mcp-server-header{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px;flex-wrap:wrap}
+.mcp-server-header h4{font-family:var(--font-display);font-size:15.5px;font-weight:600;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.mcp-cmd{font-family:var(--font-mono);font-size:11px;color:var(--ink-3);margin-bottom:8px;overflow-wrap:anywhere}
+.mcp-tools-list{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.mcp-tool-tag{
+  padding:3px 9px;background:var(--well);border:1px solid var(--line-soft);border-radius:3px;
+  font-family:var(--font-mono);font-size:11px;color:var(--ink-2);
+}
+.preset-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
+.preset-card{
+  background:var(--well);border:1px solid var(--line-soft);border-radius:4px;padding:16px;
+  display:flex;flex-direction:column;gap:8px;transition:border-color 140ms var(--ease);
+}
+.preset-card:hover{border-color:var(--line)}
+.preset-card h4{font-family:var(--font-display);font-size:15px;font-weight:600;display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+.preset-card p{font-size:12px;color:var(--ink-3);flex:1}
+.preset-card .preset-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+details.advanced{border:1px dashed var(--line);border-radius:4px;padding:0;margin-top:4px}
+details.advanced summary{
+  cursor:pointer;padding:13px 16px;font-family:var(--font-mono);font-size:11.5px;
+  letter-spacing:0.08em;color:var(--ink-3);list-style:none;display:flex;align-items:center;gap:8px;
+}
+details.advanced summary::-webkit-details-marker{display:none}
+details.advanced summary::before{content:"+";color:var(--accent-2);font-weight:600}
+details.advanced[open] summary::before{content:"–"}
+details.advanced .advanced-body{padding:4px 16px 16px}
+
+/* ---------- logs & config ---------- */
+.config-viewer{
+  background:var(--well);border:1px solid var(--line-soft);border-radius:3px;padding:16px;
+  font-family:var(--font-mono);font-size:12px;line-height:1.6;color:var(--ink-2);
+  overflow:auto;white-space:pre-wrap;word-break:break-word;max-height:420px;
+}
+
+/* ---------- toasts ---------- */
+.toast-container{position:fixed;top:20px;right:20px;z-index:1000;display:flex;flex-direction:column;gap:8px}
+.toast{
+  padding:11px 16px;border-radius:3px;font-family:var(--font-mono);font-size:12px;color:var(--ink);
+  border:1px solid var(--line);border-left-width:3px;background:var(--panel);
+  box-shadow:0 10px 30px oklch(0 0 0 / 0.45);max-width:400px;animation:toast-in 240ms var(--ease);
+}
+.toast.success{border-left-color:var(--ok)}
+.toast.error{border-left-color:var(--err)}
+.toast.info{border-left-color:var(--accent-2)}
+@keyframes toast-in{from{opacity:0;transform:translateX(16px)}to{opacity:1;transform:none}}
+.toast.removing{opacity:0;transform:translateX(16px);transition:all 200ms var(--ease)}
+.hidden{display:none!important}
+
+@media (max-width:820px){
+  .sidebar{width:var(--sidebar-w-collapsed)}
+  .brand-text,.nav-label,.nav-txt,.sessions-block,.sidebar-footer .foot-txt,.collapse-btn{display:none}
+  .sidebar nav a{justify-content:center}
+  .sidebar nav a.active::before{display:none}
+  .sidebar-brand{padding:16px 14px}
+  .main{padding:20px 16px 48px}
+  .message{max-width:96%}
+  .row{flex-direction:column;align-items:stretch}
+  .model-grid,.preset-grid{grid-template-columns:1fr}
+}
+@media (prefers-reduced-motion: reduce){
+  .star,.meteor{display:none}
+  .view.active,.message,.toast,.typing-indicator.visible{animation:none}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="sidebar-sky" id="sidebarSky" aria-hidden="true"></div>
+    <div class="sidebar-brand">
+      <div class="brand-row">
+        <div class="monogram">RH</div>
+        <div class="brand-text">
+          <div class="brand-title">Research Harness</div>
+          <div class="brand-sub">LLM Console</div>
+        </div>
+        <button id="sidebarToggle" class="collapse-btn" title="Toggle sidebar" aria-label="Toggle sidebar">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+      </div>
+    </div>
+    <nav>
+      <div class="nav-label">Console</div>
+      <a data-view="chat" class="active" title="Chat">
+        <span class="nav-icon"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>
+        <span class="nav-txt">Chat</span>
+      </a>
+      <a data-view="models" title="AI Provider">
+        <span class="nav-icon"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/><line x1="20" y1="9" x2="23" y2="9"/><line x1="20" y1="14" x2="23" y2="14"/><line x1="1" y1="9" x2="4" y2="9"/><line x1="1" y1="14" x2="4" y2="14"/></svg></span>
+        <span class="nav-txt">AI Provider</span>
+      </a>
+      <a data-view="keys" title="Keys">
+        <span class="nav-icon"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg></span>
+        <span class="nav-txt">Keys</span>
+      </a>
+      <div class="nav-label" style="margin-top:10px">Instrumentation</div>
+      <a data-view="endpoints" title="Endpoints">
+        <span class="nav-icon"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></span>
+        <span class="nav-txt">Endpoints</span>
+      </a>
+      <a data-view="mcp" title="MCP Services">
+        <span class="nav-icon"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg></span>
+        <span class="nav-txt">MCP Services</span>
+      </a>
+      <a data-view="logs" title="Logs">
+        <span class="nav-icon"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></span>
+        <span class="nav-txt">Logs</span>
+      </a>
+      <a data-view="config" title="Config">
+        <span class="nav-icon"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg></span>
+        <span class="nav-txt">Config</span>
+      </a>
+    </nav>
+
+    <div class="sessions-block">
+      <div class="sessions-head">
+        <span class="nav-label">Sessions</span>
+        <button id="sessionNew" class="btn btn-sm btn-secondary" title="Start a new chat">＋ New</button>
+      </div>
+      <div id="sessionList" class="session-list"></div>
+    </div>
+
+    <div class="sidebar-footer">
+      <span class="led" id="serverLed"></span>
+      <span class="foot-txt" id="sidebarStatus">server online</span>
+    </div>
+  </aside>
+
+  <main class="main">
+    <!-- ============ 01 · CHAT ============ -->
     <section id="view-chat" class="view active">
-      <div class="page-header"><h2>Chat</h2><p>Interact with your LLM using built-in and MCP tools</p></div>
+      <div class="page-header">
+        <span class="eyebrow">01 · Session</span>
+        <h2>Chat</h2>
+        <p>Ask the assistant anything — it can browse the web with the built-in fetcher and DuckDuckGo search, then answer with citations. Past conversations live in the Sessions panel on the left.</p>
+      </div>
       <div class="chat-container">
         <div class="chat-header">
           <div class="chat-header-left">
-            <h3>Research Session</h3>
-            <select id="modelSelector" class="model-selector"><option value="">Loading models...</option></select>
+            <h3>Research session</h3>
+            <select id="modelSelector" class="model-selector"><option value="">Loading models…</option></select>
           </div>
-          <span id="selectedModelLabel" class="badge badge-neutral">No model</span>
+          <div style="display:flex;align-items:center;gap:10px">
+            <span id="selectedModelLabel" class="badge badge-dim">no model</span>
+            <button id="chatClear" class="btn btn-sm btn-secondary" title="Start a fresh conversation">✕ New</button>
+          </div>
         </div>
         <div id="chatMessages" class="chat-messages">
           <div class="empty-state" id="chatEmptyState">
-            <div class="empty-icon">&#x1F4AC;</div>
+            <div class="empty-icon">✳</div>
             <h4>Start a conversation</h4>
-            <p>Send a message to begin. The assistant can search the web, compute, and more.</p>
+            <p>Send a message to begin. Browsing tools are on by default — no setup required.</p>
           </div>
         </div>
         <div id="typingIndicator" class="typing-indicator">
-          <div class="msg-avatar" style="background:linear-gradient(135deg,var(--bg-tertiary),var(--bg-elevated));color:var(--accent);border:1px solid var(--border)">AI</div>
+          <div class="msg-avatar" style="background:var(--well);color:var(--accent-2);border:1px solid var(--line)">AI</div>
           <div class="typing-dots"><span></span><span></span><span></span></div>
         </div>
         <div class="chat-bar">
-          <input id="chatInput" type="text" placeholder="Ask anything..." autocomplete="off">
-          <button id="chatSend" class="btn btn-primary">Send</button>
+          <input id="chatInput" type="text" placeholder="Ask anything — the assistant can browse the web…" autocomplete="off">
+          <button id="chatSend" class="btn btn-primary">Send →</button>
         </div>
       </div>
     </section>
+
+    <!-- ============ 02 · AI PROVIDER ============ -->
     <section id="view-models" class="view">
-      <div class="page-header"><h2>Models</h2><p>Browse and select AI models from your configured backend</p></div>
+      <div class="page-header">
+        <span class="eyebrow">02 · Connection</span>
+        <h2>AI Provider</h2>
+        <p>Any OpenAI-compatible endpoint works — local (Ollama, LM Studio, llama.cpp) or cloud (OpenAI, OpenRouter, Groq…). Pick a provider, add your API key, test, then fetch models.</p>
+      </div>
+
+      <div class="tabs" id="providerTabs">
+        <button class="tab active" data-tab="connection">Connection</button>
+        <button class="tab" data-tab="models">Models</button>
+        <button class="tab" data-tab="generation">Generation</button>
+      </div>
+
+      <div id="tab-connection">
       <div class="card">
-        <div class="card-header"><h3>Backend Configuration</h3></div>
+        <div class="card-header"><h3><span class="step-no">STEP 1</span>Provider &amp; credentials</h3></div>
         <div class="row">
-          <select id="aiBackend"><option value="ollama">Ollama (local)</option><option value="openai">OpenAI</option><option value="custom">Custom OpenAI-compatible</option></select>
-          <input id="aiBaseUrl" placeholder="Base URL" value="http://localhost:11434/v1">
-          <input id="aiApiKeyEnv" placeholder="API key env var (optional)">
+          <label class="field"><span>Provider preset</span>
+            <select id="aiBackend">
+              <option value="ollama">Ollama (local)</option>
+              <option value="lmstudio">LM Studio (local)</option>
+              <option value="openai">OpenAI</option>
+              <option value="openrouter">OpenRouter</option>
+              <option value="groq">Groq</option>
+              <option value="together">Together AI</option>
+              <option value="custom">Custom OpenAI-compatible</option>
+            </select>
+          </label>
+          <label class="field"><span>Base URL</span>
+            <input id="aiBaseUrl" placeholder="https://api.example.com/v1" value="http://localhost:11434/v1">
+          </label>
         </div>
-        <div style="margin-top:10px">
-          <button id="fetchModels" class="btn btn-primary">Fetch Models</button>
-          <button id="saveBackend" class="btn btn-secondary">Save as Default</button>
+        <div class="row">
+          <label class="field"><span>API key <em style="text-transform:none;letter-spacing:0">(optional for local)</em></span>
+            <input id="aiApiKey" type="password" placeholder="sk-…  (kept on this machine only)">
+          </label>
+          <label class="field"><span>API key env var <em style="text-transform:none;letter-spacing:0">(alternative)</em></span>
+            <input id="aiApiKeyEnv" placeholder="e.g. OPENAI_API_KEY">
+          </label>
+        </div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:6px">
+          <button id="connTest" class="btn btn-secondary">⟲ Test connection</button>
+          <button id="fetchModels" class="btn btn-primary">Fetch models</button>
+          <button id="saveBackend" class="btn btn-secondary">Save as default</button>
+        </div>
+        <div id="connStatus" class="conn-panel hidden">
+          <span class="led" id="connLed"></span>
+          <span class="conn-msg" id="connMsg">—</span>
+          <div class="conn-stats">
+            <span class="conn-stat">latency<b id="connLatency">—</b></span>
+            <span class="conn-stat">models<b id="connModelCount">—</b></span>
+          </div>
         </div>
       </div>
+      </div><!-- /tab-connection -->
+
+      <div id="tab-models" class="hidden">
       <div class="card">
-        <div class="card-header"><h3>Available Models</h3><span id="modelCount" class="badge badge-neutral">0 models</span></div>
+        <div class="card-header">
+          <h3><span class="step-no">STEP 2</span>Available models</h3>
+          <span id="modelCount" class="badge badge-dim">0 models</span>
+        </div>
         <div id="modelGrid" class="model-grid"></div>
         <div id="modelEmpty" class="empty-state" style="display:none">
-          <div class="empty-icon">&#x1F4F1;</div>
-          <h4>No models found</h4>
-          <p>Click "Fetch Models" to load available models from your backend.</p>
+          <div class="empty-icon">◌</div>
+          <h4>No models loaded</h4>
+          <p>Test the connection, then press “Fetch models” to list what this endpoint serves.</p>
         </div>
       </div>
+      </div><!-- /tab-models -->
+
+      <div id="tab-generation" class="hidden">
+      <div class="card">
+        <div class="card-header">
+          <h3><span class="step-no">STEP 3</span>Generation settings</h3>
+          <span class="badge badge-blue">optional</span>
+        </div>
+        <p class="hint" style="margin:0 0 16px">Control how much the model can write and how much context it sees. Increase these if answers get cut off or fall back to “couldn't produce a clean summary”. Leave empty to use the endpoint's defaults.</p>
+        <div class="row">
+          <label class="field"><span>Max output tokens</span>
+            <input id="genMaxTokens" type="number" min="1" step="1" placeholder="e.g. 2048 (empty = default)">
+            <span class="hint" style="display:block">Cap on tokens the model may <b>generate</b> per reply. Too low → truncated answers.</span>
+          </label>
+          <label class="field"><span>Context window (tokens)</span>
+            <input id="genContextWindow" type="number" min="1" step="1" placeholder="e.g. 8192 (empty = model default)">
+            <span class="hint" style="display:block">Client-side cap on prompt + tool results fed to the model. Older text is trimmed first.</span>
+          </label>
+        </div>
+        <div style="display:flex;gap:10px;align-items:center;margin-top:6px">
+          <button id="genSave" class="btn btn-primary">Save generation settings</button>
+          <button id="genClear" class="btn btn-secondary">Reset to defaults</button>
+          <span id="genStatus" class="readout"></span>
+        </div>
+      </div>
+      </div><!-- /tab-generation -->
     </section>
+
+    <!-- ============ 03 · KEYS ============ -->
     <section id="view-keys" class="view">
-      <div class="page-header"><h2>Keys</h2><p>Manage API keys for tool endpoints and AI backends</p></div>
+      <div class="page-header">
+        <span class="eyebrow">03 · Credentials</span>
+        <h2>Keys</h2>
+        <p>API keys for tool endpoints and AI backends. Values stay in server memory, are pushed to the environment, and are only ever shown masked.</p>
+      </div>
       <div class="tabs">
-        <button class="tab active" data-tab="tool-keys">Tool Keys</button>
-        <button class="tab" data-tab="ai-keys">AI Keys</button>
+        <button class="tab active" data-tab="tool-keys">Tool keys</button>
+        <button class="tab" data-tab="ai-keys">AI keys</button>
       </div>
       <div id="tab-tool-keys">
         <div class="card">
-          <div class="card-header"><h3>Set Tool Endpoint Key</h3></div>
+          <div class="card-header"><h3>Set tool endpoint key</h3></div>
           <div class="row">
-            <input id="toolKeyName" placeholder="Key name (e.g. SERPER_API_KEY)">
-            <input id="toolKeyValue" type="password" placeholder="Value">
-            <button id="toolKeySet" class="btn btn-primary">Set Key</button>
+            <label class="field"><span>Key name</span><input id="toolKeyName" placeholder="e.g. SERPER_API_KEY"></label>
+            <label class="field"><span>Value</span><input id="toolKeyValue" type="password" placeholder="••••••••"></label>
+            <button id="toolKeySet" class="btn btn-primary" style="margin-bottom:0">Set key</button>
           </div>
         </div>
         <div class="card">
-          <div class="card-header"><h3>Stored Keys</h3></div>
+          <div class="card-header"><h3>Stored keys</h3></div>
           <div id="toolKeysList"></div>
         </div>
       </div>
       <div id="tab-ai-keys" class="hidden">
         <div class="card">
-          <div class="card-header"><h3>Set AI Backend Key</h3></div>
+          <div class="card-header"><h3>Set AI backend key</h3></div>
           <div class="row">
-            <select id="aiKeyProvider"><option value="OPENAI_API_KEY">OpenAI</option><option value="OPENROUTER_API_KEY"></option><option value="CUSTOM_API_KEY">Custom</option></select>
-            <input id="aiKeyValue" type="password" placeholder="API key value">
-            <button id="aiKeySet" class="btn btn-primary">Set Key</button>
+            <label class="field"><span>Provider</span>
+              <select id="aiKeyProvider">
+                <option value="OPENAI_API_KEY">OpenAI</option>
+                <option value="OPENROUTER_API_KEY">OpenRouter</option>
+                <option value="GROQ_API_KEY">Groq</option>
+                <option value="TOGETHER_API_KEY">Together AI</option>
+                <option value="BRAVE_API_KEY">Brave Search</option>
+                <option value="CUSTOM_API_KEY">Custom</option>
+              </select>
+            </label>
+            <label class="field"><span>Value</span><input id="aiKeyValue" type="password" placeholder="••••••••"></label>
+            <button id="aiKeySet" class="btn btn-primary" style="margin-bottom:0">Set key</button>
           </div>
         </div>
         <div class="card">
-          <div class="card-header"><h3>AI Keys</h3></div>
+          <div class="card-header"><h3>AI keys</h3></div>
           <div id="aiKeysList"></div>
         </div>
       </div>
     </section>
+
+    <!-- ============ 04 · ENDPOINTS ============ -->
     <section id="view-endpoints" class="view">
-      <div class="page-header"><h2>Endpoints</h2><p>Manage tool endpoint configurations</p></div>
+      <div class="page-header">
+        <span class="eyebrow">04 · Optional</span>
+        <h2>Endpoints</h2>
+        <p>Optional manual tool endpoints. The built-in fetcher and DuckDuckGo search already work without any configuration — add these only if you have a specific API.</p>
+      </div>
       <div class="card">
-        <div class="card-header"><h3>Add Endpoint</h3></div>
+        <div class="card-header"><h3>Add endpoint</h3></div>
         <div class="row">
-          <input id="epName" placeholder="Name">
-          <input id="epUrl" placeholder="URL (use {{query}} for params)">
-          <select id="epMethod"><option>GET</option><option>POST</option></select>
+          <label class="field"><span>Name</span><input id="epName" placeholder="e.g. serper"></label>
+          <label class="field"><span>URL</span><input id="epUrl" placeholder="https://… (use {query} as placeholder)"></label>
+          <label class="field" style="max-width:130px"><span>Method</span>
+            <select id="epMethod"><option>GET</option><option>POST</option></select>
+          </label>
         </div>
         <div class="row">
-          <input id="epKeyEnv" placeholder="API key env var (optional)">
-          <button id="epAdd" class="btn btn-primary">Add</button>
+          <label class="field"><span>API key env var (optional)</span><input id="epKeyEnv" placeholder="e.g. SERPER_API_KEY"></label>
+          <button id="epAdd" class="btn btn-primary" style="margin-bottom:0">Add endpoint</button>
         </div>
       </div>
       <div class="card">
-        <div class="card-header"><h3>Registered Endpoints</h3></div>
-        <table><thead><tr><th>Name</th><th>URL</th><th>Method</th><th>Key Env</th><th>Actions</th></tr></thead><tbody id="epTable"></tbody></table>
+        <div class="card-header"><h3>Registered endpoints</h3></div>
+        <table><thead><tr><th>Name</th><th>URL</th><th>Method</th><th>Key env</th><th>Actions</th></tr></thead><tbody id="epTable"></tbody></table>
         <div id="epEmpty" class="empty-state" style="display:none">
-          <div class="empty-icon">&#x1F30D;</div>
-          <h4>No endpoints configured</h4>
-          <p>Add your first endpoint above to enable web search, academic search, and other tools.</p>
+          <div class="empty-icon">⌾</div>
+          <h4>No manual endpoints</h4>
+          <p>That's fine — the free built-in services cover browsing and search. Add an endpoint only when you have a specific API to wire in.</p>
         </div>
       </div>
     </section>
+
+    <!-- ============ 05 · MCP ============ -->
     <section id="view-mcp" class="view">
-      <div class="page-header"><h2>MCP Servers</h2><p>Manage Model Context Protocol servers and tools</p></div>
-      <div class="card">
-        <div class="card-header"><h3>Add MCP Server</h3></div>
-        <div class="mcp-add-form">
-          <input id="mcpName" placeholder="Server name">
-          <input id="mcpCommand" placeholder="Command (e.g. npx, python)">
-          <input id="mcpArgs" placeholder="Args (e.g. -y @modelcontextprotocol/server-brave-search)">
-          <button id="mcpAdd" class="btn btn-primary">Add Server</button>
-        </div>
+      <div class="page-header">
+        <span class="eyebrow">05 · Services</span>
+        <h2>MCP Services</h2>
+        <p>Model Context Protocol tools for the assistant. The free built-ins (endpoint fetcher + DuckDuckGo) are ready by default; install extra presets or add manual servers if you want more.</p>
       </div>
-      <div id="mcpServersList"></div>
+      <div class="card">
+        <div class="card-header"><h3>Default services — free</h3><span class="badge badge-blue">no setup</span></div>
+        <div id="mcpDefaults" class="preset-grid"></div>
+      </div>
+      <div class="card">
+        <div class="card-header"><h3>Optional presets</h3></div>
+        <div id="mcpPresets" class="preset-grid"></div>
+      </div>
+      <div class="card">
+        <div class="card-header"><h3>Active servers</h3></div>
+        <div id="mcpServersList"></div>
+      </div>
+      <details class="advanced">
+        <summary>ADVANCED — ADD MANUAL MCP SERVER (OPTIONAL)</summary>
+        <div class="advanced-body">
+          <div class="row" style="margin-top:12px">
+            <label class="field"><span>Server name</span><input id="mcpName" placeholder="e.g. brave-search"></label>
+            <label class="field"><span>Command</span><input id="mcpCommand" placeholder="npx / uvx / python"></label>
+            <label class="field"><span>Arguments</span><input id="mcpArgs" placeholder="-y @modelcontextprotocol/server-…"></label>
+            <button id="mcpAdd" class="btn btn-primary" style="margin-bottom:0">Add</button>
+          </div>
+          <p class="hint">Point this at any MCP server over stdio, or paste an http(s) URL as the command for SSE transports.</p>
+        </div>
+      </details>
     </section>
+
+    <!-- ============ 06 · LOGS ============ -->
     <section id="view-logs" class="view">
-      <div class="page-header"><h2>Tool Execution Logs</h2><p>Recent tool calls and their results</p></div>
+      <div class="page-header">
+        <span class="eyebrow">06 · Telemetry</span>
+        <h2>Tool Execution Logs</h2>
+        <p>Recent tool calls with timings. Keys and auth parameters are always redacted.</p>
+      </div>
       <div class="card">
         <div class="card-header">
-          <h3>Recent Calls</h3>
+          <h3>Recent calls</h3>
           <button id="logsClear" class="btn btn-danger btn-sm">Clear</button>
         </div>
         <table><thead><tr><th>Time</th><th>Tool</th><th>Params</th><th>Status</th><th>Duration</th></tr></thead><tbody id="logsTable"></tbody></table>
         <div id="logsEmpty" class="empty-state" style="display:none">
-          <div class="empty-icon">&#x1F4CB;</div>
+          <div class="empty-icon">≡</div>
           <h4>No logs yet</h4>
-          <p>Tool executions will appear here when you start chatting.</p>
+          <p>Tool executions will appear here once you start chatting.</p>
         </div>
       </div>
     </section>
+
+    <!-- ============ 07 · CONFIG ============ -->
     <section id="view-config" class="view">
-      <div class="page-header"><h2>Configuration</h2><p>View and manage your harness configuration</p></div>
-      <div class="card">
-        <div class="card-header"><h3>Export Config</h3></div>
-        <p style="color:var(--text-tertiary);margin-bottom:10px;font-size:13px">Keys are stripped for safety.</p>
-        <button id="cfgExport" class="btn btn-primary">Export</button>
-        <pre id="cfgExportPreview" class="config-viewer hidden"></pre>
+      <div class="page-header">
+        <span class="eyebrow">07 · State</span>
+        <h2>Configuration</h2>
+        <p>Export or import harness configuration. Secrets are stripped on export.</p>
       </div>
       <div class="card">
-        <div class="card-header"><h3>Import Config</h3></div>
-        <textarea id="cfgImport" rows="6" placeholder="Paste config JSON here..."></textarea>
-        <div style="margin-top:10px">
+        <div class="card-header"><h3>Export config</h3></div>
+        <p class="hint" style="margin:0 0 12px">Keys are stripped for safety.</p>
+        <button id="cfgExport" class="btn btn-primary">Export</button>
+        <pre id="cfgExportPreview" class="config-viewer hidden" style="margin-top:14px"></pre>
+      </div>
+      <div class="card">
+        <div class="card-header"><h3>Import config</h3></div>
+        <textarea id="cfgImport" rows="6" placeholder="Paste config JSON here…"></textarea>
+        <div style="margin-top:12px;display:flex;align-items:center;gap:12px">
           <button id="cfgImportBtn" class="btn btn-primary">Import</button>
-          <span id="cfgStatus" style="margin-left:10px;color:var(--text-tertiary);font-size:13px"></span>
+          <span id="cfgStatus" class="readout"></span>
         </div>
       </div>
     </section>
   </main>
 </div>
 
-<!-- Toast container -->
 <div id="toastContainer" class="toast-container"></div>
 
 <script>
-// ===== UTILITY =====
+// ===== utilities =====
 const $ = (id) => document.getElementById(id);
 const api = async (url, opts = {}) => {
   const r = await fetch(url, { headers: { "Content-Type": "application/json" }, ...opts });
@@ -174,26 +849,184 @@ function showToast(msg, type = "info") {
   t.className = "toast " + type;
   t.textContent = msg;
   c.appendChild(t);
-  setTimeout(() => { t.classList.add("removing"); setTimeout(() => t.remove(), 200); }, 3000);
+  setTimeout(() => { t.classList.add("removing"); setTimeout(() => t.remove(), 220); }, 3200);
+}
+function escapeHtml(t) {
+  return String(t).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
 }
 
-// ===== VIEW SWITCHING =====
-let currentView = "chat";
+// ---- minimal, dependency-free markdown renderer (safe: escapes first) ----
+function isTableSeparatorRow(t) {
+  // e.g. "| --- | :---: | ---: |" — pipes + dashes, only - : | and spaces.
+  if (!t.includes("|") || !t.includes("-")) return false;
+  return /^\|?[\s:\-|]+\|?$/.test(t);
+}
+function splitTableCells(t) {
+  let s = t.trim();
+  if (s.startsWith("|")) s = s.slice(1);
+  if (s.endsWith("|")) s = s.slice(0, -1);
+  return s.split("|").map(c => c.trim());
+}
+function renderTableFrom(lines, startIdx) {
+  const header = splitTableCells(lines[startIdx]);
+  const seps = splitTableCells(lines[startIdx + 1]);
+  const aligns = seps.map(c => {
+    const l = c.startsWith(":"), r = c.endsWith(":");
+    return (l && r) ? "center" : (r ? "right" : (l ? "left" : ""));
+  });
+  const colCount = header.length;
+  const alignStyle = (i) => aligns[i] ? ` style="text-align:${aligns[i]}"` : "";
+  const pad = (cells) => {
+    while (cells.length < colCount) cells.push("");
+    return cells.slice(0, colCount);
+  };
+  let out = "<table><thead><tr>";
+  pad(header).forEach((c, i) => { out += `<th${alignStyle(i)}>${inlineMd(c)}</th>`; });
+  out += "</tr></thead><tbody>";
+  let j = startIdx + 2;
+  while (j < lines.length && lines[j].trim().includes("|")) {
+    const cells = splitTableCells(lines[j]);
+    out += "<tr>";
+    pad(cells).forEach((c, i) => { out += `<td${alignStyle(i)}>${inlineMd(c)}</td>`; });
+    out += "</tr>";
+    j++;
+  }
+  out += "</tbody></table>";
+  return { html: out, next: j - 1 };
+}
+function renderMarkdown(src) {
+  if (!src) return "";
+  src = String(src).replace(/\r\n?/g, "\n");
+  const blocks = [];
+  // fenced code blocks ``` → placeholders
+  src = src.replace(/```([\w+-]*)[ \t]*\n([\s\S]*?)(?:```|$)/g, (m, lang, code) => {
+    blocks.push('<pre><code>' + escapeHtml(code.replace(/\n$/, "")) + "</code></pre>");
+    return "\u0000B" + (blocks.length - 1) + "\u0000";
+  });
+  // inline code `…` → placeholders (protects from other rules)
+  src = src.replace(/`([^`\n]+)`/g, (m, code) => {
+    blocks.push("<code>" + escapeHtml(code) + "</code>");
+    return "\u0000B" + (blocks.length - 1) + "\u0000";
+  });
+  const lines = escapeHtml(src).split("\n");
+  let html = "", para = [], listType = null, quote = [];
+  const flushPara = () => { if (para.length) { html += "<p>" + para.map(inlineMd).join("<br>") + "</p>"; para = []; } };
+  const flushList = () => { if (listType) { html += "</" + listType + ">"; listType = null; } };
+  const flushQuote = () => { if (quote.length) { html += "<blockquote>" + quote.map(inlineMd).join("<br>") + "</blockquote>"; quote = []; } };
+  const flushAll = () => { flushPara(); flushList(); flushQuote(); };
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    const t = line.trim();
+    let m;
+    if (/^\u0000B\d+\u0000$/.test(t)) { flushAll(); html += t; continue; }
+    if (!t) { flushAll(); continue; }
+    // GFM table: a pipe row followed by a separator row
+    if (t.includes("|") && i + 1 < lines.length && isTableSeparatorRow(lines[i + 1].trim())) {
+      flushAll();
+      const res = renderTableFrom(lines, i);
+      html += res.html;
+      i = res.next;
+      continue;
+    }
+    if ((m = t.match(/^(#{1,4})\s+(.*)$/))) {
+      flushAll();
+      const lvl = m[1].length;
+      html += "<h" + lvl + ">" + inlineMd(m[2]) + "</h" + lvl + ">";
+      continue;
+    }
+    if (/^(-{3,}|\*{3,}|_{3,})$/.test(t)) { flushAll(); html += "<hr>"; continue; }
+    if ((m = t.match(/^&gt;\s?(.*)$/))) { flushPara(); flushList(); quote.push(m[1]); continue; }
+    if ((m = t.match(/^[-*+]\s+(.*)$/))) {
+      flushPara(); flushQuote();
+      if (listType !== "ul") { flushList(); html += "<ul>"; listType = "ul"; }
+      html += "<li>" + inlineMd(m[1]) + "</li>";
+      continue;
+    }
+    if ((m = t.match(/^\d+[.)]\s+(.*)$/))) {
+      flushPara(); flushQuote();
+      if (listType !== "ol") { flushList(); html += "<ol>"; listType = "ol"; }
+      html += "<li>" + inlineMd(m[1]) + "</li>";
+      continue;
+    }
+    flushList(); flushQuote();
+    para.push(line);
+  }
+  flushAll();
+  return html.replace(/\u0000B(\d+)\u0000/g, (m, i) => blocks[+i]);
+}
+function inlineMd(s) {
+  return s
+    // [text](https://url) → real anchor
+    .replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g,
+      '<a href="$2" target="_blank" rel="noopener">$1</a>')
+    // bold
+    .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
+    // italic (guarded so it doesn't eat list markers / mid-word stars)
+    .replace(/(^|[\s(])\*([^*\n]+)\*(?=[\s).,!?;:]|$)/g, "$1<em>$2</em>")
+    // bare URLs → anchors (skips anything already inside a tag/anchor)
+    .replace(/(^|[\s>(])((?:https?:\/\/)[^\s<>()]+[^\s<>().,!?;:])(?![^<]*<\/a>)/g,
+      '$1<a href="$2" target="_blank" rel="noopener">$2</a>');
+}
+function relTime(ts) {
+  const d = Date.now() / 1000 - ts;
+  if (d < 60) return "now";
+  if (d < 3600) return Math.floor(d / 60) + "m ago";
+  if (d < 86400) return Math.floor(d / 3600) + "h ago";
+  return Math.floor(d / 86400) + "d ago";
+}
+
+// ===== sidebar: collapse + living sky =====
+$("sidebarToggle").addEventListener("click", () => {
+  document.body.classList.toggle("sidebar-collapsed");
+  localStorage.setItem("rh_sidebar", document.body.classList.contains("sidebar-collapsed") ? "1" : "0");
+});
+if (localStorage.getItem("rh_sidebar") === "1") document.body.classList.add("sidebar-collapsed");
+
+function seedSky() {
+  const sky = $("sidebarSky");
+  if (!sky) return;
+  sky.innerHTML = "";
+  for (let i = 0; i < 28; i++) {
+    const s = document.createElement("span");
+    s.className = "star" + (Math.random() < 0.18 ? " star-big" : "");
+    s.style.left = (Math.random() * 100) + "%";
+    s.style.top = (Math.random() * 100) + "%";
+    s.style.animationDuration = (2.2 + Math.random() * 3.5) + "s";
+    s.style.animationDelay = (Math.random() * 4) + "s";
+    sky.appendChild(s);
+  }
+}
+function meteorLoop() {
+  const sky = $("sidebarSky");
+  const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (sky && !document.hidden && !reduced) {
+    const m = document.createElement("span");
+    m.className = "meteor";
+    m.style.left = (35 + Math.random() * 65) + "%";
+    m.style.top = (Math.random() * 35) + "%";
+    m.style.animationDuration = (1.1 + Math.random() * 0.9) + "s";
+    sky.appendChild(m);
+    setTimeout(() => m.remove(), 2600);
+  }
+  setTimeout(meteorLoop, 3800 + Math.random() * 5200);
+}
+
+// ===== view switching =====
 document.querySelectorAll(".sidebar nav a").forEach(a => {
   a.addEventListener("click", () => {
     const view = a.dataset.view;
     if (!view) return;
-    currentView = view;
     document.querySelectorAll(".sidebar nav a").forEach(x => x.classList.remove("active"));
     a.classList.add("active");
-    document.querySelectorAll(".view").forEach(v => { v.classList.remove("active"); });
+    document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
     const target = $("view-" + view);
-    if (target) { target.classList.add("active"); }
-    if (view === "chat") { scrollChatToBottom(); }
+    if (target) target.classList.add("active");
+    if (view === "chat") scrollChatToBottom();
   });
 });
 
-// ===== CHAT =====
+// ===== chat =====
 const chatMessages = $("chatMessages");
 const chatInput = $("chatInput");
 const chatSend = $("chatSend");
@@ -202,185 +1035,376 @@ const chatEmptyState = $("chatEmptyState");
 const modelSelector = $("modelSelector");
 const selectedModelLabel = $("selectedModelLabel");
 let currentModel = "";
-let chatHistory = [];
+let currentSessionId = null;
 
 function scrollChatToBottom() {
   requestAnimationFrame(() => { chatMessages.scrollTop = chatMessages.scrollHeight; });
 }
-
-function addMessage(role, content, meta = "") {
+function addUserMessage(content) {
   if (chatEmptyState) chatEmptyState.style.display = "none";
   const div = document.createElement("div");
-  div.className = "message " + role;
-  const avatar = role === "user" ? "U" : "AI";
-  let metaHtml = meta ? `<div class="msg-meta">${meta}</div>` : "";
-  div.innerHTML = `<div class="msg-avatar">${avatar}</div><div><div class="msg-bubble">${escapeHtml(content)}</div>${metaHtml}</div>`;
+  div.className = "message user";
+  div.innerHTML = `<div class="msg-avatar">YOU</div><div class="msg-stack"><div class="msg-bubble">${renderMarkdown(content)}</div></div>`;
   chatMessages.appendChild(div);
   scrollChatToBottom();
   return div;
 }
-
-function addAssistantMessageRaw(contentEl) {
+function buildAssistantBubble(content, sources = [], toolCalls = []) {
+  let bubble = renderMarkdown(content);
+  if (sources && sources.length) bubble += formatSearchResults(sources);
+  if (toolCalls && toolCalls.length) {
+    bubble += '<div class="tool-calls">' + toolCalls.map(t =>
+      `<span class="tool-call-badge">⚙ ${escapeHtml(t.name || t)}</span>`).join("") + "</div>";
+  }
+  return bubble;
+}
+function addAssistantMessage(content, sources = [], toolCalls = [], meta = "") {
   if (chatEmptyState) chatEmptyState.style.display = "none";
   const div = document.createElement("div");
   div.className = "message assistant";
-  div.innerHTML = `<div class="msg-avatar">AI</div><div>${contentEl}</div>`;
+  const metaHtml = meta ? `<div class="msg-meta">${meta}</div>` : "";
+  div.innerHTML = `<div class="msg-avatar">AI</div><div class="msg-stack"><div class="msg-bubble">${buildAssistantBubble(content, sources, toolCalls)}</div>${metaHtml}</div>`;
   chatMessages.appendChild(div);
   scrollChatToBottom();
   return div;
 }
-
 function showTyping() { typingIndicator.classList.add("visible"); scrollChatToBottom(); }
 function hideTyping() { typingIndicator.classList.remove("visible"); }
 
-function escapeHtml(t) {
-  return t.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
-    .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
-    .replace(/`([^`]+)`/g, "<code>$1</code>")
-    .replace(/\n/g, "<br>");
-}
-
-function formatSearchResults(data) {
-  if (!data || !data.results) return "";
-  const results = data.results.slice(0, 5);
-  if (!results.length) return '<div class="search-results"><em style="color:var(--text-tertiary);font-size:12px">No results found</em></div>';
+function formatSearchResults(results) {
+  if (!results || !results.length) return "";
   let html = '<div class="search-results">';
-  for (const r of results) {
+  for (const r of results.slice(0, 5)) {
     const title = r.title || r.url;
     const url = r.url || "#";
     const snippet = r.snippet || r.abstract || r.content || "";
-    html += `<div class="search-result-item"><a href="${escapeHtml(url)}" target="_blank" rel="noopener">${escapeHtml(title)}</a><div class="snippet">${escapeHtml(snippet.substring(0, 200))}</div></div>`;
+    html += `<div class="search-result-item"><a href="${escapeHtml(url)}" target="_blank" rel="noopener">${escapeHtml(title)}</a><div class="snippet">${escapeHtml(snippet.substring(0, 220))}</div></div>`;
   }
-  html += "</div>";
-  return html;
+  return html + "</div>";
 }
 
 async function sendChat() {
   const msg = chatInput.value.trim();
   if (!msg) return;
   chatInput.value = "";
-  addMessage("user", msg);
-  chatHistory.push({ role: "user", content: msg });
+  addUserMessage(msg);
   showTyping();
   chatSend.disabled = true;
   try {
     const body = { message: msg };
     if (currentModel) body.model = currentModel;
+    if (currentSessionId) body.session_id = currentSessionId;
     const resp = await api("/api/chat", { method: "POST", body: JSON.stringify(body) });
     hideTyping();
-    let content = resp.response || "";
-    const toolCalls = resp.tool_calls || [];
-    const sources = resp.sources || [];
-    let bubbleContent = escapeHtml(content);
-    if (sources.length) { bubbleContent += formatSearchResults({ results: sources }); }
-    if (toolCalls.length) {
-      bubbleContent += '<div class="tool-calls">' + toolCalls.map(t => `<span class="tool-call-badge">&#x2699; ${escapeHtml(t.name || t)}</span>`).join("") + "</div>";
-    }
-    const bubble = document.createElement("div");
-    bubble.className = "msg-bubble";
-    bubble.innerHTML = bubbleContent;
-    const meta = currentModel ? `model: ${escapeHtml(currentModel)}` : "";
-    addAssistantMessageRaw(bubble.outerHTML.replace(bubble.innerHTML, bubble.innerHTML));
-    chatHistory.push({ role: "assistant", content });
+    if (resp.session_id && resp.session_id !== currentSessionId) currentSessionId = resp.session_id;
+    const meta = resp.model ? "model · " + escapeHtml(resp.model) : "";
+    addAssistantMessage(resp.response || "", resp.sources || [], resp.tool_calls || [], meta);
+    loadSessions();
   } catch (err) {
     hideTyping();
-    addMessage("assistant", "Error: " + err.message);
+    addAssistantMessage("Error: " + err.message + " — check the AI Provider tab.");
   } finally {
     chatSend.disabled = false;
     chatInput.focus();
   }
 }
-
 chatSend.addEventListener("click", sendChat);
 chatInput.addEventListener("keydown", (e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendChat(); } });
+$("chatClear").addEventListener("click", () => {
+  currentSessionId = null;
+  chatMessages.innerHTML = "";
+  chatMessages.appendChild(chatEmptyState);
+  chatEmptyState.style.display = "";
+  document.querySelectorAll(".session-item").forEach(s => s.classList.remove("active"));
+  chatInput.focus();
+});
 
-// ===== MODELS =====
+// ===== session history (sidebar) =====
+const SESSION_ICON = '<svg class="s-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>';
+
+async function loadSessions() {
+  try {
+    const data = await api("/api/chat/sessions");
+    const list = $("sessionList");
+    list.innerHTML = "";
+    const sessions = data.sessions || [];
+    if (!sessions.length) {
+      list.innerHTML = '<div class="session-empty">No sessions yet.<br>Your conversations will appear here.</div>';
+      return;
+    }
+    for (const s of sessions) {
+      const item = document.createElement("button");
+      item.className = "session-item" + (s.id === currentSessionId ? " active" : "");
+      item.title = s.title;
+      item.innerHTML = `${SESSION_ICON}
+        <span class="session-meta">
+          <span class="session-title">${escapeHtml(s.title)}</span>
+          <span class="session-time">${relTime(s.updated)} · ${s.message_count} msgs</span>
+        </span>
+        <span class="session-del" title="Delete session">✕</span>`;
+      item.addEventListener("click", (e) => {
+        if (e.target.closest(".session-del")) return;
+        openSession(s.id);
+      });
+      item.querySelector(".session-del").addEventListener("click", async (e) => {
+        e.stopPropagation();
+        try {
+          await api(`/api/chat/sessions/${encodeURIComponent(s.id)}`, { method: "DELETE" });
+          if (s.id === currentSessionId) {
+            currentSessionId = null;
+            chatMessages.innerHTML = "";
+            chatMessages.appendChild(chatEmptyState);
+            chatEmptyState.style.display = "";
+          }
+          showToast("Session deleted", "success");
+          loadSessions();
+        } catch (err) { showToast("Error: " + err.message, "error"); }
+      });
+      list.appendChild(item);
+    }
+  } catch (e) { console.error("Failed to load sessions", e); }
+}
+
+async function openSession(id) {
+  try {
+    const data = await api(`/api/chat/sessions/${encodeURIComponent(id)}`);
+    const session = data.session;
+    currentSessionId = session.id;
+    chatMessages.innerHTML = "";
+    chatMessages.appendChild(chatEmptyState);
+    for (const m of session.messages || []) {
+      if (m.role === "user") addUserMessage(m.content);
+      else addAssistantMessage(m.content, m.sources || [], m.tool_calls || [], m.model ? "model · " + escapeHtml(m.model) : "");
+    }
+    document.querySelectorAll(".session-item").forEach(el => el.classList.remove("active"));
+    const active = [...document.querySelectorAll(".session-item")].find(el => el.title === session.title);
+    if (active) active.classList.add("active");
+    // jump to chat view
+    document.querySelector('.sidebar nav a[data-view="chat"]').click();
+    loadSessions();
+  } catch (err) { showToast("Could not open session: " + err.message, "error"); }
+}
+
+$("sessionNew").addEventListener("click", () => {
+  currentSessionId = null;
+  chatMessages.innerHTML = "";
+  chatMessages.appendChild(chatEmptyState);
+  chatEmptyState.style.display = "";
+  document.querySelectorAll(".session-item").forEach(s => s.classList.remove("active"));
+  document.querySelector('.sidebar nav a[data-view="chat"]').click();
+  chatInput.focus();
+});
+
+// ===== AI provider =====
+const PRESET_URLS = {
+  ollama: "http://localhost:11434/v1",
+  lmstudio: "http://localhost:1234/v1",
+  openai: "https://api.openai.com/v1",
+  openrouter: "https://openrouter.ai/api/v1",
+  groq: "https://api.groq.com/openai/v1",
+  together: "https://api.together.xyz/v1",
+  custom: "",
+};
+let cachedModels = [];
+
+$("aiBackend").addEventListener("change", () => {
+  const preset = PRESET_URLS[$("aiBackend").value];
+  if (preset !== undefined && preset !== "") $("aiBaseUrl").value = preset;
+  if ($("aiBackend").value === "custom") $("aiBaseUrl").focus();
+});
+// Guard: people often paste the actual key into the env-var field.
+$("aiApiKeyEnv").addEventListener("blur", () => {
+  const v = $("aiApiKeyEnv").value.trim();
+  if (/^(sk-|sk_|BSA|xai-|gsk_|hf_)/.test(v) || (v.length >= 30 && !/^[A-Z0-9_]+$/i.test(v))) {
+    showToast("That looks like a real key — paste it into “API key”, not the env-var field.", "error");
+  }
+});
+
+async function testConnection() {
+  const panel = $("connStatus");
+  panel.classList.remove("hidden");
+  $("connMsg").textContent = "Testing connection…";
+  $("connLed").className = "led";
+  $("connLatency").textContent = "…";
+  $("connModelCount").textContent = "…";
+  try {
+    const r = await api("/api/ai/test", {
+      method: "POST",
+      body: JSON.stringify({
+        base_url: $("aiBaseUrl").value.trim(),
+        api_key: $("aiApiKey").value.trim(),
+        api_key_env: $("aiApiKeyEnv").value.trim(),
+      }),
+    });
+    if (r.ok) {
+      $("connLed").className = "led";
+      $("connMsg").innerHTML = `<b style="color:var(--ok)">connected</b> — ${escapeHtml(r.base_url)}`;
+      $("connLatency").textContent = r.latency_ms + " ms";
+      $("connModelCount").textContent = r.models_count;
+      showToast("Connection OK · " + r.models_count + " models", "success");
+    } else {
+      $("connLed").className = "led off";
+      $("connMsg").innerHTML = `<b style="color:var(--err)">failed</b> — ${escapeHtml(r.error || "unknown error")}${r.hint ? "<br>" + escapeHtml(r.hint) : ""}`;
+      $("connLatency").textContent = "—";
+      $("connModelCount").textContent = "—";
+      showToast("Connection failed", "error");
+    }
+    return r;
+  } catch (err) {
+    $("connLed").className = "led off";
+    $("connMsg").textContent = "Request error: " + err.message;
+    showToast("Test error: " + err.message, "error");
+    return null;
+  }
+}
+$("connTest").addEventListener("click", testConnection);
+
 async function fetchModels() {
   const baseUrl = $("aiBaseUrl").value.replace(/\/+$/, "");
   const btn = $("fetchModels");
   btn.disabled = true;
-  btn.innerHTML = '<span class="spinner-sm"></span> Loading...';
+  btn.innerHTML = '<span class="spinner-sm"></span> Loading…';
   try {
-    const resp = await api(`/api/models?base_url=${encodeURIComponent(baseUrl)}`);
+    const params = new URLSearchParams({ base_url: baseUrl });
+    const key = $("aiApiKey").value.trim();
+    if (key) params.set("api_key", key);
+    const envKey = $("aiApiKeyEnv").value.trim();
+    if (envKey) params.set("api_key_env", envKey);
+    const resp = await api("/api/models?" + params.toString());
     const models = resp.models || [];
+    cachedModels = models;
     $("modelCount").textContent = models.length + " models";
     const grid = $("modelGrid");
     grid.innerHTML = "";
-    if (!models.length) { $("modelEmpty").style.display = "flex"; }
-    else {
+    if (!models.length) {
+      $("modelEmpty").style.display = "flex";
+    } else {
       $("modelEmpty").style.display = "none";
       for (const m of models) {
         const card = document.createElement("div");
         card.className = "model-card" + (m.id === currentModel ? " selected" : "");
         const name = m.name || m.id || "unknown";
         card.innerHTML = `<div class="model-name">${escapeHtml(name)}</div><div class="model-id">${escapeHtml(m.id)}</div>`;
-        card.addEventListener("click", () => {
-          currentModel = m.id;
-          modelSelector.innerHTML = models.map(x => `<option value="${escapeHtml(x.id)}">${escapeHtml(x.name || x.id)}</option>`).join("");
-          modelSelector.value = m.id;
-          selectedModelLabel.textContent = name;
-          selectedModelLabel.className = "badge badge-success";
-          document.querySelectorAll(".model-card").forEach(c => c.classList.remove("selected"));
-          card.classList.add("selected");
-          showToast("Selected model: " + name, "success");
-        });
+        card.addEventListener("click", () => selectModel(m.id));
         grid.appendChild(card);
       }
-      if (models.length && !currentModel) {
-        currentModel = models[0].id;
-        modelSelector.innerHTML = models.map(x => `<option value="${escapeHtml(x.id)}">${escapeHtml(x.name || x.id)}</option>`).join("");
-        modelSelector.value = currentModel;
-        selectedModelLabel.textContent = models[0].name || models[0].id;
-        selectedModelLabel.className = "badge badge-success";
-      }
+      if (!currentModel) selectModel(models[0].id, true);
     }
     showToast("Loaded " + models.length + " models", "success");
+    // Fetch succeeded → make this the active provider immediately so chat works.
+    await saveBackend(true);
   } catch (err) {
     showToast("Failed to fetch models: " + err.message, "error");
   } finally {
     btn.disabled = false;
-    btn.innerHTML = "Fetch Models";
+    btn.innerHTML = "Fetch models";
   }
 }
-
+function selectModel(id, silent = false) {
+  currentModel = id;
+  const m = cachedModels.find(x => x.id === id);
+  const label = (m && (m.name || m.id)) || id;
+  modelSelector.innerHTML = cachedModels.map(x =>
+    `<option value="${escapeHtml(x.id)}">${escapeHtml(x.name || x.id)}</option>`).join("") || `<option value="${escapeHtml(id)}">${escapeHtml(label)}</option>`;
+  modelSelector.value = id;
+  selectedModelLabel.textContent = label;
+  selectedModelLabel.className = "badge badge-ok";
+  document.querySelectorAll(".model-card").forEach(c =>
+    c.classList.toggle("selected", c.querySelector(".model-id")?.textContent === id));
+  if (!silent) showToast("Selected model: " + label, "success");
+}
 $("fetchModels").addEventListener("click", fetchModels);
-$("saveBackend").addEventListener("click", () => {
-  const backend = { backend: $("aiBackend").value, base_url: $("aiBaseUrl").value, api_key_env: $("aiApiKeyEnv").value || "none" };
-  localStorage.setItem("aiBackend", JSON.stringify(backend));
-  showToast("Backend saved as default", "success");
+async function saveBackend(silent = false) {
+  const payload = {
+    provider: $("aiBackend").value,
+    base_url: $("aiBaseUrl").value.trim(),
+    api_key: $("aiApiKey").value.trim(),
+    api_key_env: $("aiApiKeyEnv").value.trim() || "none",
+    model: currentModel || undefined,
+  };
+  if (!payload.base_url) { if (!silent) showToast("Base URL required", "error"); return false; }
+  try {
+    await api("/api/ai/provider", { method: "POST", body: JSON.stringify(payload) });
+    localStorage.setItem("aiBackend", JSON.stringify({ backend: payload.provider, base_url: payload.base_url, api_key_env: payload.api_key_env }));
+    if (!silent) showToast("Provider saved as default", "success");
+    return true;
+  } catch (e) { if (!silent) showToast("Error: " + e.message, "error"); return false; }
+}
+$("saveBackend").addEventListener("click", () => saveBackend());
+
+// ===== AI provider tabs (Connection / Models / Generation) =====
+document.querySelectorAll("#providerTabs .tab").forEach(tab => {
+  tab.addEventListener("click", () => {
+    document.querySelectorAll("#providerTabs .tab").forEach(t => t.classList.remove("active"));
+    tab.classList.add("active");
+    $("tab-connection").classList.toggle("hidden", tab.dataset.tab !== "connection");
+    $("tab-models").classList.toggle("hidden", tab.dataset.tab !== "models");
+    $("tab-generation").classList.toggle("hidden", tab.dataset.tab !== "generation");
+  });
 });
+
+// ===== generation settings: max output tokens + context window (BF-014) =====
+function loadGenerationSettings() {
+  api("/api/ai/provider").then(r => {
+    const p = r.provider || {};
+    $("genMaxTokens").value = p.max_tokens || "";
+    $("genContextWindow").value = p.context_window || "";
+  }).catch(() => {});
+}
+async function saveGenerationSettings() {
+  const mt = $("genMaxTokens").value.trim();
+  const cw = $("genContextWindow").value.trim();
+  const payload = {
+    max_tokens: mt ? parseInt(mt, 10) : null,
+    context_window: cw ? parseInt(cw, 10) : null,
+  };
+  try {
+    await api("/api/ai/provider", { method: "POST", body: JSON.stringify(payload) });
+    $("genStatus").textContent = "saved ✓";
+    $("genStatus").style.color = "var(--ok)";
+    showToast("Generation settings saved", "success");
+  } catch (e) {
+    $("genStatus").textContent = "error: " + e.message;
+    $("genStatus").style.color = "var(--err)";
+    showToast("Error: " + e.message, "error");
+  }
+}
+$("genSave").addEventListener("click", saveGenerationSettings);
+$("genClear").addEventListener("click", () => {
+  $("genMaxTokens").value = "";
+  $("genContextWindow").value = "";
+  saveGenerationSettings();
+});
+
 modelSelector.addEventListener("change", () => {
   currentModel = modelSelector.value;
-  selectedModelLabel.textContent = currentModel || "No model";
-  selectedModelLabel.className = "badge " + (currentModel ? "badge-success" : "badge-neutral");
+  selectedModelLabel.textContent = currentModel || "no model";
+  selectedModelLabel.className = "badge " + (currentModel ? "badge-ok" : "badge-dim");
 });
-
-// Load saved backend
 try {
   const saved = JSON.parse(localStorage.getItem("aiBackend") || "{}");
   if (saved.base_url) $("aiBaseUrl").value = saved.base_url;
   if (saved.backend) $("aiBackend").value = saved.backend;
-  if (saved.api_key_env) $("aiApiKeyEnv").value = saved.api_key_env;
+  if (saved.api_key_env && saved.api_key_env !== "none") $("aiApiKeyEnv").value = saved.api_key_env;
 } catch (e) {}
 
-// ===== KEYS =====
+// ===== keys =====
 async function loadKeys() {
   try {
     const data = await api("/api/keys");
-    const toolList = $("toolKeysList");
-    toolList.innerHTML = "";
-    if (!data.length) { toolList.innerHTML = '<div class="empty-state" style="padding:20px"><p>No keys configured</p></div>'; }
-    else {
-      for (const k of data) {
-        const row = document.createElement("div");
-        row.className = "key-row";
-        row.innerHTML = `<span class="key-name">${escapeHtml(k.name)}</span><span class="key-value-masked">${escapeHtml(k.masked)}</span><span class="badge ${k.set ? "badge-success" : "badge-neutral"}">${k.set ? "Set" : "Not set"}</span>`;
-        toolList.appendChild(row);
-      }
-    }
+    const render = (filter) => {
+      const out = data.filter(filter);
+      if (!out.length) return '<div class="empty-state" style="padding:22px"><p>Nothing set yet</p></div>';
+      return out.map(k => `<div class="key-row">
+        <span class="key-name">${escapeHtml(k.name)}</span>
+        <span class="key-value-masked">${escapeHtml(k.masked)}</span>
+        <span class="badge ${k.set ? "badge-ok" : "badge-dim"}">${k.set ? "set" : "empty"}</span>
+      </div>`).join("");
+    };
+    $("toolKeysList").innerHTML = render(k => !/API_KEY$|OPENAI|OPENROUTER|GROQ|TOGETHER|BRAVE|CUSTOM|HARNESS/.test(k.name) || k.name === "API_KEY");
+    $("aiKeysList").innerHTML = render(k => /OPENAI|OPENROUTER|GROQ|TOGETHER|BRAVE|CUSTOM|HARNESS_LLM/.test(k.name));
   } catch (e) { console.error("Failed to load keys", e); }
 }
-
 $("toolKeySet").addEventListener("click", async () => {
   const name = $("toolKeyName").value.trim();
   const value = $("toolKeyValue").value;
@@ -392,7 +1416,6 @@ $("toolKeySet").addEventListener("click", async () => {
     loadKeys();
   } catch (e) { showToast("Error: " + e.message, "error"); }
 });
-
 $("aiKeySet").addEventListener("click", async () => {
   const provider = $("aiKeyProvider").value;
   const value = $("aiKeyValue").value;
@@ -404,45 +1427,51 @@ $("aiKeySet").addEventListener("click", async () => {
     loadKeys();
   } catch (e) { showToast("Error: " + e.message, "error"); }
 });
-
-// Key tabs
 document.querySelectorAll("#view-keys .tab").forEach(tab => {
   tab.addEventListener("click", () => {
     document.querySelectorAll("#view-keys .tab").forEach(t => t.classList.remove("active"));
     tab.classList.add("active");
-    document.getElementById("tab-tool-keys").classList.toggle("hidden", tab.dataset.tab !== "tool-keys");
-    document.getElementById("tab-ai-keys").classList.toggle("hidden", tab.dataset.tab !== "ai-keys");
+    $("tab-tool-keys").classList.toggle("hidden", tab.dataset.tab !== "tool-keys");
+    $("tab-ai-keys").classList.toggle("hidden", tab.dataset.tab !== "ai-keys");
   });
 });
 
-// ===== ENDPOINTS =====
+// ===== endpoints (optional manual) =====
 async function loadEndpoints() {
   try {
     const data = await api("/api/endpoints");
     const tbody = $("epTable");
     tbody.innerHTML = "";
-    if (!data.length) { $("epEmpty").style.display = "flex"; }
-    else {
-      $("epEmpty").style.display = "none";
-      for (const ep of data) {
-        const tr = document.createElement("tr");
-        tr.innerHTML = `<td><strong>${escapeHtml(ep.name)}</strong></td><td><code style="font-size:11px;color:var(--text-tertiary)">${escapeHtml(ep.url)}</code></td><td><span class="badge badge-neutral">${escapeHtml(ep.method || "GET")}</span></td><td>${escapeHtml(ep.api_key_env || "none")}</td><td><button class="btn btn-sm btn-secondary" onclick="testEp('${escapeHtml(ep.name)}')">Test</button></td>`;
-        tbody.appendChild(tr);
-      }
+    if (!data.length) { $("epEmpty").style.display = "flex"; return; }
+    $("epEmpty").style.display = "none";
+    for (const ep of data) {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<td><strong>${escapeHtml(ep.name)}</strong></td>
+        <td><code style="font-family:var(--font-mono);font-size:11px;color:var(--ink-3)">${escapeHtml(ep.url)}</code></td>
+        <td><span class="badge badge-dim">${escapeHtml(ep.method || "GET")}</span></td>
+        <td class="readout">${escapeHtml(ep.api_key_env || "none")}</td>
+        <td><button class="btn btn-sm btn-secondary" onclick="testEp('${encodeURIComponent(ep.name)}')">Test</button>
+            <button class="btn btn-sm btn-danger" onclick="removeEp('${encodeURIComponent(ep.name)}')">✕</button></td>`;
+      tbody.appendChild(tr);
     }
   } catch (e) { console.error("Failed to load endpoints", e); }
 }
-
 window.testEp = async function(name) {
   try {
-    showToast("Testing " + name + "...", "info");
-    const r = await api(`/api/endpoints/${encodeURIComponent(name)}/test`, { method: "POST", body: JSON.stringify({}) });
-    showToast(name + ": " + (r.result || "ok"), "success");
-  } catch (e) { showToast(name + ": " + e.message, "error"); }
+    showToast("Testing " + decodeURIComponent(name) + "…", "info");
+    const r = await api(`/api/endpoints/${name}/test`, { method: "POST", body: JSON.stringify({}) });
+    showToast(decodeURIComponent(name) + ": " + (r.result || "ok"), r.result === "ok" ? "success" : "error");
+  } catch (e) { showToast(decodeURIComponent(name) + ": " + e.message, "error"); }
 };
-
+window.removeEp = async function(name) {
+  try {
+    await api(`/api/endpoints/${name}`, { method: "DELETE" });
+    showToast("Endpoint removed", "success");
+    loadEndpoints();
+  } catch (e) { showToast("Error: " + e.message, "error"); }
+};
 $("epAdd").addEventListener("click", async () => {
-  const payload = { name: $("epName").value, url: $("epUrl").value, method: $("epMethod").value, api_key_env: $("epKeyEnv").value || "none" };
+  const payload = { name: $("epName").value.trim(), url: $("epUrl").value.trim(), method: $("epMethod").value, api_key_env: $("epKeyEnv").value.trim() || "none" };
   if (!payload.name || !payload.url) { showToast("Name and URL required", "error"); return; }
   try {
     await api("/api/endpoints", { method: "POST", body: JSON.stringify(payload) });
@@ -452,73 +1481,124 @@ $("epAdd").addEventListener("click", async () => {
   } catch (e) { showToast("Error: " + e.message, "error"); }
 });
 
-// ===== MCP =====
-async function loadMcpServers() {
+// ===== MCP services =====
+async function loadMcpDefaults() {
   try {
-    const data = await api("/api/mcp/servers");
-    const container = $("mcpServersList");
-    container.innerHTML = "";
-    if (!data.servers || !data.servers.length) {
-      container.innerHTML = '<div class="card"><div class="empty-state" style="padding:30px"><div class="empty-icon">&#x1F4E6;</div><h4>No MCP servers</h4><p>Add a server above to enable MCP tools.</p></div></div>';
-      return;
-    }
-    for (const srv of data.servers) {
+    const [presetsResp, serversResp] = await Promise.all([api("/api/mcp/presets"), api("/api/mcp/servers")]);
+    const installed = new Set((serversResp.servers || []).map(s => s.name));
+    const defaultsBox = $("mcpDefaults");
+    const presetsBox = $("mcpPresets");
+    defaultsBox.innerHTML = "";
+    presetsBox.innerHTML = "";
+    for (const p of presetsResp.presets || []) {
       const card = document.createElement("div");
-      card.className = "card mcp-server-card";
-      const toolsHtml = (srv.tools || []).map(t => `<span class="mcp-tool-tag">${escapeHtml(t.name || t)}</span>`).join("");
-      card.innerHTML = `<div class="mcp-server-header"><h4>${escapeHtml(srv.name)}</h4><button class="btn btn-sm btn-danger" onclick="removeMcp('${escapeHtml(srv.name)}')">Remove</button></div><p style="font-size:12px;color:var(--text-tertiary);font-family:monospace">${escapeHtml(srv.command || "")} ${escapeHtml((srv.args || []).join(" "))}</p><div class="mcp-tools-list">${toolsHtml || '<span style="font-size:12px;color:var(--text-tertiary)">Connecting...</span>'}</div>`;
-      container.appendChild(card);
+      card.className = "preset-card";
+      const isDefault = p.builtin;
+      const ready = isDefault || installed.has(p.id);
+      const badge = ready
+        ? '<span class="badge badge-ok">ready</span>'
+        : (p.requires_key ? '<span class="badge badge-warn">key needed</span>' : '<span class="badge badge-dim">optional</span>');
+      const freeTag = p.free ? '<span class="badge badge-blue">free</span>' : "";
+      let actions = "";
+      if (!ready) {
+        actions = p.requires_key
+          ? `<button class="btn btn-sm btn-primary" onclick="installPreset('${escapeHtml(p.id)}', true)">Enable with key</button>`
+          : `<button class="btn btn-sm btn-primary" onclick="installPreset('${escapeHtml(p.id)}')">Install</button>`;
+      } else {
+        actions = '<span class="readout" style="color:var(--ok)">✓ active</span>';
+      }
+      card.innerHTML = `<h4>${escapeHtml(p.label)} ${badge} ${freeTag}</h4><p>${escapeHtml(p.description)}</p><div class="preset-actions">${actions}</div>`;
+      (isDefault ? defaultsBox : presetsBox).appendChild(card);
     }
+    renderMcpServers(serversResp);
   } catch (e) {
-    $("mcpServersList").innerHTML = '<div class="card"><p style="color:var(--text-tertiary);font-size:13px">MCP support requires additional dependencies. Install mcp package to enable.</p></div>';
+    $("mcpDefaults").innerHTML = '<p class="hint">Could not load MCP presets: ' + escapeHtml(e.message) + "</p>";
   }
 }
-
-window.removeMcp = async function(name) {
+window.installPreset = async function(id, needsKey = false) {
   try {
-    await api(`/api/mcp/servers/${encodeURIComponent(name)}`, { method: "DELETE" });
-    showToast("Removed: " + name, "success");
-    loadMcpServers();
+    let body = {};
+    if (needsKey) {
+      const key = prompt("Enter the API key for this service:");
+      if (!key) return;
+      body = { api_key: key };
+    }
+    await api(`/api/mcp/presets/${encodeURIComponent(id)}/install`, { method: "POST", body: JSON.stringify(body) });
+    showToast("Service ready: " + id, "success");
+    loadMcpDefaults();
   } catch (e) { showToast("Error: " + e.message, "error"); }
 };
-
+function renderMcpServers(data) {
+  const container = $("mcpServersList");
+  container.innerHTML = "";
+  const servers = data.servers || [];
+  if (!servers.length) {
+    container.innerHTML = '<div class="empty-state" style="padding:26px"><div class="empty-icon">▢</div><h4>No servers</h4><p>Install a preset above or add a manual server below.</p></div>';
+    return;
+  }
+  for (const srv of servers) {
+    const card = document.createElement("div");
+    card.className = "mcp-server-card";
+    const toolsHtml = (srv.tools || []).map(t =>
+      `<span class="mcp-tool-tag">${escapeHtml(t.name || t)}</span>`).join("");
+    const builtinBadge = srv.builtin
+      ? '<span class="badge badge-blue">built-in</span>'
+      : (srv.preset ? '<span class="badge badge-ok">preset</span>' : '<span class="badge badge-dim">manual</span>');
+    const statusBadge = srv.builtin
+      ? '<span class="badge badge-ok">ready</span>'
+      : '<span class="badge badge-warn">on connect</span>';
+    const cmd = srv.command === "builtin" ? "in-process · zero setup" : `${srv.command || ""} ${(srv.args || []).join(" ")}`;
+    card.innerHTML = `<div class="mcp-server-header">
+        <h4>${escapeHtml(srv.name)} ${builtinBadge} ${statusBadge}</h4>
+        ${srv.builtin ? "" : `<button class="btn btn-sm btn-danger" onclick="removeMcp('${encodeURIComponent(srv.name)}')">Remove</button>`}
+      </div>
+      ${srv.description ? `<p style="font-size:12px;color:var(--ink-3);margin-bottom:6px">${escapeHtml(srv.description)}</p>` : ""}
+      <div class="mcp-cmd">${escapeHtml(cmd)}</div>
+      <div class="mcp-tools-list">${toolsHtml || '<span class="hint">tools listed on connect</span>'}</div>`;
+    container.appendChild(card);
+  }
+}
+window.removeMcp = async function(name) {
+  try {
+    await api(`/api/mcp/servers/${name}`, { method: "DELETE" });
+    showToast("Removed: " + decodeURIComponent(name), "success");
+    loadMcpDefaults();
+  } catch (e) { showToast("Error: " + e.message, "error"); }
+};
 $("mcpAdd").addEventListener("click", async () => {
   const name = $("mcpName").value.trim();
   const command = $("mcpCommand").value.trim();
   const argsStr = $("mcpArgs").value.trim();
   if (!name || !command) { showToast("Name and command required", "error"); return; }
-  const args = argsStr ? argsStr.split(" ").filter(Boolean) : [];
+  const args = argsStr ? argsStr.split(/\s+/).filter(Boolean) : [];
   try {
     await api("/api/mcp/servers", { method: "POST", body: JSON.stringify({ name, command, args }) });
     $("mcpName").value = ""; $("mcpCommand").value = ""; $("mcpArgs").value = "";
     showToast("MCP server added: " + name, "success");
-    loadMcpServers();
+    loadMcpDefaults();
   } catch (e) { showToast("Error: " + e.message, "error"); }
 });
 
-// ===== LOGS =====
+// ===== logs =====
 async function loadLogs() {
   try {
     const data = await api("/api/logs");
     const tbody = $("logsTable");
-    const empty = $("logsEmpty");
     tbody.innerHTML = "";
-    if (!data.length) { empty.style.display = "flex"; }
-    else {
-      empty.style.display = "none";
-      for (const log of data) {
-        const tr = document.createElement("tr");
-        const ts = new Date((log.ts || 0) * 1000).toLocaleTimeString();
-        const statusBadge = log.ok ? '<span class="badge badge-success">ok</span>' : '<span class="badge badge-error">fail</span>';
-        const dur = log.duration_ms ? log.duration_ms.toFixed(0) + "ms" : "—";
-        const params = JSON.stringify(log.params || {}).substring(0, 60);
-        tr.innerHTML = `<td style="color:var(--text-tertiary);font-size:12px">${ts}</td><td><strong>${escapeHtml(log.tool)}</strong></td><td style="font-family:monospace;font-size:12px;color:var(--text-tertiary)">${escapeHtml(params)}</td><td>${statusBadge}</td><td style="font-size:12px">${dur}</td>`;
-        tbody.appendChild(tr);
-      }
+    if (!data.length) { $("logsEmpty").style.display = "flex"; return; }
+    $("logsEmpty").style.display = "none";
+    for (const log of data) {
+      const tr = document.createElement("tr");
+      const ts = new Date((log.ts || 0) * 1000).toLocaleTimeString();
+      const statusBadge = log.ok ? '<span class="badge badge-ok">ok</span>' : '<span class="badge badge-err">fail</span>';
+      const dur = log.duration_ms ? log.duration_ms.toFixed(0) + " ms" : "—";
+      const params = JSON.stringify(log.params || {}).substring(0, 60);
+      tr.innerHTML = `<td class="readout" style="color:var(--ink-3)">${ts}</td><td><strong>${escapeHtml(log.tool)}</strong></td>
+        <td style="font-family:var(--font-mono);font-size:11px;color:var(--ink-3)">${escapeHtml(params)}</td><td>${statusBadge}</td><td class="readout">${dur}</td>`;
+      tbody.appendChild(tr);
     }
   } catch (e) { console.error("Failed to load logs", e); }
 }
-
 $("logsClear").addEventListener("click", async () => {
   try {
     await api("/api/logs", { method: "DELETE" });
@@ -527,7 +1607,7 @@ $("logsClear").addEventListener("click", async () => {
   } catch (e) { showToast("Error: " + e.message, "error"); }
 });
 
-// ===== CONFIG =====
+// ===== config =====
 $("cfgExport").addEventListener("click", async () => {
   try {
     const data = await api("/api/config/export");
@@ -536,25 +1616,48 @@ $("cfgExport").addEventListener("click", async () => {
     showToast("Config exported", "success");
   } catch (e) { showToast("Error: " + e.message, "error"); }
 });
-
 $("cfgImportBtn").addEventListener("click", async () => {
   const text = $("cfgImport").value;
   if (!text) { showToast("Config text required", "error"); return; }
   try {
-    const resp = await api("/api/config/import", { method: "POST", body: JSON.stringify({ config: text }) });
-    $("cfgStatus").textContent = "Imported successfully";
-    $("cfgStatus").style.color = "var(--success)";
+    await api("/api/config/import", { method: "POST", body: JSON.stringify({ config: text }) });
+    $("cfgStatus").textContent = "imported ✓";
+    $("cfgStatus").style.color = "var(--ok)";
     showToast("Config imported", "success");
-  } catch (e) { $("cfgStatus").textContent = "Error: " + e.message; $("cfgStatus").style.color = "var(--error)"; }
+    loadMcpDefaults();
+  } catch (e) { $("cfgStatus").textContent = "error: " + e.message; $("cfgStatus").style.color = "var(--err)"; }
 });
 
-// ===== INIT =====
+// ===== init =====
 async function init() {
+  seedSky();
+  meteorLoop();
   try {
-    await Promise.all([loadKeys(), loadEndpoints(), loadLogs(), loadMcpServers()]);
+    await Promise.all([loadKeys(), loadEndpoints(), loadLogs(), loadMcpDefaults(), loadSessions()]);
+    loadGenerationSettings();
+    // prefill model selector quickly from the default endpoint (best-effort)
+    try {
+      const resp = await api("/api/models");
+      const models = resp.models || [];
+      if (models.length) {
+        cachedModels = models;
+        modelSelector.innerHTML = models.map(x => `<option value="${escapeHtml(x.id)}">${escapeHtml(x.name || x.id)}</option>`).join("");
+        currentModel = models[0].id;
+        modelSelector.value = currentModel;
+        selectedModelLabel.textContent = models[0].name || models[0].id;
+        selectedModelLabel.className = "badge badge-ok";
+        $("modelCount").textContent = models.length + " models";
+      } else {
+        modelSelector.innerHTML = '<option value="">no endpoint connected</option>';
+      }
+    } catch (e) {
+      modelSelector.innerHTML = '<option value="">endpoint offline</option>';
+      $("serverLed").classList.add("off");
+      $("sidebarStatus").textContent = "ai endpoint offline";
+    }
   } catch (e) { console.error("Init error", e); }
 }
-
 init();
 </script>
-</body></html></main></div></body></html>
+</body>
+</html>

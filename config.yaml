@@ -8,8 +8,12 @@ llm:
   timeout: 30
   max_iterations: 8
 
+# Optional manual tool endpoints (the free built-in fetcher + DuckDuckGo search
+# work without any endpoint configuration — see docs/config-reference.md).
 endpoints: []
 
 custom_endpoints: []
 
+# MCP servers are seeded automatically with the free built-ins
+# (builtin-fetcher, builtin-search). Add stdio/SSE servers here only if needed.
 mcp_servers: []

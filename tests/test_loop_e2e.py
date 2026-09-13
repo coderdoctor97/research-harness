@@ -32,6 +32,16 @@ def test_parser_tool_call_openai():
     assert payload.name == "web_search"
 
 
+def test_parser_tool_call_wrapped_in_xml_tags():
+    raw = (
+        '<tool_call>{"tool_calls": [{"function": {"name": "web_search", '
+        '"arguments": "{\\"query\\": \\"x\\"}"}}]}</tool_call>'
+    )
+    ctype, payload = classify(raw)
+    assert ctype == CallType.TOOL_CALL
+    assert payload.name == "web_search"
+
+
 def test_parser_react_text():
     raw = "Thought: I need to search.\nAction: web_search\nAction Input: {\"query\": \"x\"}"
     ctype, payload = classify(raw)

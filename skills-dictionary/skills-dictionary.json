@@ -1,0 +1,445 @@
+{
+  "$schema": "skills-dictionary/v1",
+  "name": "Research Harness Skill Dictionary",
+  "project": "research-harness",
+  "generated": "2026-09-12",
+  "updated": "2026-09-13",
+  "purpose": "Two-part registry: (1) the frontend design skills + workflow-efficiency skills installed to polish this project's UI, and (2) an upgrade roadmap of reference frameworks/agent tooling that future AI maintainers should study or adopt when extending the harness. Each entry maps a skill/framework to its source, invocation, and when to use it.",
+  "install_root": ".claude/skills/",
+  "integration": {
+    "installed": "2026-09-12",
+    "status": "installed and applied",
+    "applied_to": [
+      "src/harness/ui/templates/index.html",
+      "src/harness/ui/app.py"
+    ],
+    "usage_log": [
+      {
+        "date": "2026-09-13",
+        "skills": [
+          "ponytail",
+          "i-have-adhd"
+        ],
+        "action": "Vendored as the mandatory efficiency layer for the plans/ improvement program: ponytail governs all implementation (ladder, minimal diffs, `ponytail:` debt tags, audit/review/debt at gates); i-have-adhd governs all reporting (action-first, numbered, state-restating). Registered in .agent/agent.md §1 and every plan's Efficiency doctrine header. Roadmap item #1 (Ponytail) is now installed."
+      },
+      {
+        "date": "2026-09-12",
+        "skills": [
+          "hallmark",
+          "impeccable",
+          "frontend-design"
+        ],
+        "action": "Full console UI redesign: research-instrument identity (warm ink + amber, Fraunces/IBM Plex type pairing, numbered nav, stepped provider flow). Hallmark anti-slop gates rejected the previous purple-gradient defaults; impeccable hierarchy/polish passes shaped the provider → key → test → fetch flow and MCP service cards."
+      }
+    ]
+  },
+  "skills": [
+    {
+      "id": "hallmark",
+      "name": "Hallmark",
+      "tagline": "Anti-AI-slop design skill — makes generated UI look made, not generated",
+      "version": "1.1.0",
+      "author": "Nutlope (Together AI)",
+      "source": "https://github.com/Nutlope/hallmark",
+      "site": "https://usehallmark.com",
+      "license": "MIT",
+      "install_path": ".claude/skills/hallmark/",
+      "entry": ".claude/skills/hallmark/SKILL.md",
+      "references_dir": ".claude/skills/hallmark/references/",
+      "project_status": "installed · applied to UI redesign 2026-09-12 (audit verb on templates/index.html)",
+      "invocation": {
+        "style": "verb-based, by name",
+        "commands": [
+          {
+            "verb": "hallmark <brief>",
+            "category": "Build",
+            "description": "Build new UI: picks a macrostructure, applies one of 21 themes, runs the 57-gate slop test before handing back."
+          },
+          {
+            "verb": "hallmark audit <target>",
+            "category": "Evaluate",
+            "description": "Score existing code against named anti-patterns. Punch list, no edits."
+          },
+          {
+            "verb": "hallmark redesign <target>",
+            "category": "Rebuild",
+            "description": "Throw out the structure, keep copy + IA + brand, rebuild with a different fingerprint."
+          },
+          {
+            "verb": "hallmark study <screenshot|URL>",
+            "category": "Extract",
+            "description": "Extract the design DNA (macrostructure, type-pairing, colour anchor) from a design you admire. Refuses pixel-clones."
+          }
+        ]
+      },
+      "best_for": "Greenfield pages and landing screens that must not look templated; structural variety across pages; auditing existing UI for AI-slop patterns.",
+      "not_for": "Small in-place polish passes on an already-established design system (use impeccable polish or frontend-design guidance instead)."
+    },
+    {
+      "id": "impeccable",
+      "name": "Impeccable",
+      "tagline": "Design fluency for frontend development — a shared design language with 23 commands",
+      "version": "4.3.1",
+      "author": "Paul Bakaus (pbakaus)",
+      "source": "https://github.com/pbakaus/impeccable",
+      "site": "https://impeccable.style",
+      "license": "Apache-2.0",
+      "install_path": ".claude/skills/impeccable/",
+      "entry": ".claude/skills/impeccable/SKILL.md",
+      "references_dir": ".claude/skills/impeccable/reference/",
+      "companion_agents": [
+        ".claude/agents/impeccable-asset-producer.md",
+        ".claude/agents/impeccable-documenter.md",
+        ".claude/agents/impeccable-finish-reviewer.md",
+        ".claude/agents/impeccable-manual-edit-applier.md"
+      ],
+      "project_status": "installed · applied to UI redesign 2026-09-12 (shape/polish passes on the web console)",
+      "invocation": {
+        "style": "slash-command driven (Claude Code)",
+        "commands": [
+          {
+            "verb": "/impeccable shape [feature]",
+            "category": "Build",
+            "description": "Plan UX/UI before writing code."
+          },
+          {
+            "verb": "/impeccable init",
+            "category": "Build",
+            "description": "Capture durable product context in PRODUCT.md."
+          },
+          {
+            "verb": "/impeccable document",
+            "category": "Build",
+            "description": "Generate DESIGN.md from existing project code."
+          },
+          {
+            "verb": "/impeccable extract [target]",
+            "category": "Build",
+            "description": "Pull reusable tokens and components into a design system."
+          },
+          {
+            "verb": "/impeccable critique [target]",
+            "category": "Evaluate",
+            "description": "UX design review with heuristic scoring."
+          },
+          {
+            "verb": "/impeccable audit [target]",
+            "category": "Evaluate",
+            "description": "Technical quality checks: accessibility, performance, responsive."
+          },
+          {
+            "verb": "/impeccable polish [target]",
+            "category": "Refine",
+            "description": "Final quality pass before shipping. The go-to for UI polishment."
+          },
+          {
+            "verb": "/impeccable bolder [target]",
+            "category": "Refine",
+            "description": "Amplify safe or bland designs."
+          },
+          {
+            "verb": "/impeccable quieter [target]",
+            "category": "Refine",
+            "description": "Tone down aggressive or overstimulating designs."
+          },
+          {
+            "verb": "/impeccable distill [target]",
+            "category": "Refine",
+            "description": "Strip to essence, remove complexity."
+          },
+          {
+            "verb": "/impeccable harden [target]",
+            "category": "Refine",
+            "description": "Production-ready: errors, i18n, edge cases."
+          },
+          {
+            "verb": "/impeccable onboard [target]",
+            "category": "Refine",
+            "description": "Design first-run flows, empty states, activation."
+          },
+          {
+            "verb": "/impeccable animate [target]",
+            "category": "Enhance",
+            "description": "Add purposeful animations and motion."
+          },
+          {
+            "verb": "/impeccable colorize [target]",
+            "category": "Enhance",
+            "description": "Add strategic color to monochromatic UIs."
+          },
+          {
+            "verb": "/impeccable typeset [target]",
+            "category": "Enhance",
+            "description": "Improve typography hierarchy and fonts."
+          },
+          {
+            "verb": "/impeccable layout [target]",
+            "category": "Enhance",
+            "description": "Fix spacing, rhythm, and visual hierarchy."
+          },
+          {
+            "verb": "/impeccable delight [target]",
+            "category": "Enhance",
+            "description": "Add personality and memorable touches."
+          },
+          {
+            "verb": "/impeccable overdrive [target]",
+            "category": "Enhance",
+            "description": "Push past conventional limits."
+          },
+          {
+            "verb": "/impeccable clarify [target]",
+            "category": "Fix",
+            "description": "Improve UX copy, labels, and error messages."
+          },
+          {
+            "verb": "/impeccable adapt [target]",
+            "category": "Fix",
+            "description": "Adapt for different devices and screen sizes."
+          },
+          {
+            "verb": "/impeccable optimize [target]",
+            "category": "Fix",
+            "description": "Diagnose and fix UI performance."
+          },
+          {
+            "verb": "/impeccable live",
+            "category": "Iterate",
+            "description": "Visual variant mode: pick elements in the browser, generate alternatives."
+          },
+          {
+            "verb": "/impeccable craft [feature]",
+            "category": "Build",
+            "description": "Deprecated alias for an ordinary new-work request."
+          }
+        ]
+      },
+      "best_for": "Full-lifecycle interface work on this project: documenting the current design (document), reviewing it (critique/audit), and polishing it (polish) — reads PRODUCT.md and DESIGN.md context.",
+      "not_for": "Backend-only or non-UI tasks.",
+      "notes": "Installed as a skill + 4 subagents. The official plugin also ships PostToolUse/Stop hooks (plugin/hooks/hooks.json) which are not auto-registered in a plain skill install; re-install via '/plugin marketplace add pbakaus/impeccable' if you want the hooks."
+    },
+    {
+      "id": "frontend-design",
+      "name": "Claude Frontend Design (Anthropic official)",
+      "tagline": "Guidance for distinctive, intentional visual design — the official Anthropic design skill",
+      "version": "latest (anthropics/skills main)",
+      "author": "Anthropic",
+      "source": "https://github.com/anthropics/skills/tree/main/skills/frontend-design",
+      "license": "See .claude/skills/frontend-design/LICENSE.txt",
+      "install_path": ".claude/skills/frontend-design/",
+      "entry": ".claude/skills/frontend-design/SKILL.md",
+      "references_dir": null,
+      "invocation": {
+        "style": "auto-invoked guidance skill (no subcommands)",
+        "commands": [
+          {
+            "verb": "(automatic)",
+            "category": "Guide",
+            "description": "Model-invoked whenever new UI is built or existing UI is reshaped: grounds design in the subject matter, drives deliberate palette/typography/layout choices, rejects templated defaults."
+          }
+        ]
+      },
+      "best_for": "Baseline design taste on every UI task — aesthetic direction, typography, and choices that don't read as templated defaults. The foundation that hallmark and impeccable build on.",
+      "not_for": "Structured command workflows (use impeccable) or themed page generation (use hallmark)."
+    },
+    {
+      "id": "ponytail",
+      "name": "Ponytail (+ ponytail-audit / ponytail-debt / ponytail-review)",
+      "tagline": "Lazy senior dev mode — laziest solution that actually works: reuse > stdlib > native > one-line > minimum code",
+      "version": "latest (vendored 2026-09-13)",
+      "author": "DietrichGebert",
+      "source": "https://github.com/DietrichGebert/ponytail",
+      "site": null,
+      "license": "MIT",
+      "install_path": ".claude/skills/ponytail/ (+ ponytail-audit/, ponytail-debt/, ponytail-review/)",
+      "entry": ".claude/skills/ponytail/SKILL.md",
+      "references_dir": null,
+      "project_status": "installed · MANDATORY efficiency layer for the plans/ improvement program (agent.md §1.1)",
+      "invocation": {
+        "style": "always-on doctrine + explicit commands",
+        "commands": [
+          "/ponytail [lite|full|ultra]",
+          "/ponytail-audit (repo-wide over-engineering scan)",
+          "/ponytail-review (diff review at gates)",
+          "/ponytail-debt (harvest `ponytail:` markers into ledger)"
+        ]
+      },
+      "best_for": [
+        "Keeping implementation lean: shortest working diff, deletion over addition",
+        "Tagging deliberate simplifications with ceiling + upgrade path",
+        "Engine plan E1/E5 audits and every REVIEW gate"
+      ],
+      "not_for": [
+        "Non-coding requests",
+        "Skipping understanding, validation, security, accessibility"
+      ]
+    },
+    {
+      "id": "i-have-adhd",
+      "name": "I Have ADHD",
+      "tagline": "ADHD-shaped output — next action first, numbered steps, state restated every turn, specific time estimates, visible wins",
+      "version": "latest (vendored 2026-09-13)",
+      "author": "ayghri",
+      "source": "https://github.com/ayghri/i-have-adhd",
+      "site": null,
+      "license": "MIT",
+      "install_path": ".claude/skills/i-have-adhd/",
+      "entry": ".claude/skills/i-have-adhd/SKILL.md",
+      "references_dir": null,
+      "project_status": "installed · MANDATORY output format for reports/PROGRESS entries (agent.md §1.2)",
+      "invocation": {
+        "style": "always-on session mode",
+        "commands": [
+          "/i-have-adhd (toggle on)",
+          "stop adhd mode / normal mode (off)"
+        ]
+      },
+      "best_for": [
+        "PROGRESS.md entries and phase sign-offs",
+        "Handoffs between plans/phases",
+        "Error reports (matter-of-fact cause + fix)"
+      ],
+      "not_for": [
+        "Long-form explanatory docs the user explicitly requests (docs/ guides stay normal prose)"
+      ]
+    }
+  ],
+  "routing": {
+    "build a brand-new page from scratch": [
+      "hallmark",
+      "frontend-design"
+    ],
+    "polish / finish an existing screen before shipping": [
+      "impeccable:polish"
+    ],
+    "review or score existing UI quality": [
+      "impeccable:critique",
+      "impeccable:audit",
+      "hallmark:audit"
+    ],
+    "redesign keeping copy and brand": [
+      "hallmark:redesign"
+    ],
+    "capture the design DNA of a site you admire": [
+      "hallmark:study"
+    ],
+    "document the project's design into DESIGN.md": [
+      "impeccable:document"
+    ],
+    "add motion / color / typography passes": [
+      "impeccable:animate",
+      "impeccable:colorize",
+      "impeccable:typeset"
+    ]
+  },
+  "upgrade_roadmap": {
+    "purpose": "Curated list of open-source frameworks and agent tooling to study (or selectively adopt) when the research-harness outgrows its current hand-rolled pieces. Not installed — these are reference targets for future upgrades, kept here so an agent has a vetted shortlist and a clear 'borrow pattern X for component Y' mapping.",
+    "reference_frameworks": [
+      {
+        "id": "ponytail",
+        "name": "Ponytail",
+        "tagline": "Makes your AI agent think like the laziest senior dev in the room — the best code is the code you never wrote.",
+        "source": "https://github.com/DietrichGebert/ponytail",
+        "version": "v4.9.0",
+        "author": "Dietrich Gebert",
+        "license": "See repo LICENSE",
+        "category": "coding-agent discipline / minimalism rule pack",
+        "what_it_is": "A rule/plugin pack that trains coding agents to write less, ship only what is needed, and mark any deliberate corner-cut with a `ponytail:` comment (greppable via `/ponytail-debt`). Ships as a plugin for Claude Code, Cursor, Codex, Devin, and others.",
+        "borrow_for": "Discipline for future agent-driven changes to this repo: resist speculative features, keep the codebase lean, and tag simplifications that cut a corner with a known ceiling — a natural complement to the bugfix.json prevention rules.",
+        "adopt_or_study": "adopt (as agent guidance, not code)",
+        "status": "INSTALLED 2026-09-13 → .claude/skills/ponytail* (see skills[] entry)"
+      },
+      {
+        "id": "composio",
+        "name": "Composio",
+        "tagline": "1000+ toolkits, tool search, context management, authentication, and a sandboxed workbench to build AI agents that turn intent into action.",
+        "source": "https://github.com/ComposioHQ/composio",
+        "author": "ComposioHQ",
+        "license": "Apache-2.0",
+        "category": "tool-integration platform / MCP gateway",
+        "what_it_is": "A managed integration layer that gives agents 1000+ tools (GitHub, Google, Slack, search, etc.) with built-in auth management, tool search, and an MCP gateway plus a sandboxed workbench.",
+        "borrow_for": "Replacing the harness's hand-rolled MCP preset catalog (src/harness/ui/routes_mcp.py + harness/mcp/) with a real, managed tool/connector catalog and managed OAuth — the obvious upgrade when the built-in fetcher/search aren't enough.",
+        "adopt_or_study": "study then adopt (tool/auth layer)"
+      },
+      {
+        "id": "chainlit",
+        "name": "Chainlit",
+        "tagline": "Build Conversational AI in minutes.",
+        "source": "https://github.com/Chainlit/chainlit",
+        "author": "Chainlit (Literal AI)",
+        "license": "Apache-2.0",
+        "category": "conversational AI UI framework (Python)",
+        "what_it_is": "Python framework for building chat interfaces with streaming, rich elements (charts, files, plots), multi-step flows, data layers, and auth.",
+        "borrow_for": "Upgrading the web console (src/harness/ui/): token streaming to the chat, richer message types (tables/charts/elements), step/thinking visualization, and user authentication — patterns to mirror against the current hand-rolled renderer.",
+        "adopt_or_study": "study (UX/streaming patterns), adopt only if replacing the console wholesale"
+      },
+      {
+        "id": "open-webui",
+        "name": "Open WebUI",
+        "tagline": "User-friendly AI Interface (Supports Ollama, OpenAI API, ...).",
+        "source": "https://github.com/open-webui/open-webui",
+        "author": "open-webui",
+        "license": "BSD-3-Clause-based (see repo LICENSE)",
+        "category": "self-hosted AI chat web interface",
+        "what_it_is": "Extensible self-hosted chat UI over Ollama/OpenAI-compatible endpoints with document RAG, function calling, multimodal support, multi-user management, and a plugin/pipelines system.",
+        "borrow_for": "The harness's multi-model, multi-user, and document-RAG direction: model management, per-user sessions/keys, and a plugin/extension model — ideas for the AI Provider, Keys, and Sessions panels.",
+        "adopt_or_study": "study (product/architecture reference)"
+      },
+      {
+        "id": "agno",
+        "name": "Agno",
+        "tagline": "Build, run, and manage agent platforms.",
+        "source": "https://github.com/agno-agi/agno",
+        "author": "agno-agi (formerly Phidata)",
+        "license": "MPL-2.0",
+        "category": "agent framework (Python)",
+        "what_it_is": "High-level Python agent framework with memory, knowledge (RAG), multi-modal input, agent teams, and a managed agent platform (AgentOS).",
+        "borrow_for": "Upgrading the hand-rolled orchestration loop (src/harness/loop/): memory management, multi-step tool use, and agent-team/delegation patterns when the single-agent chat loop grows into multi-agent.",
+        "adopt_or_study": "study (loop/memory patterns), adopt selectively"
+      },
+      {
+        "id": "semantic-kernel",
+        "name": "Semantic Kernel (Microsoft Agent Framework)",
+        "tagline": "Integrate cutting-edge LLM technology quickly and easily into your apps.",
+        "source": "https://github.com/microsoft/semantic-kernel",
+        "author": "Microsoft",
+        "license": "MIT",
+        "category": "enterprise agent orchestration SDK",
+        "what_it_is": "Microsoft's SDK for integrating LLMs with code: plugins/functions, planners, memory, and multi-agent orchestration. Its successor, Microsoft Agent Framework, adds A2A + MCP interop for fleets of agents.",
+        "borrow_for": "The citation/memory/tool-planning layers (src/harness/citations, memory, registry): planner and function-calling conventions, and A2A/MCP interop if the harness ever orchestrates multiple agents.",
+        "adopt_or_study": "study (planner/function-calling patterns)"
+      },
+      {
+        "id": "dify",
+        "name": "Dify",
+        "tagline": "Build Agentic workflows, RAG pipelines, with rich AI model and tool support on one collaborative workspace.",
+        "source": "https://github.com/langgenius/dify",
+        "author": "LangGenius",
+        "license": "Apache-2.0-based (Dify Open Source License)",
+        "category": "LLM app platform / visual workflow + RAG builder",
+        "what_it_is": "Self-hosted platform for building agent/workflow/chatflow apps visually, with RAG pipeline management, model management, and team collaboration — deployable on cloud, VPC, or self-hosted.",
+        "borrow_for": "The 'product-grade' direction: a no-code workflow/agent builder and visual RAG pipeline layer if the harness evolves beyond a single-chat research console.",
+        "adopt_or_study": "study (platform/architecture reference)"
+      }
+    ],
+    "routing_upgrade_hints": {
+      "extend tool integrations beyond built-in fetcher/search": [
+        "composio"
+      ],
+      "upgrade the chat console UX / add streaming": [
+        "chainlit",
+        "open-webui"
+      ],
+      "evolve the single-agent loop into multi-agent or add memory/RAG": [
+        "agno",
+        "semantic-kernel"
+      ],
+      "add a visual workflow / RAG builder layer": [
+        "dify"
+      ],
+      "keep future agent contributions lean and intentional": [
+        "ponytail"
+      ]
+    }
+  }
+}

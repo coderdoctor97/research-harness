@@ -14,7 +14,7 @@ def create_application() -> FastAPI:
 
     @app.get("/", response_class=HTMLResponse)
     async def index(request: Request):
-        return templates.TemplateResponse("index.html", {"request": request})
+        return templates.TemplateResponse(request, "index.html")
 
     @app.get("/health")
     async def health():
@@ -39,6 +39,11 @@ def create_application() -> FastAPI:
 
 
 def launch() -> None:
-    """Console script entry point for `harness-ui`."""
+    """Console script entry point for `harness-ui`.
+
+    Binds 127.0.0.1:8080 by default; override with HARNESS_UI_HOST / HARNESS_UI_PORT.
+    """
     import uvicorn
-    uvicorn.run(create_application(), host="127.0.0.1", port=8080)
+    host = os.environ.get("HARNESS_UI_HOST", "127.0.0.1")
+    port = int(os.environ.get("HARNESS_UI_PORT", "8080"))
+    uvicorn.run(create_application(), host=host, port=port)

@@ -8,9 +8,13 @@ build/
 
 # Environment
 .env
+.env.local
 .venv/
 venv/
 ENV/
+
+# Local runtime state (persisted provider + keys — never commit)
+.harness-state.json
 
 # Cache
 .cache/

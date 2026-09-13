@@ -16,7 +16,12 @@ class LLMResponseError(Exception):
 
 
 class LLMClient:
-    """Public API: __init__(base_url, model_name, api_key_env=...)"""
+    """Public API: __init__(base_url, model_name, api_key_env=..., api_key=...)
+
+    Works with any OpenAI-compatible endpoint (local or cloud). The API key
+    can be supplied directly (`api_key`) or resolved from an env var name
+    (`api_key_env`); a direct key wins over the env var.
+    """
 
     def __init__(
         self,
@@ -24,19 +29,26 @@ class LLMClient:
         model_name: str = "llama3",
         api_key_env: str = "none",
         timeout: float = 30.0,
+        api_key: str | None = None,
+        max_tokens: int | None = None,
     ) -> None:
         self.base_url = base_url.rstrip("/")
         self.model_name = model_name
         self.api_key_env = api_key_env
+        self.api_key = api_key
         self.timeout = timeout
+        self.max_tokens = max_tokens
         self.client = httpx.Client(timeout=timeout)
 
     def _headers(self) -> dict[str, str]:
         h: dict[str, str] = {"Content-Type": "application/json"}
-        if self.api_key_env and self.api_key_env != "none":
+        val = ""
+        if getattr(self, "api_key", None):
+            val = self.api_key
+        elif self.api_key_env and self.api_key_env != "none":
             val = os.environ.get(self.api_key_env, "")
-            if val:
-                h["Authorization"] = f"Bearer {val}"
+        if val:
+            h["Authorization"] = f"Bearer {val}"
         return h
 
     def chat(self, message: str) -> str:
@@ -46,6 +58,10 @@ class LLMClient:
             "messages": [{"role": "user", "content": message}],
             "stream": False,
         }
+        # BF-014: cap output tokens when the user has configured a ceiling.
+        # `max_tokens` is the widely-supported OpenAI-compatible field.
+        if getattr(self, "max_tokens", None):
+            payload["max_tokens"] = self.max_tokens
         try:
             r = self.client.post(url, json=payload, headers=self._headers())
             r.raise_for_status()
@@ -84,6 +100,8 @@ class LLMClient:
             "messages": [{"role": "user", "content": message}],
             "stream": True,
         }
+        if getattr(self, "max_tokens", None):
+            payload["max_tokens"] = self.max_tokens
         try:
             r = self.client.post(url, json=payload, headers=self._headers(), timeout=self.timeout + 60)
             r.raise_for_status()

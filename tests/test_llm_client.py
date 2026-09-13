@@ -46,6 +46,35 @@ class TestLLMClient:
         assert body["messages"][0]["content"] == "hi"
         assert body["stream"] is False
 
+    def test_chat_includes_max_tokens_when_set(self):
+        client = LLMClient.__new__(LLMClient)
+        client.base_url = "http://localhost:11434/v1"
+        client.model_name = "llama3"
+        client.api_key_env = "none"
+        client.timeout = 30.0
+        client.max_tokens = 2048
+        client.client = MagicMock()
+        client.client.post.return_value = _make_response(json_data={
+            "choices": [{"message": {"content": "ok"}}]
+        })
+        client.chat("hi")
+        body = client.client.post.call_args.kwargs.get("json")
+        assert body["max_tokens"] == 2048
+
+    def test_chat_omits_max_tokens_when_unset(self):
+        client = LLMClient.__new__(LLMClient)
+        client.base_url = "http://localhost:11434/v1"
+        client.model_name = "llama3"
+        client.api_key_env = "none"
+        client.timeout = 30.0
+        client.client = MagicMock()
+        client.client.post.return_value = _make_response(json_data={
+            "choices": [{"message": {"content": "ok"}}]
+        })
+        client.chat("hi")
+        body = client.client.post.call_args.kwargs.get("json")
+        assert "max_tokens" not in body
+
     def test_chat_empty_choices(self):
         client = LLMClient.__new__(LLMClient)
         client.base_url = "http://localhost:11434/v1"
