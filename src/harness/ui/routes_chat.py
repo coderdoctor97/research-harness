@@ -28,6 +28,58 @@ class ChatMessage(BaseModel):
     session_id: str | None = None
 
 
+class InspectMessage(BaseModel):
+    """U2.3 — reactive text inspection payload (Define / Break down)."""
+
+    phrase: str
+    context: str = ""
+    sources: list[dict] = []
+    mode: str = "define"  # "define" | "breakdown"
+    model: str | None = None
+
+
+_MAX_INSPECT_PHRASE = 300
+_MAX_INSPECT_CONTEXT = 4000
+
+
+def _inspect_transcript(msg: InspectMessage, sources: list[dict]) -> str:
+    # ponytail: single hop, no tool rounds — A2's multi-query research workflow
+    # is not built yet (AI plan, in flight separately). Upgrade path: route
+    # mode="breakdown" through the A2 workflow once E2.3/A3 freeze their APIs.
+    phrase = msg.phrase.strip()[:_MAX_INSPECT_PHRASE]
+    context = (msg.context or "").strip()[:_MAX_INSPECT_CONTEXT]
+    if sources:
+        ref = "\n".join(
+            f"[{i}] {s.get('title') or s.get('url') or 'source'} — {s.get('url') or ''}"
+            for i, s in enumerate(sources, 1)
+        )
+    else:
+        ref = "(none — do not use [n] markers)"
+    if msg.mode == "breakdown":
+        task = (
+            f'Give a deeper contextual breakdown of the phrase "{phrase}" within '
+            "the passage below: what it means here, why it matters, and the key "
+            "sub-points. 120-260 words, plain markdown, no preamble. Cite a "
+            "source as [n] only when the claim comes from the numbered reference "
+            "list."
+        )
+    else:
+        task = (
+            f'Define the phrase "{phrase}" as it is used in the passage below. '
+            "2-4 sentences, plain markdown, no preamble. Cite a source as [n] "
+            "only when the reference list actually supports the definition."
+        )
+    return (
+        "You are the inspection lens of a research assistant: you answer "
+        "questions about one phrase the user selected from a previous answer, "
+        "grounded in that answer's context.\n\n"
+        f"Selected phrase: {phrase}\n\n"
+        f"Reference sources from that answer:\n{ref}\n\n"
+        f"Passage:\n{context or '(none provided)'}\n\n"
+        f"Task: {task}"
+    )
+
+
 def _tool_docs() -> str:
     lines = []
     for server in BUILTIN_SERVERS.values():
@@ -389,6 +441,35 @@ def mount(app: FastAPI) -> None:
     @app.post("/api/chat")
     async def chat(msg: ChatMessage):
         return await _handle_chat(msg, allow_model_retry=True)
+
+    @app.post("/api/chat/inspect")
+    async def inspect(msg: InspectMessage):
+        # U2.3: single-hop inspection. BF-008-safe by construction (no async
+        # tools — the sync client only, same call shape as /api/chat) and
+        # reuses the saved-provider state (get_state via _get_client, BF-010).
+        # Deliberately NOT persisted into the sidebar session history: the
+        # popover is an ephemeral loupe, not part of the conversation.
+        if msg.mode not in ("define", "breakdown"):
+            raise HTTPException(422, detail="mode must be 'define' or 'breakdown'")
+        if not msg.phrase.strip():
+            raise HTTPException(422, detail="phrase is required")
+        client = _get_client(msg.model)
+        _maybe_resolve_model(client, msg.model)  # BF-011: same resolution as chat
+        sources = [s for s in msg.sources if isinstance(s, dict)][:5]
+        try:
+            raw = client.chat(_inspect_transcript(msg, sources))
+        except LLMConnectionError as exc:
+            raise HTTPException(503, detail=f"Cannot reach the AI endpoint: {exc}")
+        except LLMResponseError as exc:
+            raise HTTPException(502, detail=str(exc))
+        final = _clean_final_text(raw)
+        if not final:
+            raise HTTPException(502, detail="Empty inspection — the model produced no text. Retry.")
+        return {
+            "response": final,
+            "sources": sources,
+            "model": msg.model or client.model_name,
+        }
 
     @app.get("/api/chat/sessions")
     async def list_sessions():

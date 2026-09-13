@@ -119,6 +119,89 @@ def test_fit_context_keeps_head_and_trims_oldest():
     assert "A" * 100 not in joined
 
 
+def _mock_llm(reply: str):
+    from unittest.mock import MagicMock
+    mock = MagicMock()
+    mock.model_name = "mock-model"
+    mock.chat.return_value = reply
+    return mock
+
+
+# ---------------------------------------------------------------------------
+# U2.3 — /api/chat/inspect (reactive text inspection)
+# ---------------------------------------------------------------------------
+
+def test_inspect_define_single_hop(client):
+    from unittest.mock import patch
+    mock = _mock_llm("A stromberg is a technical noun.")
+    with patch("harness.ui.routes_chat._get_client", return_value=mock):
+        r = client.post("/api/chat/inspect", json={
+            "phrase": "stromberg",
+            "context": "The stromberg was unusual in 1998.",
+            "sources": [{"title": "T", "url": "https://e.x/1"}],
+            "mode": "define",
+        })
+    assert r.status_code == 200
+    body = r.json()
+    assert body["response"] == "A stromberg is a technical noun."
+    assert body["sources"] == [{"title": "T", "url": "https://e.x/1"}]
+    assert body["model"] == "mock-model"
+    # single hop: exactly one LLM call; prompt carries phrase + context + numbered refs
+    assert mock.chat.call_count == 1
+    prompt = mock.chat.call_args[0][0]
+    assert "stromberg" in prompt
+    assert "The stromberg was unusual in 1998." in prompt
+    assert "[1] T — https://e.x/1" in prompt
+    assert "Define the phrase" in prompt
+
+
+def test_inspect_breakdown_prompt(client):
+    from unittest.mock import patch
+    mock = _mock_llm("Deeper analysis.")
+    with patch("harness.ui.routes_chat._get_client", return_value=mock):
+        r = client.post("/api/chat/inspect", json={
+            "phrase": "qubit", "context": "qubits decohere.", "mode": "breakdown",
+        })
+    assert r.status_code == 200
+    prompt = mock.chat.call_args[0][0]
+    assert "deeper contextual breakdown" in prompt
+    assert "(none — do not use [n] markers)" in prompt  # no sources → no invented cites
+
+
+def test_inspect_rejects_bad_mode(client):
+    r = client.post("/api/chat/inspect", json={"phrase": "x", "mode": "hack"})
+    assert r.status_code == 422
+
+
+def test_inspect_requires_phrase(client):
+    r = client.post("/api/chat/inspect", json={"phrase": "   ", "mode": "define"})
+    assert r.status_code == 422
+
+
+def test_inspect_caps_inputs(client):
+    from unittest.mock import patch
+    mock = _mock_llm("ok")
+    with patch("harness.ui.routes_chat._get_client", return_value=mock):
+        r = client.post("/api/chat/inspect", json={
+            "phrase": "P" * 5000, "context": "C" * 9000, "mode": "define",
+        })
+    assert r.status_code == 200
+    prompt = mock.chat.call_args[0][0]
+    assert "P" * 300 in prompt and "P" * 301 not in prompt
+    assert "C" * 4000 in prompt and "C" * 4001 not in prompt
+
+
+def test_inspect_does_not_pollute_sessions(client):
+    from unittest.mock import patch
+    import harness.ui._chat_state as cs
+    before = len(cs.list_sessions())
+    mock = _mock_llm("ok")
+    with patch("harness.ui.routes_chat._get_client", return_value=mock):
+        r = client.post("/api/chat/inspect", json={"phrase": "term", "context": "ctx", "mode": "define"})
+    assert r.status_code == 200
+    assert len(cs.list_sessions()) == before  # ephemeral loupe, not conversation history
+
+
 def test_logs_endpoint(client):
     r = client.get("/api/logs")
     assert r.status_code == 200
