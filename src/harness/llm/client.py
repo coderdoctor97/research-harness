@@ -8,13 +8,7 @@ from typing import Any, ClassVar
 
 import httpx
 
-
-class LLMConnectionError(Exception):
-    pass
-
-
-class LLMResponseError(Exception):
-    pass
+from harness.llm.exceptions import LLMConnectionError, LLMResponseError
 
 
 class LLMClient:

@@ -164,7 +164,7 @@
 | Engine | E2 Single Orchestration Core | DONE | 9/9 | -5 src / +73 tests | 234 passed; ruff 142 | Shared core consolidated; next E3 streaming |
 | Engine | E3 Streaming End-to-End | DONE | 7/7 | +137 src / +152 tests / +50 docs | 239 passed; ruff 140 | SSE contract frozen; next E4 robustness/perf |
 | Engine | E4 Robustness & Performance | DONE | 6/6 | net tracked in E4 log | 247 passed; ruff 123 | E4 complete; next E5 structural hygiene |
-| Engine | E5 Structural Hygiene & Sign-off | TODO | 0/6 | — | — | Final engine gate |
+| Engine | E5 Structural Hygiene & Sign-off | DONE | 6/6 | -4 | 247 passed; ruff 0 | Engine plan complete; PR updated |
 | AI | A1 Provider & Key Hardening | TODO | 0/7 | — | — | Independent; parallel-safe |
 | AI | A2 Multi-Query Research Workflow | TODO | 0/9 | — | — | Capability #1; needs E2 |
 | AI | A3 Citation Pipeline Integration | TODO | 0/6 | — | — | Capability #3; needs A2 |
@@ -614,3 +614,43 @@ Ladder used: ponytail rung 2 — reused `httpx.Client` itself for pooling, kept 
 - `ponytail-review`: lean enough for E4 scope; no unresolved findings. Main avoided over-build: no separate async LLM client layer.
 
 E4 exit summary: consolidated core is parallel-safe, recovery-tested against §8, routes context through memory/dedup/doc-cache primitives, pools LLM HTTP clients, and keeps blocking model calls out of async UI/loop boundaries. Next action: `start E5`.
+
+
+## Engine E5 — Structural Hygiene & Sign-off (2026-09-13)
+
+State: Engine plan complete — Phase E5 of 5 done (6/6 E5 tasks). Next action: continue with AI/UI plans when authorized.
+
+Ladder used: ponytail rung 2 — ran the final cut/cleanup pass against existing audit findings, preferred deletion/import cleanup/no-dependency fixes, and avoided adding new abstraction layers.
+
+### E5.1 Apply E1 audit cuts + re-run ponytail-audit
+
+| E1 audit finding | E5 disposition |
+|---|---|
+| UI private chat mini-loop | Resolved earlier by E2/E3: UI now delegates to `run_chat(...)` / `run_chat_stream(...)`; surface owns HTTP/SSE/session persistence only. |
+| Duplicate browsing stacks in `mcp/builtin.py` vs built-in tools | Reduced earlier by registry-backed chat core; remaining in-process MCP server kept intentionally because UI MCP presets expose it as a zero-setup server surface. No new runtime dependency or duplicated route loop remains. |
+| BrowserMCP/SearchMCP special managers | Kept as compatibility wrappers for existing MCP tests/presets; cleaned lint/type issues instead of deleting a public test-covered surface at final gate. |
+| Unused `HotReloadWatcher` | Resolved: deleted `src/harness/config/watcher.py`. |
+| Duplicate LLM exception definitions | Resolved: `LLMClient` now imports `LLMConnectionError` / `LLMResponseError` from `harness.llm.exceptions` while preserving imports from `harness.llm.client`. |
+| Dead endpoint auto-builder path | Kept as frozen public API from E1.3; no callers added. Full ruff green, no runtime dependency. |
+| Sync-over-async bridges | Resolved for chat/UI loop in E2–E4; MCP compatibility bridge remains outside FastAPI route/loop path and is test-covered. |
+| One-line built-in factories | Kept as compatibility API for dynamic/builtin tests; no new copies added. |
+
+`ponytail-audit src/harness/` re-run result: materially shorter list than E1. Biggest findings resolved are the UI mini-loop, direct chat sync route boundary, duplicate LLM exceptions, and unused watcher. Remaining items are compatibility surfaces with active tests/presets, not unreferenced dead code.
+
+### E5.2 Docs + debt ledger alignment
+
+- `docs/architecture.md` now matches the actual one-loop path: CLI/UI → `run_chat`/`run_chat_stream` → memory budget/context → pooled LLM client → async dispatch → dedup/doc-cache → citations.
+- SSE contract remains frozen: `token`, `tool_call`, `tool_result`, `final`; SSE-only `error` documented.
+- Final `ponytail-debt` harvest: `0` markers, `0` no-trigger rows.
+
+### E5.3 Final gate
+
+- Command: `.venv/bin/ruff check .`
+- Result: `All checks passed!`
+- Command: `.venv/bin/pytest -q`
+- Result: `247 passed, 4 warnings in 4.86s`
+- Command: `.venv/bin/pytest tests/test_acceptance.py -q`
+- Result: `15 passed in 0.95s`
+- E5 net LOC delta: `-4` (`185` added, `189` deleted), including progress/skill-log records.
+
+Engine exit summary: E1–E5 are now complete. The engine has one shared chat core, opt-in streaming/SSE, parallel timeout-safe tool dispatch, §8 recovery coverage, memory/budget/dedup/doc-cache integration, pooled LLM HTTP clients, no async route blocking violations in UI/loop audit, full pytest green, and full ruff green.

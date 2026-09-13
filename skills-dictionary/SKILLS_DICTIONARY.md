@@ -25,6 +25,7 @@ Usage log (newest first):
 
 | Date | Skills | Action |
 |------|--------|--------|
+| 2026-09-13 | ponytail · ponytail-audit · ponytail-review · ponytail-debt · i-have-adhd | Executed Engine Phase E5.1-E5.3 in one pass: deleted unused `HotReloadWatcher`, merged LLM exceptions through `llm.exceptions`, applied repo-wide ruff structural cleanup, refreshed architecture/progress/debt records, and completed final gate. Verification: `ruff check .` passed; pytest 247 passed; acceptance 15 passed. |
 | 2026-09-13 | ponytail · ponytail-review · i-have-adhd | Executed Engine Phase E4.3 and closed E4: pooled LLM `httpx.Client`s per endpoint config, moved UI model discovery/listing calls through `asyncio.to_thread`, documented pooling/async boundaries, and recorded async audit. Verification: 247 pytest passed; changed-file ruff passed; full ruff snapshot 123. |
 | 2026-09-13 | ponytail · i-have-adhd | Executed Engine Phase E4.2: routed core duplicate calls through `memory.dedup.DedupCache`, added optional `memory.doccache.DocumentCache` document routing, made `memory.assembler` 3-pass budget/summarization/eviction explicit, and added 20-turn resumed-session stress coverage. Verification: 246 pytest passed; changed-file ruff passed. |
 | 2026-09-13 | ponytail · i-have-adhd | Executed Engine Phase E4.1: added `async_dispatch(...)` with asyncio.gather, max_parallel semaphore, per-call timeout, partial-failure ToolResult injection, and core duplicate-call caching; mapped §8 rows to tests in PROGRESS.md. Verification: 243 pytest passed; changed-file ruff passed. |

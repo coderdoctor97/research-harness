@@ -1,8 +1,9 @@
 # P5.T2 — Citation validator: every [n] maps to a real source; orphans removed + warning
 from __future__ import annotations
 
-import re
 import logging
+import re
+
 from harness.citations.registry import SourceRegistry
 
 log = logging.getLogger(__name__)

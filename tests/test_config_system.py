@@ -1,7 +1,7 @@
 # Phase 2 P2.T6 config system tests
-from harness.config.resolver import resolve, load_dotenv
+from harness.config.resolver import resolve
 from harness.config.templates import render
-from harness.config.validation import validate, ConfigError
+from harness.config.validation import ConfigError, validate
 
 
 def test_resolve_env_var(monkeypatch):

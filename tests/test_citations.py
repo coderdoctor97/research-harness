@@ -14,7 +14,7 @@ def _registry_with(url="https://example.com/article"):
 def test_pipeline_valid_citations_preserved():
     reg = _registry_with()
     text = "See [1] for details. https://example.com/article"
-    out, report = finalize(text, reg)
+    out, _report = finalize(text, reg)
     assert "[1]" in out
     assert "https://example.com/article" in out
 
@@ -30,7 +30,7 @@ def test_pipeline_orphan_citation_removed():
 def test_pipeline_sources_section_appended():
     reg = _registry_with()
     text = "See [1] for details."
-    out, report = finalize(text, reg)
+    out, _report = finalize(text, reg)
     assert "## Sources" in out
     assert "Example Article" in out
 
@@ -86,7 +86,7 @@ def test_pipeline_max_sources_cap():
 def test_scrubber_exact_key_redaction():
     from harness.citations.scrubber import scrub
     text = "API key: my-secret-key-12345"
-    out, redacted = scrub(text, {"my-secret-key-12345"})
+    out, _redacted = scrub(text, {"my-secret-key-12345"})
     assert "my-secret-key-12345" not in out
     assert "[REDACTED]" in out
 

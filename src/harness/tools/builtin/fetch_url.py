@@ -2,10 +2,10 @@
 from __future__ import annotations
 
 import os
+from typing import ClassVar
 from urllib.parse import quote
-from typing import Any
 
-from harness.config.models import EndpointDef, CustomEndpointDef
+from harness.config.models import CustomEndpointDef, EndpointDef
 from harness.registry.executor import HttpExecutor
 from harness.registry.tool import Tool, ToolResult
 
@@ -13,7 +13,7 @@ from harness.registry.tool import Tool, ToolResult
 class FetchUrlTool(Tool):
     name = "fetch_url"
     description = "Fetch and return the content of a URL"
-    parameters = {
+    parameters: ClassVar[dict] = {
         "url": {"type": "string", "description": "Target URL", "required": True},
         "extract_links": {"type": "boolean", "description": "Return only links", "default": False},
     }

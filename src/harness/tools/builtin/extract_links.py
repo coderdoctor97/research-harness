@@ -2,11 +2,10 @@
 from __future__ import annotations
 
 import re
-from typing import Any
+from typing import ClassVar
 
 from harness.registry.tool import Tool, ToolResult
 from harness.tools.builtin.fetch_url import FetchUrlTool
-
 
 _LINK_RE = re.compile(r'\[([^\]]+)\]\(([^)]+)\)|https?://[^\s)>\]\']+')
 
@@ -14,7 +13,7 @@ _LINK_RE = re.compile(r'\[([^\]]+)\]\(([^)]+)\)|https?://[^\s)>\]\']+')
 class ExtractLinksTool(Tool):
     name = "extract_links"
     description = "Extract links from a URL"
-    parameters = {"url": {"type": "string", "description": "URL to extract links from", "required": True}, "filter_pattern": {"type": "string", "description": "Regex filter for links", "default": ""}}
+    parameters: ClassVar[dict] = {"url": {"type": "string", "description": "URL to extract links from", "required": True}, "filter_pattern": {"type": "string", "description": "Regex filter for links", "default": ""}}
 
     def __init__(self) -> None:
         self._fetcher = FetchUrlTool()
@@ -33,7 +32,7 @@ class ExtractLinksTool(Tool):
             else:
                 href = m.group(0)
                 text = href
-            is_internal = href.startswith("/") or href.startswith("#")
+            is_internal = href.startswith(("/", "#"))
             if filter_pat:
                 try:
                     if not re.search(filter_pat, href):

@@ -1,8 +1,6 @@
 # P3.T2 — Registry auto-discovery + primary/fallback + list_schemas
 from __future__ import annotations
 
-from typing import Any
-
 from harness.config.models import EndpointDef
 from harness.registry.tool import Tool, ToolResult
 
@@ -49,6 +47,6 @@ class ToolRegistry:
         for tool in tools:
             try:
                 return tool.run(**params)
-            except Exception as exc:
+            except Exception:  # noqa: BLE001, S112 - fallback tool chain tries next endpoint
                 continue
         return ToolResult(ok=False, error=f"All endpoints failed for {name}")

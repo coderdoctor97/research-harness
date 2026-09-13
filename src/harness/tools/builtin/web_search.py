@@ -1,9 +1,9 @@
 # P3.T5 — web_search tool (Serper-shaped) + fixture tests
 from __future__ import annotations
 
-from typing import Any
+from typing import ClassVar
 
-from harness.config.models import EndpointDef, CustomEndpointDef
+from harness.config.models import CustomEndpointDef, EndpointDef
 from harness.registry.executor import HttpExecutor
 from harness.registry.tool import Tool, ToolResult
 
@@ -11,7 +11,7 @@ from harness.registry.tool import Tool, ToolResult
 class WebSearchTool(Tool):
     name = "web_search"
     description = "Search the web for a query"
-    parameters = {
+    parameters: ClassVar[dict] = {
         "query": {"type": "string", "description": "Search query"},
         "num_results": {"type": "integer", "description": "Max results", "default": 5},
         "country_code": {"type": "string", "description": "Country code", "default": "us"},
