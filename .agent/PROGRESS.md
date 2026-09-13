@@ -171,7 +171,7 @@
 | AI | A4 Ingestion & Tool Surface | TODO | 0/6 | — | — | Capability #2; parallel with A3 |
 | AI | A5 Research Validation & Tuning | TODO | 0/6 | — | — | Scenarios R1/R2 + §10 regression |
 | UI | U1 Skill-Driven Baseline & Audit | DONE | 6/6 | 0 (read-only) | — | Closed 2026-09-13: DESIGN.md + 0C/6M/11m + 29/40 + frozen scope (18/18 homed, 4 rejections) |
-| UI | U2 Reactive Text Inspection | TODO | 0/11 | — | — | Capability #4; U2.3 needs A2/A3 |
+| UI | U2 Reactive Text Inspection | IN_PROGRESS | 2/11 | 0 (design only) | — | U2.1 done: pattern note (18 lines) + shape brief in `plans/u2-task-brief.md`. Next: U2.2 native implementation |
 | UI | U3 Research Output Rendering | TODO | 0/7 | — | — | Needs A3.2.1 + E3.2.2 contracts |
 | UI | U4 Console Polish & Consistency | TODO | 0/7 | — | — | Punch-list execution |
 | UI | U5 Skill Verification & Sign-off | TODO | 0/5 | — | — | Re-score gates |
@@ -192,11 +192,14 @@
 | 2026-09-13 | U1.1 skill pass (impeccable document · scan mode) | `DESIGN.md` (20 OKLCH tokens, 5 type roles, 9 components) + `.impeccable/design.json` sidecar; 0 `ponytail:` markers (no code) |
 | 2026-09-13 | U1.2 skill pass (hallmark audit · impeccable critique) | Baseline: 0 critical / 6 major / 11 minor (58 gates) + critique 29/40; contrast computed for 24 pairs (10 fail); 0 `ponytail:` markers (no code) |
 | 2026-09-13 | U1.3 scope freeze (ponytail ladder · no-new-features rule) | 18/18 findings homed (U4.1.3 ×7, U4.2.1 ×3, U4.2.2 ×8); rank-1 and rank-2 both empty (verified, not assumed); 4 out-of-scope requests rejected; 0 `ponytail:` markers (no code) |
+| 2026-09-13 | U2.1 skill pass (frontend-design baseline · impeccable shape · references-registry study) | `plans/u2-task-brief.md`: 18-line pattern note (Floating UI virtual-element + Tiptap BubbleMenu, native, no package) + 6-state shape brief token-mapped to DESIGN.md; 5 marked assumptions (A1–A5); 0 `ponytail:` markers (no code) |
 | — | ponytail-audit (E1.1.1) | pending |
 | — | ponytail-debt harvests | pending — 0 markers, 0 no-trigger |
 | — | Program net-LOC | 0 (baseline: src 3,666 py + 1,663 template; 233 tests) |
 
 ## Execution Log (adhd-format, newest first)
+
+- **2026-09-13 — U2 sub-phase 2.1 of 4 done (2/2 tasks; U2 total 2/11).** Design locked for the selection popover: `plans/u2-task-brief.md` now carries (1) the ≤20-line pattern note — 18 lines, TRIGGER/ANCHOR/PLACEMENT/COLLISION, Floating UI virtual-element + Tiptap BubbleMenu patterns adopted natively, zero packages — and (2) the shape brief: 6 states (idle → selection → popover → loading → answer → cite, +error) with every surface decision token-mapped to DESIGN.md, 5 marked assumptions (A1–A5: Define=primary, floating-surface shadow, 3-char minimum, reposition-on-scroll, focus restore), and 3 open decisions explicitly handed to U2.3 (no builder invention). Win: U2.2 starts from a frozen spec — ladder rung 2+4 (reuse `renderMarkdown`/`.search-result-item`/`.spinner-sm`, native `getSelection`). Two DESIGN.md deltas logged for U5.2.2 (floating-surface shadow generalization, `--ink-2` eyebrow pending H-M1). Next: **U2.2 — native implementation** (~0.5 day; selection listener + anchored popover, target well under 200 lines).
 
 - **2026-09-13 — U1 sub-phase 1.3 of 3 done (2/2 tasks) → PHASE U1 DONE (6/6).** Punch list frozen: rank-1 (capability blockers) and rank-2 (BF violations) both verified empty — rank 3 ordered a11y-floor → structural/mobile/error-prevention → visual coherence, 18/18 items homed (U4.2.2 ×8, U4.2.1 ×3, U4.1.3 ×7), 4 out-of-scope requests explicitly rejected (docs link, ⌘K, session search, batch ops). Win: U4's three sub-phases now have a complete, ranked work queue and U4.1.1/U4.1.2 are declared verification-only passes. Next: **E1 — Engine baseline audit & debt map** (~2–3 h, read-only, parallel-safe; unblocks E2 → A2 → A3 → U2.3), or say "U2.1" to stay on the UI thread (pattern study + design, backend-independent).
 
