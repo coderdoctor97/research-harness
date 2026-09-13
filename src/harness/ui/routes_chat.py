@@ -30,6 +30,84 @@ class ChatMessage(BaseModel):
     session_id: str | None = None
 
 
+<<<<<<< HEAD
+class InspectMessage(BaseModel):
+    """U2.3 — reactive text inspection payload (Define / Break down)."""
+
+    phrase: str
+    context: str = ""
+    sources: list[dict] = []
+    mode: str = "define"  # "define" | "breakdown"
+    model: str | None = None
+
+
+_MAX_INSPECT_PHRASE = 300
+_MAX_INSPECT_CONTEXT = 4000
+
+
+def _inspect_transcript(msg: InspectMessage, sources: list[dict]) -> str:
+    # ponytail: single hop, no tool rounds — A2's multi-query research workflow
+    # is not built yet (AI plan, in flight separately). Upgrade path: route
+    # mode="breakdown" through the A2 workflow once E2.3/A3 freeze their APIs.
+    phrase = msg.phrase.strip()[:_MAX_INSPECT_PHRASE]
+    context = (msg.context or "").strip()[:_MAX_INSPECT_CONTEXT]
+    if sources:
+        ref = "\n".join(
+            f"[{i}] {s.get('title') or s.get('url') or 'source'} — {s.get('url') or ''}"
+            for i, s in enumerate(sources, 1)
+        )
+    else:
+        ref = "(none — do not use [n] markers)"
+    if msg.mode == "breakdown":
+        task = (
+            f'Give a deeper contextual breakdown of the phrase "{phrase}" within '
+            "the passage below: what it means here, why it matters, and the key "
+            "sub-points. 120-260 words, plain markdown, no preamble. Cite a "
+            "source as [n] only when the claim comes from the numbered reference "
+            "list."
+        )
+    else:
+        task = (
+            f'Define the phrase "{phrase}" as it is used in the passage below. '
+            "2-4 sentences, plain markdown, no preamble. Cite a source as [n] "
+            "only when the reference list actually supports the definition."
+        )
+    return (
+        "You are the inspection lens of a research assistant: you answer "
+        "questions about one phrase the user selected from a previous answer, "
+        "grounded in that answer's context.\n\n"
+        f"Selected phrase: {phrase}\n\n"
+        f"Reference sources from that answer:\n{ref}\n\n"
+        f"Passage:\n{context or '(none provided)'}\n\n"
+        f"Task: {task}"
+    )
+
+
+def _tool_docs() -> str:
+    lines = []
+    for server in BUILTIN_SERVERS.values():
+        for tool in server.list_tools():
+            params = ", ".join(tool.get("inputSchema", {}).get("properties", {}).keys())
+            lines.append(f"- {tool['name']}({params}): {tool['description']} [server: {server.name}]")
+    return "\n".join(lines)
+
+
+def _build_system_prompt() -> str:
+    return (
+        "You are a research assistant powered by LLM Research Harness. "
+        "You can browse the web using the built-in tools below.\n\n"
+        "Available tools:\n" + _tool_docs() + "\n\n"
+        "When you need a tool, reply with a tool call in ONE of these forms:\n"
+        '  {"tool_calls": [{"name": "<tool>", "arguments": { ... }}]}\n'
+        '  <tool_call>{"name": "<tool>", "arguments": { ... }}</tool_call>\n\n'
+        "After the tool results are provided, answer the user's question in plain "
+        "text and cite the sources (title + URL) you used. Do NOT include the "
+        "tool-call markup or JSON in your final answer. Be concise."
+    )
+
+
+=======
+>>>>>>> master
 def _get_client(model: str | None) -> LLMClient:
     import os
 
@@ -169,6 +247,36 @@ def mount(app: FastAPI) -> None:
     async def chat(msg: ChatMessage):
         return await _handle_chat(msg, allow_model_retry=True)
 
+<<<<<<< HEAD
+    @app.post("/api/chat/inspect")
+    async def inspect(msg: InspectMessage):
+        # U2.3: single-hop inspection. BF-008-safe by construction (no async
+        # tools — the sync client only, same call shape as /api/chat) and
+        # reuses the saved-provider state (get_state via _get_client, BF-010).
+        # Deliberately NOT persisted into the sidebar session history: the
+        # popover is an ephemeral loupe, not part of the conversation.
+        if msg.mode not in ("define", "breakdown"):
+            raise HTTPException(422, detail="mode must be 'define' or 'breakdown'")
+        if not msg.phrase.strip():
+            raise HTTPException(422, detail="phrase is required")
+        client = _get_client(msg.model)
+        _maybe_resolve_model(client, msg.model)  # BF-011: same resolution as chat
+        sources = [s for s in msg.sources if isinstance(s, dict)][:5]
+        try:
+            raw = client.chat(_inspect_transcript(msg, sources))
+        except LLMConnectionError as exc:
+            raise HTTPException(503, detail=f"Cannot reach the AI endpoint: {exc}")
+        except LLMResponseError as exc:
+            raise HTTPException(502, detail=str(exc))
+        final = _clean_final_text(raw)
+        if not final:
+            raise HTTPException(502, detail="Empty inspection — the model produced no text. Retry.")
+        return {
+            "response": final,
+            "sources": sources,
+            "model": msg.model or client.model_name,
+        }
+=======
     def _stream_response(msg: ChatMessage) -> StreamingResponse:
         async def events():
             client = _get_client(msg.model)
@@ -200,6 +308,7 @@ def mount(app: FastAPI) -> None:
         session_id: str | None = Query(default=None),
     ):
         return _stream_response(ChatMessage(message=message, model=model, session_id=session_id))
+>>>>>>> master
 
     @app.get("/api/chat/sessions")
     async def list_sessions():
