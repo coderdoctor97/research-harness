@@ -160,8 +160,13 @@ three-color status set — every color is a machine or action, never decoration.
 
 - **Blue Signal** (`oklch(0.70 0.13 235)`): the cool counterpart. Links in
   rendered answers, active nav state and its left bar, assistant-bubble left
-  edge, selected model cards, tab underline, focus rings (40 % alpha), text
-  selection background, and typing dots.
+  edge, selected model cards, tab underline, text selection background, and
+  typing dots. Its 40 %-alpha ring is the decorative ring/glow/border role
+  (`--blue-ring` — 2.16–2.19:1, never the sole state indicator); the input
+  focus ring uses the 60 %-alpha strong ring (`--blue-ring-strong`,
+  3.46:1 on the Well input host — the 3:1 non-text floor, verified
+  colour-science 0.4.7 in U5.1.1, which also corrected the U4-era "3.35:1"
+  measurement made on a buggy luminance model).
 
 ### Tertiary
 
@@ -176,8 +181,8 @@ three-color status set — every color is a machine or action, never decoration.
 - **Panel Raised** (`oklch(0.245 0.026 256)`): one step up — secondary buttons, table-row hover, dim badges.
 - **Well** (`oklch(0.15 0.019 258)`): recessed surfaces — inputs, code blocks, assistant bubbles, model cards. Darker than the background: wells sink, panels rise.
 - **Warm Ink** (`oklch(0.93 0.012 235)`): primary text — slightly cool, never white.
-- **Warm Ink Soft** (`oklch(0.72 0.022 240)`): secondary text, nav links, readouts, snippets.
-- **Warm Ink Faint** (`oklch(0.68 0.024 242)`): labels, timestamps, hints, icons at rest. Raised from 0.55 in U4.2.2 (H-M1) to clear WCAG AA 4.5:1 on every surface it sits on — weakest is Panel at 4.65:1.
+- **Warm Ink Soft** (`oklch(0.72 0.022 240)`): secondary text, nav links, readouts, snippets — and the text-inspection popover's leading label (the `INSPECT` eyebrow), the one label register that sits a step lighter than Faint because it heads the only floating surface; 6.51:1 on Panel Raised (verified U5.1.1, resolving the U2.1 note that this choice was pending H-M1).
+- **Warm Ink Faint** (`oklch(0.68 0.024 242)`): labels, timestamps, hints, icons at rest. Raised from 0.55 in U4.2.2 (H-M1) to clear WCAG AA 4.5:1 on every surface it sits on — weakest is Panel at **6.22:1** (U5.1.1: verified against the colour-science 0.4.7 reference; the in-session oklch models undercounted this pair by ~25–35 % at the WCAG-luminance step, so the U1.2/U4 ratios were recomputed against the reference there).
 - **Line** (`oklch(0.315 0.032 252)`): strong borders (inputs, buttons, tables, scrollbars).
 - **Line Soft** (`oklch(0.275 0.028 252)`): quiet borders (cards, rows, page-header rule).
 
@@ -300,7 +305,7 @@ its border is dashed — the console's visual idiom for "not required".
 
 - **Style:** Well background, 1 px Line border, 3 px radius, 9 px 12 px padding, 13.5 px Plex Sans; selects use an inline SVG chevron and `appearance:none`.
 - **Labels:** mono, 10.5 px, uppercase, 0.12em tracking, Warm Ink Faint, above the field.
-- **Focus:** border → Blue Signal + 3 px Blue Signal Ring glow (instant — the ring is deliberately kept off the transition). Outline removed in favor of the ring. `:hover` → border Warm Ink Faint; `:disabled` → 55 % opacity, `not-allowed`.
+- **Focus:** border → Blue Signal + 3 px Blue Signal strong ring (`--blue-ring-strong`, 60 % alpha — 3.46:1 on the Well host; U5.1.1) — instant, deliberately kept off the transition. Outline removed in favor of the ring. `:hover` → border Warm Ink Faint; `:disabled` → 55 % opacity, `not-allowed`.
 - **Placeholder:** Warm Ink Faint.
 
 ### Navigation (sidebar)

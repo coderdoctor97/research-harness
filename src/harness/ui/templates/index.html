@@ -21,15 +21,16 @@
   --well:oklch(0.15 0.019 258);
   --ink:oklch(0.93 0.012 235);
   --ink-2:oklch(0.72 0.022 240);
-  --ink-3:oklch(0.68 0.024 242); /* U4.2.2 (H-M1): raised for AA — 0.68 = 4.65:1 on panel (weakest named surface) */
-  --line:oklch(0.315 0.032 252); /* ponytail: instrument hairline at 2.22:1 (tone shift identifies edges); revisit if edges lose definition on a lighter theme */
+  --ink-3:oklch(0.68 0.024 242); /* U4.2.2 (H-M1): raised for AA — 0.68 = 6.22:1 on panel (weakest named surface; verified colour-science 0.4.7 in U5.1.1 — U4's 4.65 used a WCAG-luminance-buggy model) */
+  --line:oklch(0.315 0.032 252); /* ponytail: instrument hairline at 1.40:1 on panel (tone shift identifies edges; verified colour-science 0.4.7 — U5.1.1); revisit if edges lose definition on a lighter theme */
   --line-soft:oklch(0.275 0.028 252);
   --accent:oklch(0.80 0.14 75);
   --accent-2:oklch(0.70 0.13 235);
   --accent-soft:oklch(0.80 0.14 75 / 0.10);
   --accent-ring:oklch(0.80 0.14 75 / 0.28);
   --blue-soft:oklch(0.70 0.13 235 / 0.06); /* U4.2.2 (H-m6): darker badge bg = higher text contrast */
-  --blue-ring:oklch(0.70 0.13 235 / 0.40); /* U4.2.2 (H-M2): 3.35:1 on well (input host) */
+  --blue-ring:oklch(0.70 0.13 235 / 0.40); /* U4.2.2 (H-M2): decorative ring/glow/border role (selection, nav glow, hover, badges) — 2.16–2.19:1 on well/panel (verified U5.1.1: below 3:1 by design, never the sole state indicator) */
+  --blue-ring-strong:oklch(0.70 0.13 235 / 0.60); /* U5.1.1: input focus ring only — 3.46:1 well / 3.37:1 panel (verified colour-science 0.4.7; the 3:1 non-text floor) */
   --ok:oklch(0.76 0.14 160); /* U4.2.2 (H-m6) */
   --ok-soft:oklch(0.74 0.14 160 / 0.12);
   --warn:oklch(0.82 0.14 85);
@@ -246,7 +247,7 @@ input,select,textarea{
 }
 input,select{height:var(--control-h)}
 input::placeholder,textarea::placeholder{color:var(--ink-3)}
-input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent-2);box-shadow:0 0 0 3px var(--blue-ring)}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent-2);box-shadow:0 0 0 3px var(--blue-ring-strong)}
 input:hover,select:hover,textarea:hover{border-color:var(--ink-3)}
 input:disabled,select:disabled,textarea:disabled{opacity:.55;cursor:not-allowed}
 button:focus-visible{outline:2px solid var(--accent-2);outline-offset:2px}
@@ -417,10 +418,10 @@ tbody tr:last-child td{border-bottom:none}
 .model-card .model-id{font-family:var(--font-mono);font-size:10.5px;color:var(--ink-3);overflow-wrap:anywhere}
 
 /* ---------- keys / endpoints / mcp ---------- */
-.tabs{display:flex;gap:0;border-bottom:1px solid var(--line-soft);margin-bottom:18px}
+.tabs{display:flex;flex-wrap:wrap;gap:0;border-bottom:1px solid var(--line-soft);margin-bottom:18px}
 .tab{
   padding:9px 18px;background:none;border:none;border-bottom:2px solid transparent;border-radius:0;
-  font-family:var(--font-mono);font-size:11.5px;font-weight:500;letter-spacing:0.06em;color:var(--ink-3);cursor:pointer;
+  font-family:var(--font-mono);font-size:11.5px;font-weight:500;letter-spacing:0.06em;color:var(--ink-3);cursor:pointer;white-space:nowrap;
 }
 .tab:hover{color:var(--ink)}
 .tab.active{color:var(--accent-2);border-bottom-color:var(--accent-2)}
