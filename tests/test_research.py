@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import asyncio
 import json
+import re
 
 import pytest
 
@@ -194,3 +195,93 @@ class TestRunResearch:
 
 if __name__ == "__main__":
     pytest.main([__file__, "-q"])
+
+
+# ---------------------------------------------------------------------------
+# A3 — Citation & anchor pipeline integration (wires existing citations/)
+# ---------------------------------------------------------------------------
+
+class TestCitationIntegration:
+    @staticmethod
+    async def _run_tool(name, args):
+        return _results("https://real/1")
+
+    def test_orphan_citation_removed(self):
+        # A3.1.1 — raw mock answer with orphan [7] → removed.
+        def llm(prompt):
+            if "research planner" in prompt:
+                return json.dumps({"queries": ["only"]})
+            return "Fact [1]. Bogus fact [7]."
+
+        out = asyncio.run(run_research("q?", llm, self._run_tool))
+        assert "[7]" not in out["answer"]
+        assert "[1]" in out["answer"]
+        assert "orphan citation [7]" in out["report"]["warnings"]
+
+    def test_fabricated_url_stripped_seen_url_linked(self):
+        # A3.1.2 — unseen URL stripped; tool-seen URL becomes [title](url).
+        def llm(prompt):
+            if "research planner" in prompt:
+                return json.dumps({"queries": ["only"]})
+            return "See https://real/1 and also https://fabricated.example/fake [1]."
+
+        out = asyncio.run(run_research("q?", llm, self._run_tool))
+        assert "https://fabricated.example/fake" not in out["answer"]
+        assert "https://fabricated.example/fake" in out["report"]["stripped_urls"]
+        assert "[T https://real/1](https://real/1)" in out["answer"]
+
+    def test_sources_section_auto_appended_and_capped(self):
+        # A3.1.3 — Sources auto-added, deduped, respects max_sources.
+        async def many(name, args):
+            return _results(*[f"https://s/{i}" for i in range(6)])
+
+        def llm(prompt):
+            if "research planner" in prompt:
+                return json.dumps({"queries": ["only"]})
+            return "A [1] B [2] C [3] D [4] E [5] F [6]."
+
+        out = asyncio.run(run_research("q?", llm, many, max_sources=3))
+        assert "## Sources" in out["answer"]
+        sources_block = out["answer"].split("## Sources", 1)[1]
+        listed = re.findall(r"^\[\d+\]", sources_block, re.MULTILINE)
+        assert len(listed) == 3  # capped at max_sources
+
+    def test_citation_metadata_map_complete(self):
+        # A3.2.1 — id → url/title map matches every registered source.
+        async def two(name, args):
+            return _results("https://m/1", "https://m/2")
+
+        def llm(prompt):
+            if "research planner" in prompt:
+                return json.dumps({"queries": ["only"]})
+            return "X [1] Y [2].\n\n## Sources\n[1] a — https://m/1\n[2] b — https://m/2"
+
+        out = asyncio.run(run_research("q?", llm, two))
+        assert set(out["citations"]) == {1, 2}
+        assert out["citations"][1] == {"url": "https://m/1", "title": "T https://m/1"}
+        assert {s["id"] for s in out["sources"]} == set(out["citations"])
+
+    def test_workflow_output_scrubbed(self):
+        # A3.2.2 / A1.2.2 — seeded key in mock synthesis → scrubbed.
+        secret = "sk-workflow-leak-abcdef9876543210"
+
+        def llm(prompt):
+            if "research planner" in prompt:
+                return json.dumps({"queries": ["only"]})
+            return f"Answer [1], and the key is {secret}."
+
+        out = asyncio.run(run_research("q?", llm, self._run_tool, key_set={secret}))
+        assert secret not in out["answer"]
+        assert "[REDACTED]" in out["answer"]
+        assert secret in out["report"]["redacted_keys"]
+
+    def test_degraded_mode_keeps_contract_shape(self):
+        async def down(name, args):
+            raise ConnectionError("down")
+
+        def llm(prompt):
+            return json.dumps({"queries": ["only"]})
+
+        out = asyncio.run(run_research("q?", llm, down))
+        assert out["citations"] == {}
+        assert out["report"]["warnings"] == []

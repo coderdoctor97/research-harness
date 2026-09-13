@@ -18,6 +18,7 @@ import asyncio
 import json
 from collections.abc import Awaitable, Callable
 
+from harness.citations.pipeline import finalize
 from harness.citations.registry import SourceRegistry
 
 RunTool = Callable[[str, dict], Awaitable[dict]]
@@ -164,10 +165,16 @@ async def run_research(
     max_queries: int = 4,
     max_parallel: int = 4,
     per_call_timeout: float = 30.0,
+    key_set: set[str] | None = None,
+    max_sources: int = 10,
 ) -> dict:
     """The one workflow entry (A2.3.2): question → decompose → fan-out →
-    aggregate → synthesize. Returns the raw synthesis + source pool;
-    citation post-processing is wired on top by the caller (A3)."""
+    aggregate → synthesize → citation pipeline (A3).
+
+    The synthesis output always passes the full existing citations pipeline
+    (validate → urls → links → sources → scrub) before reaching any surface,
+    and the result carries the citation metadata contract for the UI:
+    `citations`: {id: {"url": ..., "title": ...}} (A3.2.1)."""
     registry = registry if registry is not None else SourceRegistry()
 
     queries = await asyncio.to_thread(decompose, question, llm_chat, max_queries)
@@ -186,6 +193,8 @@ async def run_research(
             ),
             "queries": queries,
             "sources": [],
+            "citations": {},
+            "report": {"warnings": [], "stripped_urls": [], "redacted_keys": []},
             "failures": failures,
             "degraded": True,
         }
@@ -193,10 +202,22 @@ async def run_research(
     prompt = _SYNTHESIS_PROMPT.format(sources=_source_block(pool), question=question)
     answer = await asyncio.to_thread(llm_chat, prompt)
 
+    # A3.1: full existing citation pipeline — orphan [n] removed, fabricated
+    # URLs stripped, bare URLs link-formatted, Sources deduped/capped, keys
+    # scrubbed (A3.2.2) — before the answer reaches any surface.
+    answer, report = finalize(answer, registry, {
+        "max_sources_per_response": max_sources,
+        "key_set": list(key_set or ()),
+    })
+
     return {
         "answer": answer,
         "queries": queries,
         "sources": [{"id": s["id"], "title": s["title"], "url": s["url"]} for s in pool],
+        # A3.2.1 citation metadata contract for the UI (id → url/title map):
+        # anchors render without re-parsing markdown.
+        "citations": {s["id"]: {"url": s["url"], "title": s["title"]} for s in pool},
+        "report": report,
         "failures": failures,
         "degraded": False,
     }
