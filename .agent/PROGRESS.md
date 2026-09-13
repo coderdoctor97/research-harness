@@ -165,11 +165,11 @@
 | Engine | E3 Streaming End-to-End | TODO | 0/7 | — | — | Blocks U3.3 |
 | Engine | E4 Robustness & Performance | TODO | 0/6 | — | — | Parallel-safe after E2 |
 | Engine | E5 Structural Hygiene & Sign-off | TODO | 0/6 | — | — | Final engine gate |
-| AI | A1 Provider & Key Hardening | TODO | 0/7 | — | — | Independent; parallel-safe |
-| AI | A2 Multi-Query Research Workflow | TODO | 0/9 | — | — | Capability #1; needs E2 |
-| AI | A3 Citation Pipeline Integration | TODO | 0/6 | — | — | Capability #3; needs A2 |
-| AI | A4 Ingestion & Tool Surface | TODO | 0/6 | — | — | Capability #2; parallel with A3 |
-| AI | A5 Research Validation & Tuning | TODO | 0/6 | — | — | Scenarios R1/R2 + §10 regression |
+| AI | A1 Provider & Key Hardening | DONE | 7/7 | +14 src / +150 test | 244 pass | BF-010/BF-005 verified; scrub gap fixed in routes_chat |
+| AI | A2 Multi-Query Research Workflow | DONE | 9/9 | +205 src | 261 pass | research.py: decompose→fan-out→aggregate→synthesize; run_tool injectable (E2 rewire tagged) |
+| AI | A3 Citation Pipeline Integration | DONE | 6/6 | +24 src | 267 pass | citations/pipeline wired into workflow; id→url/title contract in docs/ai-integration.md |
+| AI | A4 Ingestion & Tool Surface | DONE | 6/6 | +75 src | 275 pass | strip_html noise fix (root cause); ingest()+compress_pool(); uniform dispatch verified |
+| AI | A5 Research Validation & Tuning | DONE | 6/6 | +0 src | 282 pass | R1/R2 PASS; §10 15/15 regression PASS; 4-profile decompose fixtures green |
 | UI | U1 Skill-Driven Baseline & Audit | TODO | 0/6 | 0 (read-only) | — | Start here (parallel with E1) |
 | UI | U2 Reactive Text Inspection | TODO | 0/11 | — | — | Capability #4; U2.3 needs A2/A3 |
 | UI | U3 Research Output Rendering | TODO | 0/7 | — | — | Needs A3.2.1 + E3.2.2 contracts |
@@ -182,7 +182,7 @@
 |---|---|---|---|
 | Core loop API (shared CLI+UI) | E2.3 | A2, U2.3 | — |
 | SSE event schema (token/tool_call/tool_result/final) | E3.3 | U3.3 | — |
-| Citation metadata map (source id → url/title) | A3.2 | U2.3, U3.1 | — |
+| Citation metadata map (source id → url/title) | A3.2 | U2.3, U3.1 | FROZEN 2026-09-13 — docs/ai-integration.md §4 |
 
 ## Efficiency Ledger
 
@@ -190,5 +190,38 @@
 |---|---|---|
 | 2026-09-13 | Efficiency skills vendored | `ponytail` (+audit/debt/review) & `i-have-adhd` installed to `.claude/skills/` |
 | — | ponytail-audit (E1.1.1) | pending |
-| — | ponytail-debt harvests | pending — 0 markers, 0 no-trigger |
+| 2026-09-13 | ponytail-debt harvest (A2.4.2, A4.3.1) | 1 marker: research.py run_tool→E2 core rewire (trigger: E2.3 core API freeze). 0 no-trigger defects |
+| 2026-09-13 | ponytail-review (A1–A5 gates) | Diffs reviewed per phase; no speculative re-ranking/ML; A1 produced ~14 src lines (verification phase, under 100-line ceiling) |
+| 2026-09-13 | Program net-LOC (AI plan) | +318 src / +490 test — all traced to capabilities #1/#2/#3 (alignment, not addition) |
 | — | Program net-LOC | 0 (baseline: src 3,666 py + 1,663 template; 233 tests) |
+
+
+## AI Integration Plan — Phase Entries (adhd format)
+
+**AI phase A1 of 5 done** — provider→key→models pipeline survives restarts; keys can no longer echo through a model reply (scrub wired into routes_chat with provider key + Keys-tab values). 11 new tests. Verify: `pytest tests/test_ai_integration.py`. Next: A2 fan-out.
+
+Key path table (A1.2.1 — each hop has a test in TestKeySecurityAudit):
+
+| Hop | Path | Guard | Test |
+|---|---|---|---|
+| 1 | .env / env var → LLMClient._headers | direct key wins, env resolved at call time | test_hop1_resolver_env_to_header |
+| 2 | provider save → API response | public_state() masks (last-4) | test_hop2_provider_response_masked |
+| 3 | Keys tab → /api/keys listing | _mask() last-4 | test_hop3_keys_listing_masked |
+| 4 | tool params → /api/logs | _sanitize() key-name heuristic → *** | test_hop4_logs_sanitize_key_params |
+| 5 | model output → browser | citations/scrubber.scrub on final text | test_hop5_model_output_scrubbed (+ Keys-tab variant) |
+
+**AI phase A2 of 5 done** — one research question fans out into 3–5 queries, runs them in parallel, dedupes into one SourceRegistry-backed pool, synthesizes with §5 citation rules. Fan-out works end-to-end on mocks (17 tests, ~0.1 s). Verify: `pytest tests/test_research.py`. Next: A3 citations on the live path.
+
+**AI phase A3 of 5 done** — workflow output is citation-enforced by the existing citations/ pipeline: orphan [n] removed, fabricated URLs stripped, anchors clickable, Sources deduped, keys scrubbed. Citation metadata contract (id→url/title) FROZEN and documented in docs/ai-integration.md §4 for U2.3/U3.1. Verify: `pytest tests/test_research.py::TestCitationIntegration`. Next: A4 ingestion.
+
+**AI phase A4 of 5 done** — strip_html now drops nav/footer/banner/form noise (root-cause fix in the shared extractor); workflow ingests top-3 sources as clean text with per-source caps; over-budget pools compress via side-channel summaries with citations intact; MCP built-ins and registry custom tools dispatch through one path. Verify: `pytest tests/test_research.py::TestIngestionQuality`. Next: A5 validation.
+
+**AI phase A5 of 5 done** — R1 (≥3 verified sources, zero fabricated URLs, zero leaked keys) PASS; R2 (all backends down → §8 answer in <5 s, no hang) PASS; all 15 plan.md §10 scenarios re-run PASS; decompose parses Mistral/Llama-3/Qwen/Phi output styles (4 fixtures + ReAct fallback). pytest 282 green, ruff clean on all touched files. **AI plan complete: capability #1 ✅ #2 ✅ #3 ✅ — #4 tracked in UI plan U2.** Next: E1 baseline audit (engine plan).
+
+### Research Acceptance Log (A5.1)
+
+| # | Scenario | Backend | Result | Notes |
+|---|---|---|---|---|
+| R1 | Full research fan-out | mock | PASS | 3 sources, fabricated URL stripped, key scrubbed |
+| R2 | All search endpoints down | mock | PASS | Degraded §8 answer, <5 s, no crash/hang |
+| S1–S15 | plan.md §10 regression | mock | 17/17 PASS | test_acceptance.py incl. new R1/R2 |

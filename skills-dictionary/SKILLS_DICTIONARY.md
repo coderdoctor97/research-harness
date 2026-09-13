@@ -25,6 +25,7 @@ Usage log (newest first):
 
 | Date | Skills | Action |
 |------|--------|--------|
+| 2026-09-13 | ponytail (ladder + review + debt) · i-have-adhd | **AI Integration plan A1–A5 executed under the efficiency layer.** Ladder rungs recorded per phase (A1: verify-only; A2/A3/A4: rung 2 — reused SourceRegistry, citations/pipeline, built-in fetcher, summarize pattern; zero new deps). 1 `ponytail:` debt marker (research.py run_tool → E2 core, trigger E2.3). ponytail-review at every gate; adhd-format entries in PROGRESS.md. Net: +318 src for 3 capabilities. |
 | 2026-09-13 | ponytail · i-have-adhd | Vendored as the **mandatory efficiency layer** for the `plans/` improvement program (agent.md §1): ponytail governs implementation (ladder, minimal diffs, `ponytail:` debt tags, audit/review/debt at gates); i-have-adhd governs reporting (action-first, numbered, state-restating). Roadmap item #1 now installed. |
 | 2026-09-12 | hallmark · impeccable · frontend-design | Full console redesign + AI-provider flow + MCP service cards |
 

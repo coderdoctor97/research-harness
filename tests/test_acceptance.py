@@ -1,20 +1,19 @@
 # P10.T8 — 15-scenario acceptance run (plan.md §10)
 from __future__ import annotations
 
-import pytest
 import time
-from harness.llm.client import LLMClient, LLMConnectionError, LLMResponseError
-from harness.registry.tool import ToolResult
-from harness.registry.index import ToolRegistry
-from harness.loop.recovery import correction_prompt, duplicate_guard_key
+
+import pytest
+
 from harness.citations.scrubber import scrub
-from harness.memory.dedup import DedupCache, params_hash
-from harness.tools.builtin.compute import ComputeTool
+from harness.llm.client import LLMClient, LLMConnectionError, LLMResponseError
+from harness.loop.recovery import correction_prompt, duplicate_guard_key
+from harness.memory.dedup import DedupCache
+from harness.registry.tool import ToolResult
 from harness.tools.builtin.academic_search import AcademicSearchTool
-from harness.tools.builtin.news_search import NewsSearchTool
+from harness.tools.builtin.compute import ComputeTool
 from harness.tools.builtin.extract_links import ExtractLinksTool
 from harness.ui.app import create_application
-from fastapi.testclient import TestClient
 
 
 # S1 — Connection refused → LLMConnectionError
@@ -27,6 +26,7 @@ def test_s1_connection_refused():
 # S2 — HTTP 429 → LLMResponseError
 def test_s2_rate_limit():
     from unittest.mock import MagicMock
+
     import httpx
     c = LLMClient.__new__(LLMClient)
     c.base_url = "http://test"
@@ -45,6 +45,7 @@ def test_s2_rate_limit():
 # S3 — HTTP 500 → LLMResponseError
 def test_s3_server_error():
     from unittest.mock import MagicMock
+
     import httpx
     c = LLMClient.__new__(LLMClient)
     c.base_url = "http://test"
@@ -165,3 +166,63 @@ def test_s15_package_importable():
     assert harness.__version__ == "0.1.0"
     from harness.tools.builtin.compute import ComputeTool
     assert ComputeTool().name == "compute"
+
+
+# ---------------------------------------------------------------------------
+# A5.1 — Research acceptance scenarios (plans/ai-integration-plan.md)
+# ---------------------------------------------------------------------------
+
+# R1 — full question → fan-out (mock backends) → synthesized answer with
+# ≥3 distinct verified sources, zero fabricated URLs, zero leaked keys.
+def test_r1_research_workflow_end_to_end():
+    import asyncio
+    import json as _json
+
+    from harness.research import run_research
+
+    secret = "sk-r1-secret-key-000999888777"
+
+    def llm(prompt: str) -> str:
+        if "research planner" in prompt:
+            return _json.dumps({"queries": ["q-a", "q-b", "q-c"]})
+        return (
+            f"Finding one [1]. Finding two [2]. Finding three [3]. "
+            f"Fabricated: https://fake.example/nope — and key {secret}.\n\n"
+            "## Sources\n[1] A — https://src/a\n[2] B — https://src/b\n[3] C — https://src/c"
+        )
+
+    async def run_tool(name, args):
+        if name == "fetch_url":
+            return {"ok": True, "content": f"clean text for {args['url']}"}
+        return {"ok": True, "results": [
+            {"title": f"S {args['query']}", "url": f"https://src/{args['query'][-1]}",
+             "snippet": "snip"}]}
+
+    out = asyncio.run(run_research("R1 question?", llm, run_tool, key_set={secret}))
+    assert out["degraded"] is False
+    assert len(out["sources"]) >= 3                      # ≥3 distinct verified sources
+    assert "https://fake.example/nope" not in out["answer"]  # zero fabricated URLs
+    assert secret not in out["answer"]                   # zero leaked keys
+    assert set(out["citations"]) == {s["id"] for s in out["sources"]}
+
+
+# R2 — degraded mode: all search endpoints fail → graceful §8-style answer,
+# no crash, no hanging loop.
+def test_r2_degraded_all_backends_down():
+    import asyncio
+    import json as _json
+
+    from harness.research import run_research
+
+    def llm(prompt: str) -> str:
+        return _json.dumps({"queries": ["a", "b"]})
+
+    async def run_tool(name, args):
+        raise ConnectionError("endpoint completely unavailable")
+
+    started = time.time()
+    out = asyncio.run(run_research("R2 question?", llm, run_tool, per_call_timeout=2))
+    assert time.time() - started < 5          # no hanging loop
+    assert out["degraded"] is True
+    assert "could not retrieve" in out["answer"].lower()  # honest §8-style wording
+    assert out["sources"] == [] and out["citations"] == {}

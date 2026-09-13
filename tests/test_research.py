@@ -4,6 +4,7 @@ from __future__ import annotations
 import asyncio
 import json
 import re
+import typing
 
 import pytest
 
@@ -411,3 +412,36 @@ class TestUniformToolSurface:
 
         out = asyncio.run(compress_pool(pool, llm, budget_chars=1000))
         assert out[0]["content"] == "tiny"
+
+
+# ---------------------------------------------------------------------------
+# A5.2 — Prompt robustness across model profiles (Mistral/Llama-3/Qwen/Phi)
+# ---------------------------------------------------------------------------
+
+class TestProfileRobustness:
+    """Per-profile mock fixtures: each model family emits JSON differently;
+    decompose must parse all of them (ReAct-era weak parsers included)."""
+
+    FIXTURES: typing.ClassVar[dict] = {
+        "mistral": '{"queries": ["m1", "m2", "m3"]}',                     # clean JSON
+        "llama3": 'Here you go:\n```json\n{"queries": ["l1", "l2"]}\n```',  # fenced
+        "qwen": '<tool_call>\n{"queries": ["w1", "w2"]}\n</tool_call>',  # tag-wrapped
+        "phi": 'Sure! The queries are: {"queries": ["p1"]} Hope that helps!',  # chatty prose
+    }
+
+    EXPECTED: typing.ClassVar[dict] = {
+        "mistral": ["m1", "m2", "m3"],
+        "llama3": ["l1", "l2"],
+        "qwen": ["w1", "w2"],
+        "phi": ["p1"],
+    }
+
+    @pytest.mark.parametrize("profile", ["mistral", "llama3", "qwen", "phi"])
+    def test_decompose_parses_profile_output(self, profile):
+        llm = lambda p: self.FIXTURES[profile]
+        assert decompose("q", llm) == self.EXPECTED[profile]
+
+    def test_react_style_refusal_falls_back(self):
+        # Weakest case: model answers in ReAct prose with no JSON at all.
+        llm = lambda p: "Thought: I should search.\nAction: web_search\nAction Input: q"
+        assert decompose("original q", llm) == ["original q"]
