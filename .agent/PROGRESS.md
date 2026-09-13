@@ -170,7 +170,7 @@
 | AI | A3 Citation Pipeline Integration | TODO | 0/6 | — | — | Capability #3; needs A2 |
 | AI | A4 Ingestion & Tool Surface | TODO | 0/6 | — | — | Capability #2; parallel with A3 |
 | AI | A5 Research Validation & Tuning | TODO | 0/6 | — | — | Scenarios R1/R2 + §10 regression |
-| UI | U1 Skill-Driven Baseline & Audit | IN_PROGRESS | 4/6 | 0 (read-only) | — | U1.1+U1.2 done (audit baseline 0C/6M/11m + 29/40). Next: U1.3 rank & freeze |
+| UI | U1 Skill-Driven Baseline & Audit | DONE | 6/6 | 0 (read-only) | — | Closed 2026-09-13: DESIGN.md + 0C/6M/11m + 29/40 + frozen scope (18/18 homed, 4 rejections) |
 | UI | U2 Reactive Text Inspection | TODO | 0/11 | — | — | Capability #4; U2.3 needs A2/A3 |
 | UI | U3 Research Output Rendering | TODO | 0/7 | — | — | Needs A3.2.1 + E3.2.2 contracts |
 | UI | U4 Console Polish & Consistency | TODO | 0/7 | — | — | Punch-list execution |
@@ -191,11 +191,14 @@
 | 2026-09-13 | Efficiency skills vendored | `ponytail` (+audit/debt/review) & `i-have-adhd` installed to `.claude/skills/` |
 | 2026-09-13 | U1.1 skill pass (impeccable document · scan mode) | `DESIGN.md` (20 OKLCH tokens, 5 type roles, 9 components) + `.impeccable/design.json` sidecar; 0 `ponytail:` markers (no code) |
 | 2026-09-13 | U1.2 skill pass (hallmark audit · impeccable critique) | Baseline: 0 critical / 6 major / 11 minor (58 gates) + critique 29/40; contrast computed for 24 pairs (10 fail); 0 `ponytail:` markers (no code) |
+| 2026-09-13 | U1.3 scope freeze (ponytail ladder · no-new-features rule) | 18/18 findings homed (U4.1.3 ×7, U4.2.1 ×3, U4.2.2 ×8); rank-1 and rank-2 both empty (verified, not assumed); 4 out-of-scope requests rejected; 0 `ponytail:` markers (no code) |
 | — | ponytail-audit (E1.1.1) | pending |
 | — | ponytail-debt harvests | pending — 0 markers, 0 no-trigger |
 | — | Program net-LOC | 0 (baseline: src 3,666 py + 1,663 template; 233 tests) |
 
 ## Execution Log (adhd-format, newest first)
+
+- **2026-09-13 — U1 sub-phase 1.3 of 3 done (2/2 tasks) → PHASE U1 DONE (6/6).** Punch list frozen: rank-1 (capability blockers) and rank-2 (BF violations) both verified empty — rank 3 ordered a11y-floor → structural/mobile/error-prevention → visual coherence, 18/18 items homed (U4.2.2 ×8, U4.2.1 ×3, U4.1.3 ×7), 4 out-of-scope requests explicitly rejected (docs link, ⌘K, session search, batch ops). Win: U4's three sub-phases now have a complete, ranked work queue and U4.1.1/U4.1.2 are declared verification-only passes. Next: **E1 — Engine baseline audit & debt map** (~2–3 h, read-only, parallel-safe; unblocks E2 → A2 → A3 → U2.3), or say "U2.1" to stay on the UI thread (pattern study + design, backend-independent).
 
 - **2026-09-13 — U1 sub-phase 1.2 of 3 done (2/2 tasks; U1 total 4/6).** Dual scored audit complete, read-only, zero edits. **Hallmark audit: 0 critical · 6 major · 11 minor** (58 gates, v1.1.0). **Impeccable critique: 29/40 (Good, 72.5%)** — degraded single-context run (no sub-agent tools / no engine binary / no browser in harness; static review). Headline findings: (1) `--ink-3` tertiary-text tier fails WCAG AA 3.71–4.17:1 everywhere it's used, (2) focus ring 2.90:1 < 3:1 + transitioning ring + no `:focus-visible` matrix, (3) 38 off-token color values on a DESIGN.md-managed project, (4) no `overflow-x: clip` + `.key-row` 320px risk, (5) destructive actions without confirm/undo, (6) 4 celebratory toasts on visible effects. Full punch list with home-task mapping below. Win: U1.3 now ranks a scored list; U5.1 re-scores against this baseline. Next: **U1.3 — prioritize & freeze the punch list** (~30 min).
 
@@ -254,7 +257,7 @@
 **Cognitive load:** low-moderate — one near-fail (MCP view stacks 4 sections + advanced = 5 blocks).
 **Contrast computation:** 24 pairs measured (OKLCH→sRGB→WCAG): 14 pass, 10 fail (all listed in H-M1/M2/M6/m7 above).
 
-### Provisional home mapping (frozen by U1.3.2)
+### Provisional home mapping (SUPERSEDED — frozen by U1.3 Frozen Scope below, 2026-09-13)
 
 | Item(s) | Home task |
 |---------|-----------|
@@ -264,3 +267,58 @@
 | H-m3 | U4.1.1 (rank-3 polish item) |
 | P1 confirm/undo (critique) | U4.1.1 — needs U1.3 rank-1/2 decision (touches 4 JS handlers; not a BF rule but an error-prevention gap) |
 | P2 docs link (critique #10) | U4.1.1 or reject as out-of-plan scope (no new features) |
+
+---
+
+## U1.3 Frozen Scope (2026-09-13 — U1.3.1 ranked list + U1.3.2 home mapping, FROZEN)
+
+Ranking rule (plan): (1) vision-capability blockers → (2) BF-rule violations → (3) polish.
+BF-rule verification for rank 2 (ran against `bugfix.json` rules_for_agents): **BF-001** 0 literal `{{` in template · **BF-006** no base-`opacity:0`+missing-fill-mode pair exists (3 finite animations lack `both` — view-in L200, typing-indicator L349, toast-in L451 — all have visible base states, so no snap-to-invisible; U4.1.2 sweep normalizes them as hardening) · **BF-010** 4 localStorage persistence paths present. **No BF-rule violations found.**
+
+### Rank 1 — vision-capability blockers: **NONE from the audit**
+
+The capability work itself (citation rendering = U3, reactive inspection = U2) lives in the plan's phases, not in audit findings — no U1.2 finding blocks U2/U3 implementation. Two inputs travel with it: U2.2.3 (popover keyboard-reachable) must reuse the H-M3 focus convention when built; U3.1.1 anchors must not reintroduce H-M5-style off-token colors.
+
+### Rank 2 — BF-rule violations: **NONE found** (sweep above)
+
+U4.1.2 still runs its verification sweep (acceptance: "zero violations" confirmed, 3 fill-mode normalizations applied).
+
+### Rank 3 — polish, internal order: **a11y floor → structural/mobile/error-prevention safety → visual coherence**
+
+Rationale for the a11y floor first: ponytail's "never lazy about accessibility basics" + U4.2.2 is the plan's designated a11y home. WCAG AA text failures are a floor, not taste.
+
+| Order | Item | One-line defect | Home task (FROZEN) |
+|-------|------|-----------------|--------------------|
+| 3a.1 | H-M1 | `--ink-3` labels 3.71–4.17:1 < 4.5:1 (one token: L 0.55→0.60) | **U4.2.2** |
+| 3a.2 | H-M2 | focus ring 2.90:1 < 3:1 (one token: alpha 0.30→0.40) | **U4.2.2** |
+| 3a.3 | H-M3 | no `:focus-visible` matrix; ring transitions in; inputs lack hover/disabled (~5 rules) | **U4.2.2** |
+| 3a.4 | H-m4 | reduced-motion misses: typing bounce, LED pulse, spinner | **U4.2.2** |
+| 3a.5 | H-m5 | 9+ decorative SVGs lack `aria-hidden` | **U4.2.2** |
+| 3a.6 | H-m6 | badge contrast: ok 4.41 / err 3.64 / blue 4.32 | **U4.2.2** |
+| 3a.7 | H-m7 | hairline `--line` 1.48:1 (tone shift mitigates) — raise or ponytail-tag | **U4.2.2** |
+| 3b.1 | H-M4 | no `overflow-x: clip`; `.key-row` 320px risk | **U4.2.1** |
+| 3b.2 | H-m8 | input 41px vs button 39px, no shared height | **U4.2.1** |
+| 3b.3 | H-m9 | `.chat-bar` missing `align-items:center` | **U4.2.1** |
+| 3b.4 | P1 (critique) | destructive actions w/o confirm/undo: session del, endpoint del, MCP del, config import (4 JS handlers) | **U4.2.2** (harden: errors/edge cases) |
+| 3c.1 | H-M5 | 38 off-token color values — lift to `:root` tokens | **U4.1.3** |
+| 3c.2 | H-M6 | missing `/* Hallmark · system: DESIGN.md … */` stamp | **U4.1.3** |
+| 3c.3 | H-m1 | `transition:all` (L457) | **U4.1.3** |
+| 3c.4 | H-m2 | sidebar animates `width` — decision: ponytail-tag exception (transform rail distorts icons) | **U4.1.3** |
+| 3c.5 | H-m3 | 4 celebratory toasts on visible effects → silent success (/impeccable clarify) | **U4.1.3** |
+| 3c.6 | H-m10 | no named spacing scale (8.5/11/13/15px paddings) — optional 8pt rationalization | **U4.1.3** |
+| 3c.7 | H-m11 | 3rd background glow · dingbat icons → SVG · nested cards | **U4.1.3** |
+
+**Coverage check (U1.3.2 acceptance — every item has a home):** 18/18 items homed (17 punch-list + 1 P1 confirm/undo). U4.1.1 (rank-1 execution) and U4.1.2 (rank-2 sweep) receive **no findings** — U4.1.1 becomes a no-op pass; U4.1.2 runs as verification only. Consequence noted, not a defect: the audit found no capability blockers and no BF violations.
+
+### Explicit rejections (out-of-plan-scope — hard constraint #1, one line each)
+
+| Rejected request (from U1.2 critique) | Reason |
+|---|---|
+| In-console docs/help link (heuristic 10) | New affordance; no plan task names it. Contextual hints + empty states cover the in-scope need. |
+| ⌘K / keyboard-shortcut set (heuristic 7, Alex) | New feature — no plan task. |
+| Session search (Alex persona) | New feature — no plan task. |
+| Bulk/batch delete or actions (Alex persona) | New feature — no plan task. |
+
+### U1 exit check
+
+DESIGN.md exists ✓ · both audits scored ✓ (0C/6M/11m + 29/40) · punch list prioritized and frozen ✓ (this section) · no edits made in U1 ✓ (docs only). **U1 = DONE.**
