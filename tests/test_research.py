@@ -285,3 +285,129 @@ class TestCitationIntegration:
         out = asyncio.run(run_research("q?", llm, down))
         assert out["citations"] == {}
         assert out["report"]["warnings"] == []
+
+
+# ---------------------------------------------------------------------------
+# A4 — Live ingestion & tool surface in the workflow (capability #2)
+# ---------------------------------------------------------------------------
+
+from harness.research import compress_pool, ingest
+
+
+class TestIngestionQuality:
+    NOISY_HTML = """
+    <html><head><title>Paper</title><style>.x{}</style></head><body>
+    <nav><a href="/home">Home</a><a href="/about">About</a></nav>
+    <header><div class="banner">SUBSCRIBE TO OUR NEWSLETTER!</div></header>
+    <main><h1>Quantum Advances</h1><p>Real content about qubits.</p>
+    <a href="https://cited.org/ref1">Reference One</a></main>
+    <form><input name="email"></form>
+    <footer>© 2026 Noise Corp · <a href="/privacy">Privacy</a></footer>
+    <script>track()</script></body></html>
+    """
+
+    def test_noise_stripped_content_kept(self):
+        # A4.1.1 — Crawl4AI checklist: nav/banner/footer/form gone, content + fidelity kept.
+        from harness.mcp.builtin import strip_html
+        text = strip_html(self.NOISY_HTML)
+        assert "Real content about qubits" in text
+        assert "Quantum Advances" in text
+        assert "Reference One" in text          # in-content links preserved
+        assert "SUBSCRIBE" not in text          # header banner
+        assert "Home" not in text               # nav
+        assert "Noise Corp" not in text         # footer
+        assert "track()" not in text            # script
+
+    def test_link_harvesting_intact(self):
+        # extract_links still harvests raw links (uses raw HTML, not strip_html).
+        from harness.mcp.builtin import _HREF_RE
+        hrefs = [h for h, _ in _HREF_RE.findall(self.NOISY_HTML)]
+        assert "https://cited.org/ref1" in hrefs
+
+    def test_ingest_fetches_top_sources_with_cap(self):
+        # A4.1.2 — oversized page → truncated with marker.
+        pool = [{"id": 1, "title": "t", "url": "https://big/1", "snippet": ""}]
+
+        async def run_tool(name, args):
+            assert name == "fetch_url"
+            assert args["max_chars"] == 100
+            return {"ok": True, "content": "x" * 100, "truncated": True}
+
+        out = asyncio.run(ingest(pool, run_tool, top_n=1, per_source_chars=100))
+        assert out[0]["content"].endswith("…[truncated]")
+        assert len(out[0]["content"]) <= 100 + len(" …[truncated]")
+
+    def test_ingest_failure_keeps_snippet(self):
+        pool = [{"id": 1, "title": "t", "url": "https://down/1", "snippet": "the snippet"}]
+
+        async def run_tool(name, args):
+            raise ConnectionError("fetch failed")
+
+        out = asyncio.run(ingest(pool, run_tool))
+        assert "content" not in out[0]
+        assert out[0]["snippet"] == "the snippet"
+
+
+class TestUniformToolSurface:
+    def test_fanout_dispatches_builtin_mcp_tools(self):
+        # A4.2.1 — the same run_tool signature reaches MCP built-ins…
+        from harness.mcp.builtin import BUILTIN_SERVERS
+
+        async def run_tool(name, arguments):
+            for server in BUILTIN_SERVERS.values():
+                if name in {t["name"] for t in server.list_tools()}:
+                    return {"ok": True, "results": [
+                        {"title": "via-builtin", "url": "https://b/1", "snippet": ""}]}
+            return {"ok": False, "error": f"unknown tool: {name}"}
+
+        successes, _failures = asyncio.run(fan_out(["q"], run_tool))
+        assert successes[0]["results"][0]["title"] == "via-builtin"
+
+    def test_fanout_dispatches_registry_custom_tool(self):
+        # …and a custom-endpoint tool registered in the ToolRegistry.
+        from harness.registry.index import ToolRegistry
+        from harness.registry.tool import Tool, ToolResult
+
+        class MockCustom(Tool):
+            name = "web_search"
+            description = "custom endpoint search"
+            parameters = {"query": {"type": "string"}}  # noqa: RUF012 — matches Tool convention
+
+            def run(self, **params):
+                return ToolResult(ok=True, data={"results": [
+                    {"title": "via-registry", "url": "https://r/1", "snippet": ""}]})
+
+        registry = ToolRegistry()
+        registry.register(MockCustom())
+
+        async def run_tool(name, arguments):
+            result = registry.dispatch(name, **arguments)
+            return {"ok": result.ok, **(result.data or {})}
+
+        successes, _ = asyncio.run(fan_out(["q"], run_tool))
+        assert successes[0]["results"][0]["title"] == "via-registry"
+
+    def test_over_budget_pool_compressed_citations_resolve(self):
+        # A4.2.2 — summaries replace raw content; ids/urls untouched.
+        pool = [
+            {"id": 1, "title": "a", "url": "https://a/1", "snippet": "", "content": "long " * 200},
+            {"id": 2, "title": "b", "url": "https://b/1", "snippet": "", "content": "words " * 200},
+        ]
+
+        def llm(prompt):
+            assert "Summarize" in prompt
+            return "short summary"
+
+        out = asyncio.run(compress_pool(pool, llm, budget_chars=100))
+        assert all(s["content"] == "short summary" for s in out)
+        assert [s["id"] for s in out] == [1, 2]
+        assert [s["url"] for s in out] == ["https://a/1", "https://b/1"]
+
+    def test_under_budget_pool_untouched(self):
+        pool = [{"id": 1, "title": "a", "url": "https://a/1", "content": "tiny"}]
+
+        def llm(prompt):
+            raise AssertionError("must not be called")
+
+        out = asyncio.run(compress_pool(pool, llm, budget_chars=1000))
+        assert out[0]["content"] == "tiny"

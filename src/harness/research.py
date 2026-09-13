@@ -156,6 +156,61 @@ def _source_block(pool: list[dict]) -> str:
     return "\n".join(lines)
 
 
+async def ingest(
+    pool: list[dict],
+    run_tool: RunTool,
+    *,
+    top_n: int = 3,
+    per_source_chars: int = 4000,
+) -> list[dict]:
+    """Capability #2 inside the workflow (A4.1): fetch the top sources as
+    clean markdown-ish text via the existing `fetch_url` built-in, with a
+    per-source cap so one huge page can't blow the synthesis budget (A4.1.2).
+
+    Fetch failures are non-fatal — the source keeps its snippet.
+    """
+    async def _one(src: dict) -> None:
+        try:
+            result = await run_tool("fetch_url", {"url": src["url"],
+                                                  "max_chars": per_source_chars})
+        except Exception:  # noqa: BLE001 — ingestion is best-effort per source
+            return
+        if isinstance(result, dict) and result.get("ok") and result.get("content"):
+            content = str(result["content"])[:per_source_chars]
+            if result.get("truncated") or len(content) == per_source_chars:
+                content += " …[truncated]"
+            src["content"] = content
+
+    await asyncio.gather(*(_one(s) for s in pool[:top_n]))
+    return pool
+
+
+async def compress_pool(
+    pool: list[dict],
+    llm_chat: LlmChat,
+    budget_chars: int,
+) -> list[dict]:
+    """A4.2.2: when the pool exceeds the budget, replace raw content with
+    side-channel LLM summaries (summarize_page pattern) — citations still
+    resolve because ids/urls are untouched."""
+    total = sum(len(s.get("content", "")) for s in pool)
+    if total <= budget_chars:
+        return pool
+
+    async def _summarize(src: dict) -> None:
+        prompt = (
+            "Summarize the following content in under 150 words, keeping "
+            f"facts and figures:\n\n{src['content']}"
+        )
+        try:
+            src["content"] = (await asyncio.to_thread(llm_chat, prompt)).strip()
+        except Exception:  # noqa: BLE001 — keep truncated raw content on failure
+            src["content"] = src["content"][: budget_chars // max(1, len(pool))]
+
+    await asyncio.gather(*(_summarize(s) for s in pool if s.get("content")))
+    return pool
+
+
 async def run_research(
     question: str,
     llm_chat: LlmChat,
@@ -167,6 +222,9 @@ async def run_research(
     per_call_timeout: float = 30.0,
     key_set: set[str] | None = None,
     max_sources: int = 10,
+    ingest_top_n: int = 3,
+    per_source_chars: int = 4000,
+    pool_budget_chars: int = 24000,
 ) -> dict:
     """The one workflow entry (A2.3.2): question → decompose → fan-out →
     aggregate → synthesize → citation pipeline (A3).
@@ -198,6 +256,13 @@ async def run_research(
             "failures": failures,
             "degraded": True,
         }
+
+    # A4: live ingestion of the top sources (clean text, capped per source),
+    # then budget-driven compression if the pool is still too large.
+    if ingest_top_n > 0:
+        pool = await ingest(pool, run_tool, top_n=ingest_top_n,
+                            per_source_chars=per_source_chars)
+        pool = await compress_pool(pool, llm_chat, pool_budget_chars)
 
     prompt = _SYNTHESIS_PROMPT.format(sources=_source_block(pool), question=question)
     answer = await asyncio.to_thread(llm_chat, prompt)
