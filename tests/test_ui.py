@@ -40,7 +40,7 @@ def test_keys_set_and_masked(client):
 
 
 def test_chat_endpoint(client):
-    from unittest.mock import patch, MagicMock
+    from unittest.mock import MagicMock, patch
     mock_client = MagicMock()
     mock_client.model_name = "mock-model"
     mock_client.chat.return_value = "Echo: hello"
@@ -51,7 +51,8 @@ def test_chat_endpoint(client):
 
 
 def test_tool_call_extraction_wrapped_in_xml_tags():
-    from harness.ui.routes_chat import _extract_tool_calls, _clean_final_text
+    from harness.loop.parser import clean_final_text as _clean_final_text
+    from harness.loop.parser import extract_tool_calls as _extract_tool_calls
     raw = (
         "<tool_call>\n"
         '{"tool_calls": [{"name": "fetch_url", "arguments": '
@@ -68,7 +69,7 @@ def test_tool_call_extraction_wrapped_in_xml_tags():
 
 
 def test_tool_call_extraction_shorthand_tag():
-    from harness.ui.routes_chat import _extract_tool_calls
+    from harness.loop.parser import extract_tool_calls as _extract_tool_calls
     raw = '<tool_call>{"name": "web_search", "arguments": {"query": "x"}}</tool_call>'
     calls = _extract_tool_calls(raw)
     assert len(calls) == 1
@@ -77,7 +78,7 @@ def test_tool_call_extraction_shorthand_tag():
 
 
 def test_clean_final_text_strips_payload_and_tags():
-    from harness.ui.routes_chat import _clean_final_text
+    from harness.loop.parser import clean_final_text as _clean_final_text
     raw = (
         "Here is some prose.\n"
         '<tool_call>{"tool_calls": [{"name": "web_search", "arguments": {"query": "x"}}]}</tool_call>\n'
@@ -90,11 +91,12 @@ def test_clean_final_text_strips_payload_and_tags():
 
 
 def test_clean_final_text_strips_bare_json():
-    from harness.ui.routes_chat import _clean_final_text
+    from harness.loop.parser import clean_final_text as _clean_final_text
     raw = '{"tool_calls": [{"name": "web_search", "arguments": {"query": "x"}}]}'
     assert _clean_final_text(raw) == ""
 
 
+<<<<<<< HEAD
 def test_fit_context_no_window_returns_unchanged():
     from harness.ui.routes_chat import _fit_context
     lines = ["[system] prompt", "[user] question", "[tool:x] result"]
@@ -202,6 +204,8 @@ def test_inspect_does_not_pollute_sessions(client):
     assert len(cs.list_sessions()) == before  # ephemeral loupe, not conversation history
 
 
+=======
+>>>>>>> master
 def test_logs_endpoint(client):
     r = client.get("/api/logs")
     assert r.status_code == 200

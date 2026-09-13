@@ -1,16 +1,13 @@
 # Tests for MCP client, browser, search, and registry modules
 from __future__ import annotations
 
-import asyncio
-import json
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
 from harness.mcp.client import MCPClient, MCPConnectionError
-from harness.mcp.registry import MCPToolRegistry, MCPToolDefinition
+from harness.mcp.registry import MCPToolDefinition, MCPToolRegistry
 from harness.ui._mcp_state import _mcp_servers
-
 
 # ---- helpers ----
 
@@ -121,7 +118,7 @@ class TestMCPClient:
         mock_process.stdout = AsyncMock()
 
         async def fake_readline():
-            raise asyncio.TimeoutError()
+            raise TimeoutError()
 
         mock_process.stdout.readline = fake_readline
 
@@ -258,7 +255,7 @@ class TestMCPToolRegistry:
         mock_client = AsyncMock()
         mock_client.initialize.side_effect = Exception("init failed")
 
-        with patch("harness.mcp.registry.MCPClient", return_value=mock_client):
+        with patch("harness.mcp.registry.MCPClient", return_value=mock_client):  # noqa: SIM117
             with pytest.raises(MCPConnectionError, match="Init failed"):
                 await registry.connect_server("srv", "https://example.com", [])
 
@@ -266,7 +263,7 @@ class TestMCPToolRegistry:
     async def test_connect_browser(self):
         registry = MCPToolRegistry()
 
-        with patch("asyncio.create_subprocess_exec", side_effect=OSError("no npx")):
+        with patch("asyncio.create_subprocess_exec", side_effect=OSError("no npx")):  # noqa: SIM117
             with patch("harness.mcp.browser.MCPClient") as MockClient:
                 mock_client = AsyncMock()
                 mock_client.initialize.return_value = {}
@@ -284,7 +281,7 @@ class TestMCPToolRegistry:
     async def test_connect_search(self):
         registry = MCPToolRegistry()
 
-        with patch("asyncio.create_subprocess_exec", side_effect=OSError("no npx")):
+        with patch("asyncio.create_subprocess_exec", side_effect=OSError("no npx")):  # noqa: SIM117
             with patch("harness.mcp.search.MCPClient") as MockClient:
                 mock_client = AsyncMock()
                 mock_client.initialize.return_value = {}

@@ -1,11 +1,10 @@
 # Tests for LLM client — chat, streaming, and list_models
 from __future__ import annotations
 
-import json
 from unittest.mock import MagicMock, patch
 
-import pytest
 import httpx
+import pytest
 
 from harness.llm.client import LLMClient, LLMConnectionError, LLMResponseError
 
@@ -159,12 +158,11 @@ class TestLLMClient:
         client.timeout = 30.0
         client.client = MagicMock()
 
-        sse_lines = "\n".join([
-            'data: {"choices":[{"delta":{"content":"Hello"}}]}',
-            'data: {"choices":[{"delta":{"content":" world"}}]}',
-            "data: [DONE]",
-            "",
-        ])
+        sse_lines = (
+            'data: {"choices":[{"delta":{"content":"Hello"}}]}\n'
+            'data: {"choices":[{"delta":{"content":" world"}}]}\n'
+            "data: [DONE]\n"
+        )
         mock_resp = _make_response(text=sse_lines)
         client.client.post.return_value = mock_resp
 

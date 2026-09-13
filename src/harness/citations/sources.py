@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import re
+
 from harness.citations.registry import SourceRegistry
 
 _CITE_RE = re.compile(r"\[(\d+)\]")

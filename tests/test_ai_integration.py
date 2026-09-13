@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import json
+from typing import ClassVar
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
@@ -11,6 +12,8 @@ from fastapi.testclient import TestClient
 
 from harness.llm.client import LLMClient, LLMConnectionError
 from harness.mcp import builtin as mcp_builtin
+from harness.registry.index import ToolRegistry
+from harness.registry.tool import Tool, ToolResult
 from harness.ui._mcp_state import _mcp_servers, restore_defaults
 from harness.ui.app import create_application
 
@@ -316,6 +319,24 @@ class TestEndpointsAndKeys:
 # Chat tool loop over built-in services
 # ---------------------------------------------------------------------------
 
+class FakeSearchTool(Tool):
+    name = "web_search"
+    description = "Search web"
+    parameters: ClassVar[dict] = {"query": {"type": "string"}}
+
+    def __init__(self, results=None):
+        self._results = results or []
+
+    def run(self, **params):
+        return ToolResult(ok=True, data={"results": self._results})
+
+
+def _registry_with_fake_search(results=None):
+    registry = ToolRegistry()
+    registry.register(FakeSearchTool(results))
+    return registry
+
+
 class TestChatToolLoop:
     def test_chat_runs_tool_then_answers(self, client):
         tool_call_json = json.dumps({
@@ -325,11 +346,12 @@ class TestChatToolLoop:
         mock_llm.chat.side_effect = [tool_call_json, "The answer is 42. [1] https://example.com/paper"]
         mock_llm.model_name = "llama3"
 
-        async def fake_run_tool(name, arguments):
-            return {"ok": True, "results": [{"title": "Example Paper", "url": "https://example.com/paper", "snippet": "s"}]}
+        registry = _registry_with_fake_search([
+            {"title": "Example Paper", "url": "https://example.com/paper", "snippet": "s"}
+        ])
 
         with patch("harness.ui.routes_chat._get_client", return_value=mock_llm), \
-             patch("harness.ui.routes_chat._run_tool", side_effect=fake_run_tool):
+             patch("harness.ui.routes_chat.builtin_tool_registry", return_value=registry):
             r = client.post("/api/chat", json={"message": "find the answer"})
 
         assert r.status_code == 200
@@ -357,11 +379,8 @@ class TestChatToolLoop:
         mock_llm.chat.return_value = tool_call_json  # never stops asking for tools
         mock_llm.model_name = "llama3"
 
-        async def fake_run_tool(name, arguments):
-            return {"ok": True, "results": []}
-
         with patch("harness.ui.routes_chat._get_client", return_value=mock_llm), \
-             patch("harness.ui.routes_chat._run_tool", side_effect=fake_run_tool):
+             patch("harness.ui.routes_chat.builtin_tool_registry", return_value=_registry_with_fake_search()):
             r = client.post("/api/chat", json={"message": "loop forever"})
         assert r.status_code == 200
         # MAX_TOOL_ROUNDS tool rounds + one BF-014 "force final answer" call.
@@ -379,11 +398,8 @@ class TestChatToolLoop:
                                      tool_call_json, "Final answer at last."]
         mock_llm.model_name = "llama3"
 
-        async def fake_run_tool(name, arguments):
-            return {"ok": True, "results": []}
-
         with patch("harness.ui.routes_chat._get_client", return_value=mock_llm), \
-             patch("harness.ui.routes_chat._run_tool", side_effect=fake_run_tool):
+             patch("harness.ui.routes_chat.builtin_tool_registry", return_value=_registry_with_fake_search()):
             r = client.post("/api/chat", json={"message": "loop forever"})
         assert r.status_code == 200
         assert "Final answer at last." in r.json()["response"]

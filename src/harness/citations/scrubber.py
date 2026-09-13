@@ -1,8 +1,8 @@
 # P5.T6 — Key scrubber: exact-match resolved keys + §9 regex patterns, in-memory only
 from __future__ import annotations
 
-import re
 import logging
+import re
 
 log = logging.getLogger(__name__)
 

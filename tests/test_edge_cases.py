@@ -1,12 +1,14 @@
 # P10.T1 — Error-handling audit: every §8 row has a test
 from __future__ import annotations
 
-import pytest
-import httpx
 from unittest.mock import MagicMock
+
+import httpx
+import pytest
+
+from harness.citations.scrubber import scrub
 from harness.llm.client import LLMClient, LLMConnectionError, LLMResponseError
 from harness.loop.recovery import correction_prompt
-from harness.citations.scrubber import scrub
 
 
 # --- §8 connection errors ---

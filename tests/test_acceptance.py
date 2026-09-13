@@ -2,19 +2,16 @@
 from __future__ import annotations
 
 import pytest
-import time
-from harness.llm.client import LLMClient, LLMConnectionError, LLMResponseError
-from harness.registry.tool import ToolResult
-from harness.registry.index import ToolRegistry
-from harness.loop.recovery import correction_prompt, duplicate_guard_key
+
 from harness.citations.scrubber import scrub
-from harness.memory.dedup import DedupCache, params_hash
-from harness.tools.builtin.compute import ComputeTool
+from harness.llm.client import LLMClient, LLMConnectionError, LLMResponseError
+from harness.loop.recovery import correction_prompt, duplicate_guard_key
+from harness.memory.dedup import DedupCache
+from harness.registry.tool import ToolResult
 from harness.tools.builtin.academic_search import AcademicSearchTool
-from harness.tools.builtin.news_search import NewsSearchTool
+from harness.tools.builtin.compute import ComputeTool
 from harness.tools.builtin.extract_links import ExtractLinksTool
 from harness.ui.app import create_application
-from fastapi.testclient import TestClient
 
 
 # S1 — Connection refused → LLMConnectionError
@@ -27,6 +24,7 @@ def test_s1_connection_refused():
 # S2 — HTTP 429 → LLMResponseError
 def test_s2_rate_limit():
     from unittest.mock import MagicMock
+
     import httpx
     c = LLMClient.__new__(LLMClient)
     c.base_url = "http://test"
@@ -45,6 +43,7 @@ def test_s2_rate_limit():
 # S3 — HTTP 500 → LLMResponseError
 def test_s3_server_error():
     from unittest.mock import MagicMock
+
     import httpx
     c = LLMClient.__new__(LLMClient)
     c.base_url = "http://test"

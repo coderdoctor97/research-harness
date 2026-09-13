@@ -5,11 +5,10 @@ import re
 from typing import Any
 
 from harness.config.models import CustomEndpointDef
+from harness.config.resolver import resolve
+from harness.config.templates import render as render_template
 from harness.registry.executor import HttpExecutor
 from harness.registry.tool import Tool, ToolResult
-from harness.config.templates import render as render_template
-from harness.config.resolver import resolve
-
 
 _TMPL_RE = re.compile(r"\{\{([^}]+)\}\}")
 

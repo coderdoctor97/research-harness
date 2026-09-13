@@ -7,9 +7,9 @@ from unittest.mock import MagicMock, patch
 import pytest
 from fastapi.testclient import TestClient
 
-from harness.ui.app import create_application
-from harness.llm.client import LLMClient, LLMConnectionError, LLMResponseError
+from harness.llm.client import LLMConnectionError, LLMResponseError
 from harness.ui._mcp_state import _mcp_servers
+from harness.ui.app import create_application
 
 
 @pytest.fixture(autouse=True)

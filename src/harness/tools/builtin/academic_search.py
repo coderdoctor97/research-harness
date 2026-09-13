@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 import xml.etree.ElementTree as ET
-from typing import Any
+from typing import ClassVar
 
 from harness.registry.executor import HttpExecutor
 from harness.registry.tool import Tool, ToolResult
@@ -11,7 +11,7 @@ from harness.registry.tool import Tool, ToolResult
 class AcademicSearchTool(Tool):
     name = "academic_search"
     description = "Search arXiv for academic papers"
-    parameters = {"query": {"type": "string", "description": "Search query"}, "num_results": {"type": "integer", "description": "Max results", "default": 5}}
+    parameters: ClassVar[dict] = {"query": {"type": "string", "description": "Search query"}, "num_results": {"type": "integer", "description": "Max results", "default": 5}}
 
     def __init__(self) -> None:
         self._executor = HttpExecutor()
@@ -37,5 +37,5 @@ class AcademicSearchTool(Tool):
                 published = entry.findtext("atom:published", default="", namespaces=ns)
                 results.append({"title": title, "url": link, "authors": authors[:3], "abstract": abstract[:500], "published": published})
             return ToolResult(ok=True, data={"results": results, "query_used": query, "result_count": len(results)})
-        except Exception as exc:
+        except ET.ParseError as exc:
             return ToolResult(ok=False, error=f"Parse error: {exc}")

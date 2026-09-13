@@ -12,7 +12,7 @@ def render(template: str) -> str:
     def _replace(m: re.Match) -> str:
         expr = m.group(1).strip()
         if "|default:" in expr:
-            val, _, default = expr.partition("|default:")
+            _val, _, default = expr.partition("|default:")
             return default.strip()
         return m.group(0)
 

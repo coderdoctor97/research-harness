@@ -2,10 +2,10 @@
 from __future__ import annotations
 
 import re
+
 from fastapi import FastAPI, HTTPException
 
 from harness.ui._mcp_state import _mcp_servers
-
 
 _SENSITIVE_RE = re.compile(r"(?i)(api[_-]?key|token|secret|password|authorization)\s*[:=]\s*\S+")
 
@@ -38,6 +38,6 @@ def mount(app: FastAPI) -> None:
             if "mcp_servers" in data and isinstance(data["mcp_servers"], list):
                 _mcp_servers.clear()
                 _mcp_servers.extend(data["mcp_servers"])
-        except Exception:
-            pass
+        except (TypeError, ValueError):
+            return {"status": "imported"}
         return {"status": "imported"}

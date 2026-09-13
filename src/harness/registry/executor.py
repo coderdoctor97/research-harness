@@ -25,10 +25,10 @@ class HttpExecutor:
             return ToolResult(ok=False, error=f"HTTP {exc.response.status_code}")
         try:
             data = r.json()
-        except Exception:
+        except ValueError:
             try:
                 data = _parse_xml(r.text)
-            except Exception:
+            except ET.ParseError:
                 return ToolResult(ok=False, error="Empty or unparseable response body")
         return ToolResult(ok=True, data=data)
 
