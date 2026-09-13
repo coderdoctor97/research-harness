@@ -14,6 +14,7 @@ import time
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 
+from harness.citations.scrubber import scrub
 from harness.llm.client import LLMClient, LLMConnectionError, LLMResponseError
 from harness.mcp.builtin import BUILTIN_SERVERS
 from harness.ui import _chat_state
@@ -197,9 +198,7 @@ def _strip_tool_call_json(text: str) -> str:
             calls = data.get("tool_calls")
             if isinstance(calls, list) and any(
                 isinstance(c, dict) and c.get("name") for c in calls
-            ):
-                is_tool = True
-            elif data.get("name") and "arguments" in data:
+            ) or data.get("name") and "arguments" in data:
                 is_tool = True
         if is_tool:
             out = out[:idx] + out[end:]
@@ -254,6 +253,17 @@ def _fit_context(lines: list[str], context_window: int | None) -> list[str]:
             remaining -= len(line)
     kept.reverse()
     return head + kept
+
+
+def _known_key_set() -> set[str]:
+    """Every secret the harness knows: saved provider key + Keys-tab values (§9)."""
+    from harness.ui.routes_keys import _key_store
+
+    keys = {v for v in _key_store.values() if v}
+    api_key = get_state().get("api_key") or ""
+    if api_key:
+        keys.add(api_key)
+    return keys
 
 
 async def _run_tool(name: str, arguments: dict) -> dict:
@@ -361,6 +371,9 @@ def mount(app: FastAPI) -> None:
         _chat_state.append_message(session, {"role": "user", "content": msg.message, "ts": time.time()})
         used_model = msg.model or client.model_name
         final_text = _clean_final_text(response_text)
+        # §9 / A1.2.2: keys never reach the browser — scrub every model-facing
+        # output (also the hook-in point for A2/A3 workflow outputs).
+        final_text, _ = scrub(final_text, _known_key_set())
         if not final_text:
             # The model only ever emitted tool calls and never produced a clean
             # answer — surface a friendly note instead of raw markup/JSON.
